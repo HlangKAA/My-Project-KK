@@ -1,0 +1,82 @@
+:root {
+  --primary-bg: #0d1117;
+  --secondary-bg: #161b22;
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --primary-cyan: #22d3ee;
+  --accent-purple: #9333ea;
+  --dot-red: #ff5f56;
+  --dot-yellow: #ffbd2e;
+  --dot-green: #27c93f;
+  --text-main: #e6edf3;
+  --text-muted: #8b949e;
+  --font-main: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  --font-code: "Consolas", "Monaco", monospace;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--primary-bg);
+  color: var(--text-main);
+  font-family: var(--font-main);
+  overflow: hidden; /* App-like feel */
+}
+
+a {
+  color: var(--primary-cyan);
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* Utilities */
+.glass-panel {
+  background: rgba(22, 27, 34, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+}
+
+.btn-neon {
+  background: transparent;
+  border: 1px solid var(--primary-cyan);
+  color: var(--primary-cyan);
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.btn-neon:hover {
+  background: var(--primary-cyan);
+  color: #000;
+  box-shadow: 0 0 20px rgba(34, 211, 238, 0.5);
+}
+
+.title-neon {
+  font-family: "Russo One", sans-serif; /* Fallback if not loaded */
+  color: #fff;
+  text-shadow:
+    0 0 10px var(--primary-cyan),
+    0 0 20px var(--primary-cyan);
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+}
+
+/* Animations */
+@keyframes popIn {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

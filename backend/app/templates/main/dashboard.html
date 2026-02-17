@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - The Lost Spectrum</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      .dashboard-grid {
+        display: grid;
+        gap: 20px;
+        max-width: 900px;
+        width: 100%;
+      }
+
+      .profile-section {
+        text-align: center;
+      }
+
+      .avatar-circle {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--bg-dark), var(--bg-darker));
+        border: 2px solid var(--primary-cyan);
+        margin: 0 auto 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: var(--neon-glow-cyan);
+      }
+
+      .avatar-circle i {
+        font-size: 3rem;
+        color: var(--primary-cyan);
+      }
+
+      .progress-container {
+        margin: 15px 0;
+        text-align: left;
+      }
+
+      .progress-label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.85rem;
+        margin-bottom: 5px;
+        color: var(--text-muted);
+      }
+
+      .progress-bar {
+        height: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 0.5s ease;
+      }
+
+      .fill-cyan {
+        background: var(--primary-cyan);
+        box-shadow: 0 0 10px var(--primary-cyan);
+      }
+
+      .fill-purple {
+        background: var(--accent-purple);
+        box-shadow: 0 0 10px var(--accent-purple);
+      }
+
+      .dashboard-buttons {
+        display: grid;
+        gap: 10px;
+      }
+
+      .btn-large {
+        font-size: 1.1rem;
+        padding: 1.2rem;
+        letter-spacing: 1px;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="glass-panel dashboard-grid">
+      <div class="profile-section">
+        <div class="avatar-circle">
+          <i class="fas fa-user-astronaut"></i>
+        </div>
+
+        <h1 style="font-size: 1.8rem; margin-bottom: 0.5rem">DASHBOARD</h1>
+        <p style="color: var(--text-muted)">Explorer: {{ username }}</p>
+
+        <div class="progress-container">
+          <div class="progress-label">
+            <span>Color Restored</span>
+            <span>15%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill fill-cyan" style="width: 15%"></div>
+          </div>
+        </div>
+
+        <div class="progress-container">
+          <div class="progress-label">
+            <span>Python Skills</span>
+            <span>Level 2</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill fill-purple" style="width: 40%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-buttons">
+        <a
+          href="{{ url_for('game.game_page') }}"
+          class="btn-neon btn-primary btn-large text-center"
+          style="text-decoration: none"
+        >
+          CONTINUE ADVENTURE
+        </a>
+
+        <div class="stats-grid">
+          <a
+            href="{{ url_for('game.level_select') }}"
+            class="btn-neon btn-secondary text-center"
+            style="text-decoration: none; margin-top: 0; font-size: 0.9rem"
+          >
+            LEVEL SELECT
+          </a>
+          <button
+            class="btn-neon btn-secondary"
+            style="margin-top: 0; font-size: 0.9rem"
+          >
+            ACHIEVEMENTS
+          </button>
+        </div>
+
+        <button class="btn-neon btn-secondary" style="margin-top: 0">
+          SETTINGS
+        </button>
+
+        <button
+          onclick="logout()"
+          class="btn-neon"
+          style="
+            border: 2px solid var(--accent-pink);
+            color: var(--accent-pink);
+            background: transparent;
+          "
+        >
+          LOGOUT
+        </button>
+      </div>
+    </div>
+
+    <script>
+      async function logout() {
+        try {
+          const response = await fetch("/api/logout", { method: "POST" });
+          const data = await response.json();
+          if (data.success)
+            window.location.href = "{{ url_for('auth.login_page') }}";
+        } catch (error) {
+          console.error("Logout error:", error);
+          window.location.href = "{{ url_for('auth.login_page') }}";
+        }
+      }
+    </script>
+  </body>
+</html>

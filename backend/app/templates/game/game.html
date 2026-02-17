@@ -1,0 +1,626 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ level_data['title'] }}</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <!-- Skulpt for Python Execution -->
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
+    <style>
+      body {
+        align-items: flex-start;
+        padding: 20px;
+        height: 100vh;
+        overflow: hidden;
+      }
+      .game-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        max-width: 1400px;
+        width: 100%;
+        height: calc(100vh - 40px);
+      }
+      .visual-panel {
+        background: rgba(10, 10, 15, 0.8);
+        border-radius: 20px;
+        border: 1px solid var(--glass-border);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+      .game-header {
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(0, 0, 0, 0.3);
+        border-bottom: 1px solid var(--glass-border);
+      }
+      .level-title {
+        font-family: "Russo One", sans-serif;
+        color: var(--primary-cyan);
+        font-size: 1.2rem;
+        text-transform: uppercase;
+      }
+      .code-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+      .ide-window {
+        flex-grow: 1;
+        background: #0d1117;
+        border-radius: 12px;
+        border: 1px solid var(--glass-border);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .ide-header {
+        background: #161b22;
+        padding: 8px 15px;
+        display: flex;
+        gap: 8px;
+        border-bottom: 1px solid #30363d;
+      }
+      .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+      }
+      .dot-red {
+        background: #ff5f56;
+      }
+      .dot-yellow {
+        background: #ffbd2e;
+      }
+      .dot-green {
+        background: #27c93f;
+      }
+      .code-area {
+        flex-grow: 1;
+        background: transparent;
+        color: #e6edf3;
+        font-family: "Consolas", "Monaco", monospace;
+        font-size: 14px;
+        line-height: 1.5;
+        padding: 15px;
+        border: none;
+        resize: none;
+        outline: none;
+      }
+      .console-output {
+        background: #0d1117;
+        border: 1px solid var(--glass-border);
+        border-radius: 8px;
+        padding: 10px;
+        font-family: monospace;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        height: 120px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+      }
+      .action-bar {
+        display: flex;
+        gap: 10px;
+      }
+
+      /* Game Specific Visuals */
+      #game-canvas {
+        flex-grow: 1;
+        position: relative;
+        background: #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      }
+
+      /* Level 1: Red Channel */
+      .color-box {
+        width: 200px;
+        height: 200px;
+        background-color: rgb(0, 0, 0); /* Start black */
+        border: 4px solid #fff;
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        transition: background-color 1s ease;
+      }
+
+      /* Level 2: Matrix */
+      .matrix-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        width: 80%;
+      }
+      .matrix-cell {
+        background: rgba(255, 255, 255, 0.1);
+        height: 80px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-muted);
+        font-family: monospace;
+        border: 2px solid transparent;
+      }
+      .matrix-cell.active {
+        border-color: var(--primary-cyan);
+        color: var(--primary-cyan);
+        box-shadow: 0 0 15px rgba(34, 211, 238, 0.3);
+      }
+      .matrix-cell.found {
+        background: var(--accent-purple);
+        color: #fff;
+        box-shadow: 0 0 20px var(--accent-purple);
+        border-color: #fff;
+      }
+
+      /* Level 3: Threshold */
+      .light-meter {
+        width: 300px;
+        height: 30px;
+        background: #333;
+        border-radius: 15px;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 20px;
+      }
+      .light-bar {
+        width: 0%;
+        height: 100%;
+        background: linear-gradient(90deg, #444, #fff);
+        transition: width 0.5s;
+      }
+      .threshold-line {
+        position: absolute;
+        left: 58%;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #ff5f56;
+        z-index: 10;
+      }
+      .fragment {
+        font-size: 3rem;
+        color: #fff;
+        opacity: 0.3;
+        transition: all 0.5s;
+      }
+      .fragment.collected {
+        opacity: 1;
+        text-shadow: 0 0 20px #fff;
+        transform: scale(1.2);
+      }
+      /* Wizard Speech Bubble */
+      .speech-bubble {
+        position: absolute;
+        bottom: 80px;
+        left: 20px;
+        background: #fff;
+        color: #000;
+        padding: 15px;
+        border-radius: 15px;
+        border-bottom-left-radius: 0;
+        max-width: 250px;
+        font-family: "Courier New", serif;
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.5s ease;
+        z-index: 100;
+        pointer-events: none;
+      }
+      .speech-bubble.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .wizard-avatar {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        width: 60px;
+        height: 60px;
+        background: #444; /* Placeholder for Wizard Image */
+        border-radius: 50%;
+        border: 2px solid var(--primary-cyan);
+        box-shadow: 0 0 20px var(--primary-cyan);
+        z-index: 99;
+      }
+      .success-anim {
+        animation: jump 0.5s ease infinite alternate;
+        box-shadow: 0 0 50px gold !important;
+        border-color: gold !important;
+      }
+      @keyframes jump {
+        0% {
+          transform: translateY(0);
+        }
+        100% {
+          transform: translateY(-20px);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="game-container">
+      <!-- Visual Panel -->
+      <div class="visual-panel">
+        <div class="game-header">
+          <span class="level-title">{{ level_data['title'] }}</span>
+          <a
+            href="{{ url_for('game.level_select') }}"
+            style="color: var(--text-muted); text-decoration: none"
+          >
+            <i class="fas fa-times"></i>
+          </a>
+        </div>
+
+        <!-- Wizard UI Elements -->
+        <div id="wizard-speech" class="speech-bubble">
+          "Greetings, Apprentice! Ready to write some code?"
+        </div>
+        <div class="wizard-avatar" id="wizard-char"></div>
+
+        <div id="game-canvas">
+          {% if level == 1 %}
+          <!-- Level 1 Visuals -->
+          <div id="visual-l1" class="color-box"></div>
+          <div style="position: absolute; bottom: 20px; color: #fff">
+            Restored: <span id="rgb-val">0, 0, 0</span>
+          </div>
+          {% elif level == 2 %}
+          <!-- Level 2 Visuals -->
+          <div class="matrix-grid" id="visual-l2">
+            <div class="matrix-cell" id="cell-0">0: [10]</div>
+            <div class="matrix-cell" id="cell-1">1: [25]</div>
+            <div class="matrix-cell" id="cell-2">2: [46]</div>
+            <div class="matrix-cell" id="cell-3">3: [80]</div>
+          </div>
+          {% elif level == 3 %}
+          <!-- Level 3 Visuals -->
+          <div style="text-align: center">
+            <div class="light-meter">
+              <div class="light-bar" id="light-bar"></div>
+              <div class="threshold-line" title="Threshold: 150"></div>
+            </div>
+            <i class="fas fa-gem fragment" id="fragment-gem"></i>
+            <p style="margin-top: 20px; color: var(--text-muted)">
+              Light Intensity: <span id="light-val">0</span>
+            </p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Code Panel -->
+      <div class="code-panel">
+        <div
+          class="glass-panel"
+          style="
+            padding: 20px;
+            border-radius: 12px;
+            background: rgba(13, 17, 23, 0.9);
+          "
+        >
+          <h3
+            style="
+              font-size: 1rem;
+              margin-bottom: 10px;
+              color: var(--primary-cyan);
+            "
+          >
+            OBJECTIVE
+          </h3>
+          <p style="font-size: 0.9rem; color: #e6edf3; margin-bottom: 10px">
+            {{ level_data['objective'] }}
+          </p>
+          <div
+            style="
+              font-size: 0.85rem;
+              color: var(--text-muted);
+              background: rgba(255, 255, 255, 0.05);
+              padding: 10px;
+              border-radius: 6px;
+            "
+          >
+            <i
+              class="fas fa-lightbulb"
+              style="color: var(--dot-yellow); margin-right: 5px"
+            ></i>
+            {{ level_data['hint'] }}
+          </div>
+        </div>
+
+        <div class="ide-window">
+          <div class="ide-header">
+            <div class="dot dot-red"></div>
+            <div class="dot dot-yellow"></div>
+            <div class="dot dot-green"></div>
+            <span
+              style="
+                margin-left: 10px;
+                color: #8b949e;
+                font-size: 0.8rem;
+                font-family: monospace;
+              "
+              >solution.py</span
+            >
+          </div>
+          <!-- TODO: Escape properly for textarea -->
+          <textarea id="code-editor" class="code-area" spellcheck="false">
+{{ level_data['initial_code'] }}</textarea
+          >
+        </div>
+
+        <div class="console-output" id="console">> System Ready...</div>
+
+        <div class="action-bar">
+          <button
+            onclick="runPython()"
+            class="btn-neon btn-primary"
+            style="margin-top: 0; flex-grow: 2"
+          >
+            <i class="fas fa-play" style="margin-right: 8px"></i> RUN CODE
+          </button>
+          <button
+            onclick="resetCode()"
+            class="btn-neon btn-secondary"
+            style="margin-top: 0; flex-grow: 1"
+          >
+            RESET
+          </button>
+          {% if level < max_levels %}
+          <a
+            href="{{ url_for('game.game_page', level_id=level+1) }}"
+            id="next-level-btn"
+            class="btn-neon"
+            style="
+              margin-top: 0;
+              flex-grow: 1;
+              display: none;
+              text-align: center;
+              background: var(--dot-green);
+              color: #000;
+              border: none;
+              text-decoration: none;
+            "
+          >
+            NEXT LEVEL <i class="fas fa-arrow-right"></i>
+          </a>
+          {% else %}
+          <a
+            href="{{ url_for('main.dashboard') }}"
+            id="next-level-btn"
+            class="btn-neon"
+            style="
+              margin-top: 0;
+              flex-grow: 1;
+              display: none;
+              text-align: center;
+              background: var(--dot-green);
+              color: #000;
+              border: none;
+              text-decoration: none;
+            "
+          >
+            FINISH <i class="fas fa-flag"></i>
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Game State & API
+      const level = {{ level }};
+      const consoleDiv = document.getElementById('console');
+
+      /* Wizard Hint System */
+      const wizardHints = {
+          "SyntaxError": "The magical scroll cannot read your runes! Check for missing brackets or typos.",
+          "NameError": "You are summoning a spirit (variable) that does not exist! Check your spelling.",
+          "IndentationError": "Your chanting rhythm is off! Python requires proper indentation (spaces).",
+          "TypeError": "You are mixing elements that do not blend! Check your data types."
+      };
+
+      let bubbleTimeout;
+      function updateCharacterSpeech(text) {
+          const bubble = document.getElementById('wizard-speech');
+          bubble.innerText = text;
+          bubble.classList.add('show');
+
+          if (bubbleTimeout) clearTimeout(bubbleTimeout);
+          bubbleTimeout = setTimeout(() => {
+              bubble.classList.remove('show');
+          }, 6000); // 6 seconds timeout
+      }
+
+      function processExecutionResult(error) {
+          let message = error.toString();
+          let hint = "Something is wrong with the magical flow... Check your code.";
+
+          for (let key in wizardHints) {
+              if (message.includes(key)) {
+                  hint = wizardHints[key];
+                  break;
+              }
+          }
+          updateCharacterSpeech(hint);
+          log("[WIZARD] " + hint);
+      }
+
+      function playSuccessAnimation() {
+          const char = document.getElementById('wizard-char');
+          if(char) char.classList.add('success-anim');
+          updateCharacterSpeech("Magnificent! You have restored order!");
+      }
+
+      // Mock Python 'hero' module functions
+      const HeroAPI = {
+          cast_color: (r, g, b) => {
+              log(`Hero casting color: RGB(${r}, ${g}, ${b})`);
+              if (level === 1) {
+                  const box = document.getElementById('visual-l1');
+                  const label = document.getElementById('rgb-val');
+                  box.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+                  label.innerText = `${r}, ${g}, ${b}`;
+
+                  if (r === 255) levelComplete();
+                  else log("System: Intensity too low. Need absolute RED (255).");
+              }
+          },
+          move_to_x: (pos) => {
+              log(`Hero moving to X: ${pos}`);
+              if (level === 2) {
+                  // Reset matrix
+                  document.querySelectorAll('.matrix-cell').forEach(c => c.classList.remove('found', 'active'));
+
+                  // Highlight index logic based on value
+                  const values = [10, 25, 46, 80];
+                  const index = values.indexOf(pos);
+
+                  if (index !== -1) {
+                      const cell = document.getElementById(`cell-${index}`);
+                      if (cell) cell.classList.add('found');
+
+                      if (pos === 46) levelComplete();
+                      else log(`System: Found fragment at ${pos}, but it's not the signal source.`);
+                  } else {
+                      log("System: Coordinates out of bounds.");
+                  }
+              }
+          },
+          scan_light: () => {
+              // Return a random value for simulation or fixed for tutorial
+              // For Level 3, we want to simulate a "bright" object
+              const val = 180;
+              log(`Hero scanned light intensity: ${val}`);
+
+              if (level === 3) {
+                  const bar = document.getElementById('light-bar');
+                  const label = document.getElementById('light-val');
+                  bar.style.width = (val / 255 * 100) + '%';
+                  label.innerText = val;
+              }
+              return val;
+          },
+          collect_fragment: () => {
+              log("Hero attempting to collect fragment...");
+              if (level === 3) {
+                  const gem = document.getElementById('fragment-gem');
+                  gem.classList.add('collected');
+                  levelComplete();
+              }
+          },
+          avoid_shadow: () => {
+              log("Hero avoiding shadow...");
+          },
+          say: (msg) => {
+              log(`Hero says: "${msg}"`);
+          }
+      };
+
+      function log(msg) {
+          consoleDiv.innerHTML += `\n> ${msg}`;
+          consoleDiv.scrollTop = consoleDiv.scrollHeight;
+      }
+
+      function levelComplete() {
+          log("\n[SUCCESS] OBJECTIVE COMPLETE!");
+          playSuccessAnimation();
+
+          // Celebration effect
+          const panel = document.querySelector('.visual-panel');
+          panel.style.boxShadow = '0 0 50px rgba(39, 201, 63, 0.3)';
+          panel.style.borderColor = '#27c93f';
+
+          // Send progress to backend
+          fetch("{{ url_for('game.complete_level') }}", {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ level_id: level })
+          })
+          .then(res => res.json())
+          .then(data => {
+              console.log("Progress Saved:", data);
+              const btn = document.getElementById('next-level-btn');
+              if(btn) btn.style.display = 'block';
+          })
+          .catch(err => console.error("Save Error:", err));
+      }
+
+      // Skulpt Setup
+      function builtinRead(x) {
+          if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
+              throw "File not found: '" + x + "'";
+          return Sk.builtinFiles["files"][x];
+      }
+
+      // Custom Module 'hero'
+      function runPython() {
+          const prog = document.getElementById("code-editor").value;
+          consoleDiv.innerHTML = "> Executing script...";
+
+          Sk.configure({
+              output: (text) => log(text),
+              read: builtinRead
+          });
+
+          // Register 'hero' module properly as a Skulpt object
+          var heroModule = new Sk.builtin.module();
+          heroModule.$d = {
+              cast_color: new Sk.builtin.func(function(r, g, b) {
+                  HeroAPI.cast_color(Sk.ffi.remapToJs(r), Sk.ffi.remapToJs(g), Sk.ffi.remapToJs(b));
+              }),
+              move_to_x: new Sk.builtin.func(function(x) {
+                  HeroAPI.move_to_x(Sk.ffi.remapToJs(x));
+              }),
+              scan_light: new Sk.builtin.func(function() {
+                  return Sk.ffi.remapToPy(HeroAPI.scan_light());
+              }),
+              collect_fragment: new Sk.builtin.func(function() {
+                  HeroAPI.collect_fragment();
+              }),
+              avoid_shadow: new Sk.builtin.func(function() {
+                  HeroAPI.avoid_shadow();
+              }),
+              say: new Sk.builtin.func(function(msg) {
+                  HeroAPI.say(Sk.ffi.remapToJs(msg));
+              })
+          };
+          Sk.builtins.hero = heroModule;
+
+          const myPromise = Sk.misceval.asyncToPromise(function() {
+              return Sk.importMainWithBody("<stdin>", false, prog, true);
+          });
+
+          myPromise.then(
+              function(mod) {
+                  consoleDiv.innerHTML += "\n> Execution finished.";
+              },
+              function(err) {
+                  consoleDiv.innerHTML += "\n[ERROR] " + err.toString();
+                  processExecutionResult(err);
+              }
+          );
+      }
+
+      function resetCode() {
+          window.location.reload();
+      }
+    </script>
+  </body>
+</html>
