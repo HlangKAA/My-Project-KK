@@ -1,15 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap');
+
 :root {
-  --primary-bg: #0d1117;
-  --secondary-bg: #161b22;
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --primary-cyan: #22d3ee;
-  --accent-purple: #9333ea;
-  --dot-red: #ff5f56;
-  --dot-yellow: #ffbd2e;
-  --dot-green: #27c93f;
-  --text-main: #e6edf3;
-  --text-muted: #8b949e;
-  --font-main: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  --primary-bg: #1a0a0a;
+  --secondary-bg: #0d0505;
+  --glass-border: rgba(220, 38, 38, 0.35);
+  --primary-red: #dc2626;
+  --accent-maroon: #7f1d1d;
+  --accent-gold: #d4a373;
+  --text-main: #f1e8e0;
+  --text-muted: #a89080;
+  --font-main: 'Inter', sans-serif;
+  --font-heading: 'Cinzel', serif;
   --font-code: "Consolas", "Monaco", monospace;
 }
 
@@ -19,11 +20,10 @@ body {
   background-color: var(--primary-bg);
   color: var(--text-main);
   font-family: var(--font-main);
-  overflow: hidden; /* App-like feel */
 }
 
 a {
-  color: var(--primary-cyan);
+  color: var(--primary-red);
   text-decoration: none;
 }
 
@@ -33,40 +33,42 @@ button {
 
 /* Utilities */
 .glass-panel {
-  background: rgba(22, 27, 34, 0.8);
-  backdrop-filter: blur(10px);
+  background: rgba(30, 10, 10, 0.8);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--glass-border);
   border-radius: 12px;
 }
 
 .btn-neon {
-  background: transparent;
-  border: 1px solid var(--primary-cyan);
-  color: var(--primary-cyan);
+  background: var(--primary-red);
+  border: none;
+  color: #fff;
   padding: 10px 20px;
   font-size: 1rem;
-  border-radius: 6px;
+  border-radius: 8px;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
   text-transform: uppercase;
   font-weight: bold;
+  font-family: var(--font-heading);
+  letter-spacing: 2px;
+  box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
 }
 
 .btn-neon:hover {
-  background: var(--primary-cyan);
-  color: #000;
-  box-shadow: 0 0 20px rgba(34, 211, 238, 0.5);
+  background: #ef4444;
+  box-shadow: 0 6px 25px rgba(220, 38, 38, 0.5);
+  transform: translateY(-2px);
 }
 
 .title-neon {
-  font-family: "Russo One", sans-serif; /* Fallback if not loaded */
+  font-family: var(--font-heading);
   color: #fff;
-  text-shadow:
-    0 0 10px var(--primary-cyan),
-    0 0 20px var(--primary-cyan);
+  text-shadow: 0 2px 15px rgba(0, 0, 0, 0.5);
   font-size: 2.5rem;
   margin-bottom: 20px;
+  letter-spacing: 3px;
 }
 
 /* Animations */
@@ -78,5 +80,16 @@ button {
   to {
     transform: scale(1);
     opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

@@ -1,0 +1,425 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap');
+
+/* ============================================
+   LEVEL COMPLETE - Celebration Screen
+   ============================================ */
+
+.lc-page {
+    min-height: 100vh;
+    background: #1a0a0a;
+    color: #f1e8e0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Navbar */
+.lc-navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+    height: 52px;
+    background: rgba(20, 8, 8, 0.95);
+    border-bottom: 1px solid rgba(220, 38, 38, 0.2);
+    flex-shrink: 0;
+}
+
+.lc-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.lc-brand-icon {
+    width: 28px;
+    height: 28px;
+    background: #dc2626;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 0.8rem;
+}
+
+.lc-brand-text {
+    font-family: 'Cinzel', serif;
+    font-weight: 800;
+    font-size: 0.9rem;
+    color: #fff;
+    letter-spacing: 1.5px;
+}
+
+.lc-nav-links {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.lc-nav-link {
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #a89080;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    transition: color 0.2s;
+}
+
+.lc-nav-link:hover { color: #fff; }
+
+.lc-pause-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 1rem;
+    background: #dc2626;
+    border: none;
+    border-radius: 6px;
+    color: #fff;
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+}
+
+.lc-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #555, #333);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #aaa;
+    font-size: 0.9rem;
+}
+
+/* Content */
+.lc-content {
+    flex: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+    width: 100%;
+}
+
+/* Badge */
+.lc-badge {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.lc-badge-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(220, 38, 38, 0.15);
+    border: 1px solid rgba(220, 38, 38, 0.3);
+    border-radius: 20px;
+    padding: 0.4rem 1rem;
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #dc2626;
+}
+
+.lc-badge-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #dc2626;
+    box-shadow: 0 0 6px rgba(220, 38, 38, 0.5);
+}
+
+/* Title */
+.lc-title {
+    text-align: center;
+    font-family: 'Cinzel', serif;
+    font-size: 2.8rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    color: #dc2626;
+    text-shadow: 0 2px 20px rgba(220, 38, 38, 0.3);
+    margin: 0 0 0.5rem;
+    animation: scaleIn 0.6s ease;
+}
+
+.lc-subtitle {
+    text-align: center;
+    font-size: 0.95rem;
+    color: #a89080;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+}
+
+/* Chapter Card */
+.lc-chapter-card {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 2.5rem;
+    border: 1px solid rgba(220, 38, 38, 0.15);
+}
+
+.lc-chapter-art {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    display: block;
+}
+
+.lc-chapter-art-placeholder {
+    width: 100%;
+    height: 300px;
+    background:
+        radial-gradient(ellipse at 50% 40%, rgba(139, 92, 246, 0.2), transparent 60%),
+        radial-gradient(ellipse at 30% 60%, rgba(220, 38, 38, 0.15), transparent 50%),
+        radial-gradient(ellipse at 70% 60%, rgba(59, 130, 246, 0.15), transparent 50%),
+        linear-gradient(180deg, #1a0a1a 0%, #2a1a2a 50%, #1a0a0a 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.lc-chapter-art-icon {
+    font-size: 5rem;
+    color: rgba(220, 38, 38, 0.3);
+}
+
+.lc-chapter-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1.5rem;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.lc-chapter-name {
+    font-family: 'Cinzel', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.lc-chapter-location {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.8rem;
+    color: #a89080;
+    margin-top: 0.2rem;
+}
+
+.lc-chapter-location i {
+    color: #dc2626;
+    font-size: 0.7rem;
+}
+
+.lc-chapter-tags {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.lc-tag {
+    padding: 0.3rem 0.7rem;
+    border-radius: 6px;
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.lc-tag.xp {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #f1e8e0;
+}
+
+.lc-tag.mastery {
+    background: rgba(220, 38, 38, 0.2);
+    border: 1px solid rgba(220, 38, 38, 0.3);
+    color: #dc2626;
+}
+
+/* Skills Section */
+.lc-skills-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 1.2rem;
+    letter-spacing: 1px;
+}
+
+.lc-skills-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+}
+
+.lc-skill-card {
+    background: rgba(30, 10, 10, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 1.2rem;
+}
+
+.lc-skill-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.8rem;
+}
+
+.lc-skill-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: rgba(220, 38, 38, 0.1);
+    border: 1px solid rgba(220, 38, 38, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #dc2626;
+    font-size: 0.85rem;
+}
+
+.lc-skill-type {
+    font-family: 'Cinzel', serif;
+    font-size: 0.55rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #a89080;
+}
+
+.lc-skill-name {
+    font-family: 'Cinzel', serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.4rem;
+}
+
+.lc-skill-desc {
+    font-size: 0.75rem;
+    color: #a89080;
+    line-height: 1.5;
+    margin-bottom: 0.8rem;
+}
+
+.lc-skill-bar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.lc-skill-bar {
+    flex: 1;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.lc-skill-bar-fill {
+    height: 100%;
+    background: #dc2626;
+    border-radius: 2px;
+    transition: width 1s ease;
+}
+
+.lc-skill-pct {
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #dc2626;
+    min-width: 30px;
+    text-align: right;
+}
+
+/* Action Buttons */
+.lc-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.lc-btn-replay {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 2rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    color: #a89080;
+    font-family: 'Cinzel', serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.lc-btn-replay:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+.lc-btn-continue {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 2.5rem;
+    background: #dc2626;
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-family: 'Cinzel', serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
+}
+
+.lc-btn-continue:hover {
+    background: #ef4444;
+    box-shadow: 0 6px 25px rgba(220, 38, 38, 0.5);
+    transform: translateY(-2px);
+}
+
+/* Animations */
+@keyframes scaleIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .lc-title {
+        font-size: 2rem;
+    }
+
+    .lc-skills-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .lc-actions {
+        flex-direction: column;
+    }
+}

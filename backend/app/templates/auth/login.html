@@ -1,105 +1,164 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - The Lost Spectrum</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - The Lost Spectrum</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-
-<body>
-  <div class="glass-panel" style="max-width: 400px; width: 100%;">
-    <div class="text-center mb-4">
-      <h1 class="brand-title" style="margin-bottom: 0.5rem;">THE LOST<br>SPECTRUM</h1>
-      <p style="color: var(--text-muted); font-size: 0.9rem;">ENTER THE VOID</p>
+  <body>
+    <div class="auth-bg">
+      <img
+        src="{{ url_for('static', filename='images/bg-auth.png') }}"
+        alt=""
+      />
     </div>
 
-    <form id="loginForm">
-      <div class="form-group">
-        <label for="email">Email Address</label>
-        <div class="input-wrapper">
-          <input type="email" id="email" name="email" required placeholder="explorer@void.com">
-          <i class="fas fa-envelope input-icon"></i>
+    <div class="glass-panel" style="max-width: 420px; width: 100%">
+      <div class="text-center mb-4">
+        <div class="logo-icon">
+          <i class="fas fa-chess-rook"></i>
         </div>
+        <h1 class="brand-title">THE LOST<br />SPECTRUM</h1>
+        <p class="subtitle">Enter the misty realm of forgotten magic.</p>
       </div>
 
-      <div class="form-group">
-        <label for="password">Password</label>
-        <div class="input-wrapper">
-          <input type="password" id="password" name="password" required placeholder="••••••••"
-            style="padding-right: 2.5rem;">
-          <i class="fas fa-eye input-icon toggle-password" onclick="togglePassword('password', this)"></i>
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="email">Runic Access Key</label>
+          <div class="input-wrapper">
+            <i class="fas fa-key input-icon left"></i>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              required
+              placeholder="Enter your runic key"
+            />
+          </div>
         </div>
+
+        <div class="divider">OR LOGIN</div>
+
+        <div class="form-group">
+          <label for="username_field">Username</label>
+          <div class="input-wrapper">
+            <i class="fas fa-user input-icon left"></i>
+            <input
+              type="email"
+              id="username_field"
+              name="email_alt"
+              placeholder="Ex: Gandalf_The_Grey"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="input-wrapper">
+            <i class="fas fa-lock input-icon left"></i>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              required
+              placeholder="••••••"
+              style="padding-right: 2.8rem"
+            />
+            <i
+              class="fas fa-eye-slash input-icon right toggle-password"
+              onclick="togglePassword('password', this)"
+            ></i>
+          </div>
+          <a
+            href="{{ url_for('auth.forgot_password_page') }}"
+            class="link-text forgot-link"
+            >Forgot Password?</a
+          >
+        </div>
+
+        <div id="statusMessage" class="helper-text error-text"></div>
+
+        <button type="submit" class="btn-neon btn-primary">
+          <i class="fas fa-shield-alt btn-icon"></i> ENTER THE REALM
+        </button>
+      </form>
+
+      <div class="text-center mt-4">
+        <p class="helper-text">
+          Don't have a mage ID?
+          <a href="{{ url_for('auth.signup_page') }}" class="link-text"
+            >Register for the Archives</a
+          >
+        </p>
       </div>
-
-      <div id="statusMessage" class="helper-text" style="color: var(--accent-pink);"></div>
-
-      <button type="submit" class="btn-neon btn-primary">
-        LOGIN
-      </button>
-    </form>
-
-    <div class="text-center mt-4">
-      <p class="helper-text">
-        Don't have an account? <a href="{{ url_for('auth.signup_page') }}" class="link-text">Sign Up</a>
-      </p>
-      <p class="helper-text" style="margin-top: 5px;">
-        <a href="{{ url_for('auth.forgot_password_page') }}" class="link-text" style="font-size: 0.8rem;">Forgot
-          Password?</a>
-      </p>
     </div>
-  </div>
 
-  <script>
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      const status = document.getElementById('statusMessage');
-      const btn = e.target.querySelector('button');
+    <div class="auth-footer">
+      &copy; 2025 The Lost Spectrum. All rights reserved. Access to the archives
+      is restricted to authorized personnel of the Grand Tower.
+    </div>
 
-      try {
-        btn.disabled = true;
-        btn.innerText = 'AUTHENTICATING...';
-        status.innerText = '';
+    <script>
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const email = document.getElementById("email").value;
+          const password = document.getElementById("password").value;
+          const status = document.getElementById("statusMessage");
+          const btn = e.target.querySelector("button");
 
-        const response = await fetch('/api/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password })
+          try {
+            btn.disabled = true;
+            btn.innerHTML =
+              '<i class="fas fa-spinner fa-spin"></i> AUTHENTICATING...';
+            status.innerText = "";
+
+            const response = await fetch("/api/login", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email, password }),
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+              window.location.href = '{{ url_for("main.dashboard") }}';
+            } else {
+              status.innerText = data.message;
+              btn.disabled = false;
+              btn.innerHTML =
+                '<i class="fas fa-shield-alt btn-icon"></i> ENTER THE REALM';
+            }
+          } catch (error) {
+            status.innerText = "Connection Error";
+            btn.disabled = false;
+            btn.innerHTML =
+              '<i class="fas fa-shield-alt btn-icon"></i> ENTER THE REALM';
+          }
         });
 
-        const data = await response.json();
-
-        if (data.success) {
-          window.location.href = '{{ url_for("main.dashboard") }}';
+      function togglePassword(inputId, icon) {
+        const input = document.getElementById(inputId);
+        if (input.type === "password") {
+          input.type = "text";
+          icon.classList.remove("fa-eye-slash");
+          icon.classList.add("fa-eye");
         } else {
-          status.innerText = data.message;
-          btn.disabled = false;
-          btn.innerText = 'LOGIN';
+          input.type = "password";
+          icon.classList.remove("fa-eye");
+          icon.classList.add("fa-eye-slash");
         }
-      } catch (error) {
-        status.innerText = 'Connection Error';
-        btn.disabled = false;
-        btn.innerText = 'LOGIN';
       }
-    });
-
-    function togglePassword(inputId, icon) {
-      const input = document.getElementById(inputId);
-      if (input.type === 'password') {
-        input.type = 'text';
-        icon.classList.remove('fa-eye');
-        icon.classList.add('fa-eye-slash');
-      } else {
-        input.type = 'password';
-        icon.classList.remove('fa-eye-slash');
-        icon.classList.add('fa-eye');
-      }
-    }
-  </script>
-</body>
-
+    </script>
+  </body>
 </html>

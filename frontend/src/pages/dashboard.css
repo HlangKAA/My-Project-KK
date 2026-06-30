@@ -1,0 +1,504 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap');
+
+/* ============================================
+   DASHBOARD - Mission Select Gothic Theme
+   ============================================ */
+
+/* Navbar */
+.dash-navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+    height: 56px;
+    background: rgba(20, 8, 8, 0.95);
+    border-bottom: 1px solid rgba(220, 38, 38, 0.2);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.dash-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.dash-brand-icon {
+    width: 32px;
+    height: 32px;
+    background: #dc2626;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    color: #fff;
+}
+
+.dash-brand-text {
+    font-family: 'Cinzel', serif;
+    font-weight: 800;
+    font-size: 1rem;
+    color: #fff;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.dash-nav-links {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
+.dash-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #a89080;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    transition: color 0.2s;
+    text-decoration: none;
+    background: none;
+    border: none;
+    padding: 0;
+}
+
+.dash-nav-link:hover,
+.dash-nav-link.active {
+    color: #fff;
+}
+
+.dash-nav-link i {
+    font-size: 0.85rem;
+}
+
+.dash-user {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.dash-user-info {
+    text-align: right;
+}
+
+.dash-user-role {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    color: #a89080;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.dash-user-name {
+    font-family: 'Cinzel', serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.dash-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #dc2626, #7f1d1d);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1rem;
+    border: 2px solid rgba(220, 38, 38, 0.4);
+}
+
+.dash-logout {
+    background: rgba(220, 38, 38, 0.15);
+    border: 1px solid rgba(220, 38, 38, 0.3);
+    border-radius: 6px;
+    color: #dc2626;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+}
+
+.dash-logout:hover {
+    background: #dc2626;
+    color: #fff;
+}
+
+/* Main Layout */
+.dash-main {
+    display: flex;
+    height: calc(100vh - 56px);
+    overflow: hidden;
+}
+
+/* Map Area */
+.dash-map-area {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.dash-header {
+    padding: 1.5rem 2rem 0;
+}
+
+.dash-title {
+    font-family: 'Cinzel', serif;
+    font-size: 2rem;
+    font-weight: 900;
+    color: #fff;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.dash-quote {
+    font-style: italic;
+    color: #a89080;
+    font-size: 0.85rem;
+    margin: 0.3rem 0 0;
+}
+
+.dash-header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dash-view-btn {
+    background: rgba(30, 10, 10, 0.8);
+    border: 1px solid rgba(220, 38, 38, 0.3);
+    border-radius: 8px;
+    color: #f1e8e0;
+    padding: 0.6rem 1rem;
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.2s;
+}
+
+.dash-view-btn:hover {
+    background: rgba(220, 38, 38, 0.2);
+    border-color: #dc2626;
+}
+
+/* Map Container */
+.dash-map {
+    position: relative;
+    margin: 1rem 2rem;
+    height: calc(100% - 140px);
+    background: rgba(200, 190, 170, 0.15);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+}
+
+.dash-map-search {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    z-index: 10;
+}
+
+.dash-map-search input {
+    background: rgba(30, 10, 10, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: #a89080;
+    padding: 0.6rem 1rem;
+    font-size: 0.8rem;
+    width: 180px;
+    font-family: 'Inter', sans-serif;
+}
+
+.dash-map-search input::placeholder {
+    color: rgba(168, 144, 128, 0.5);
+}
+
+.dash-map-search input:focus {
+    outline: none;
+    border-color: rgba(220, 38, 38, 0.4);
+}
+
+/* Map Controls */
+.dash-map-controls {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    z-index: 10;
+}
+
+.dash-map-ctrl-btn {
+    width: 34px;
+    height: 34px;
+    background: rgba(30, 10, 10, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: #a89080;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.dash-map-ctrl-btn:hover {
+    background: rgba(220, 38, 38, 0.2);
+    color: #fff;
+}
+
+/* Region Nodes */
+.dash-region {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.dash-region:hover {
+    transform: scale(1.08);
+}
+
+.dash-region-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid transparent;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    position: relative;
+}
+
+.dash-region-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.dash-region-icon.active {
+    border-color: #dc2626;
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.4);
+}
+
+.dash-region-icon.locked {
+    filter: grayscale(0.7) brightness(0.6);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dash-region-icon.complete {
+    border-color: #16a34a;
+    box-shadow: 0 0 15px rgba(22, 163, 74, 0.3);
+}
+
+.dash-region-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    color: #fff;
+}
+
+.dash-region-badge.lock {
+    background: #555;
+}
+
+.dash-region-badge.check {
+    background: #16a34a;
+}
+
+.dash-region-label {
+    margin-top: 0.4rem;
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    white-space: nowrap;
+}
+
+.dash-region-label.active {
+    background: rgba(220, 38, 38, 0.8);
+    color: #fff;
+    border: 1px solid #dc2626;
+}
+
+.dash-region-label.locked {
+    background: rgba(40, 20, 20, 0.8);
+    color: #a89080;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dash-region-label.complete {
+    background: rgba(22, 163, 74, 0.2);
+    color: #4ade80;
+    border: 1px solid rgba(22, 163, 74, 0.3);
+}
+
+/* Dashed Path between nodes */
+.dash-path-line {
+    position: absolute;
+    border-top: 2px dashed rgba(220, 38, 38, 0.3);
+    transform-origin: left center;
+    z-index: 0;
+}
+
+/* Sidebar */
+.dash-sidebar {
+    width: 280px;
+    background: rgba(20, 8, 8, 0.95);
+    border-left: 1px solid rgba(220, 38, 38, 0.15);
+    padding: 1.5rem;
+    overflow-y: auto;
+    flex-shrink: 0;
+}
+
+.dash-sidebar-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    font-weight: 800;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 0 0 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dash-sidebar-title i {
+    color: #dc2626;
+}
+
+/* Essence Cards */
+.dash-essence-card {
+    background: rgba(30, 10, 10, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.dash-essence-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.3rem;
+}
+
+.dash-essence-name {
+    font-family: 'Cinzel', serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.dash-essence-pct {
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.dash-essence-sub {
+    font-size: 0.65rem;
+    color: #a89080;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.6rem;
+}
+
+.dash-essence-bar {
+    height: 40px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+}
+
+.dash-essence-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.6s ease;
+}
+
+/* Resonance Footer */
+.dash-resonance {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dash-resonance-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    color: #a89080;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.dash-resonance-value {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #dc2626;
+}
+
+.dash-resonance-xp {
+    font-size: 0.7rem;
+    color: #a89080;
+    margin-left: 0.3rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .dash-main {
+        flex-direction: column;
+    }
+
+    .dash-sidebar {
+        width: 100%;
+        border-left: none;
+        border-top: 1px solid rgba(220, 38, 38, 0.15);
+        max-height: 300px;
+    }
+
+    .dash-nav-links {
+        display: none;
+    }
+}

@@ -1,0 +1,347 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap');
+
+/* ============================================
+   GRIMOIRE - Parchment Book Modal
+   ============================================ */
+
+.grimoire-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.grimoire-close {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(40, 20, 15, 0.9);
+    border: 2px solid rgba(220, 38, 38, 0.3);
+    color: #f1e8e0;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.1rem;
+    transition: all 0.2s;
+    z-index: 210;
+}
+
+.grimoire-close:hover {
+    background: rgba(220, 38, 38, 0.3);
+    border-color: #dc2626;
+}
+
+.grimoire-close-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.5rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* Book Container */
+.grimoire-book {
+    display: flex;
+    max-width: 900px;
+    width: 90%;
+    max-height: 80vh;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+    animation: scaleIn 0.4s ease;
+}
+
+/* Page (shared) */
+.grimoire-page {
+    width: 50%;
+    padding: 2.5rem 2rem;
+    overflow-y: auto;
+    position: relative;
+}
+
+.grimoire-page-left {
+    background: linear-gradient(135deg, #f5ecd7 0%, #ebe0c8 100%);
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.grimoire-page-right {
+    background: linear-gradient(135deg, #f0e5cf 0%, #e8dcc4 100%);
+}
+
+/* Page Title */
+.grimoire-section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: 'Cinzel', serif;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #2a1a10;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 1.2rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid rgba(42, 26, 16, 0.15);
+}
+
+.grimoire-section-title i {
+    font-size: 1rem;
+    color: #8a5c3a;
+}
+
+/* Page Body Text */
+.grimoire-text {
+    font-family: 'Crimson Text', Georgia, serif;
+    font-size: 1rem;
+    color: #3a2a1a;
+    line-height: 1.7;
+    margin-bottom: 1.2rem;
+}
+
+/* Code Block */
+.grimoire-code-block {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    margin: 1rem 0;
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    font-size: 0.85rem;
+    color: #2a1a10;
+}
+
+.grimoire-code-block .keyword {
+    color: #8a3ffc;
+}
+
+.grimoire-code-block .string {
+    color: #0f7b4f;
+}
+
+.grimoire-code-block .variable {
+    color: #0066cc;
+}
+
+/* Index Demo */
+.grimoire-index-demo {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin: 1rem 0;
+}
+
+.grimoire-index-box {
+    width: 40px;
+    height: 40px;
+    border: 2px dashed #8a5c3a;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #2a1a10;
+}
+
+.grimoire-index-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #8a5c3a;
+    text-align: center;
+}
+
+.grimoire-index-arrow {
+    font-size: 1.2rem;
+    color: #8a5c3a;
+}
+
+.grimoire-index-value {
+    padding: 0.4rem 0.8rem;
+    border: 2px dashed #8a5c3a;
+    border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    color: #2a1a10;
+}
+
+/* Note */
+.grimoire-note {
+    font-family: 'Crimson Text', Georgia, serif;
+    font-size: 0.9rem;
+    font-style: italic;
+    color: #5a4a3a;
+    line-height: 1.6;
+    margin: 1rem 0;
+}
+
+/* Incantations List */
+.grimoire-incantations-title {
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #2a1a10;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 1.5rem;
+    margin-bottom: 0.8rem;
+}
+
+.grimoire-incantations {
+    list-style: disc;
+    padding-left: 1.2rem;
+    margin: 0;
+}
+
+.grimoire-incantations li {
+    font-family: 'Crimson Text', Georgia, serif;
+    font-size: 0.9rem;
+    color: #3a2a1a;
+    margin-bottom: 0.4rem;
+    line-height: 1.5;
+}
+
+.grimoire-incantations li code {
+    font-family: 'JetBrains Mono', monospace;
+    background: rgba(0, 0, 0, 0.06);
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    color: #6a3070;
+}
+
+/* Color Wheel */
+.grimoire-color-wheel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 1.5rem 0;
+}
+
+.grimoire-wheel-circle {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    border: 2px dashed rgba(0, 0, 0, 0.15);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.grimoire-wheel-label {
+    font-family: 'Crimson Text', serif;
+    font-size: 0.8rem;
+    font-style: italic;
+    color: #8a5c3a;
+    text-align: center;
+}
+
+.grimoire-wheel-dot {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Color Legend */
+.grimoire-color-legend {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    margin-left: 1rem;
+}
+
+.grimoire-color-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.3rem;
+    font-family: 'Crimson Text', serif;
+    font-size: 0.85rem;
+    color: #3a2a1a;
+}
+
+.grimoire-color-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+/* Quote */
+.grimoire-quote {
+    background: rgba(220, 180, 100, 0.15);
+    border-left: 3px solid #d4a373;
+    padding: 0.8rem 1rem;
+    margin: 1.5rem 0;
+    border-radius: 0 8px 8px 0;
+}
+
+.grimoire-quote p {
+    font-family: 'Crimson Text', serif;
+    font-style: italic;
+    color: #5a3a1a;
+    line-height: 1.6;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* Page Numbers */
+.grimoire-page-num {
+    position: absolute;
+    bottom: 1rem;
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #a89080;
+}
+
+.grimoire-page-left .grimoire-page-num {
+    left: 2rem;
+}
+
+.grimoire-page-right .grimoire-page-num {
+    right: 2rem;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .grimoire-book {
+        flex-direction: column;
+        max-height: 90vh;
+    }
+
+    .grimoire-page {
+        width: 100%;
+    }
+}

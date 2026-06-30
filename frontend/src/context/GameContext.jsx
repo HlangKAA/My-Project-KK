@@ -7,7 +7,6 @@ export const useGame = () => useContext(GameContext);
 
 // Configure Axios
 const api = axios.create({
-  baseURL: 'http://localhost:5000', // Auth routes base URL
   withCredentials: true // Important for cookies/session
 });
 
@@ -58,12 +57,10 @@ export const GameProvider = ({ children }) => {
   };
 
   const updateProgress = (levelId) => {
-    // TODO: Sync with backend API for level progress
     if (user) {
-      // Temporary local update for UI responsiveness
-      // In real app, call API to save progress
-      // const updatedUser = { ...user, level: Math.max(user.level || 0, levelId + 1) };
-      // setUser(updatedUser);
+      const newLevel = Math.max(user.level || 1, levelId + 1);
+      const updatedUser = { ...user, level: newLevel };
+      setUser(updatedUser);
     }
   };
 
