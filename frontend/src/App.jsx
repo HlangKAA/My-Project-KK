@@ -6,8 +6,11 @@ import { GameProvider, useGame } from './context/GameContext';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import GamePage from './pages/GamePage';
 import Dashboard from './pages/Dashboard';
+import RegionMap from './pages/RegionMap';
+import StagePage from './pages/StagePage';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children }) => {
@@ -29,6 +32,8 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
           
           <Route 
             path="/dashboard" 
@@ -40,12 +45,27 @@ function App() {
           />
           
           <Route 
-            path="/game/:levelId" 
+            path="/region/:regionId" 
             element={
               <ProtectedRoute>
-                <GamePage />
+                <RegionMap />
               </ProtectedRoute>
             } 
+          />
+          
+          <Route 
+            path="/region/:regionId/stage/:stageId" 
+            element={
+              <ProtectedRoute>
+                <StagePage />
+              </ProtectedRoute>
+            } 
+          />
+
+          {/* Backward compatibility: redirect old /game/:levelId */}
+          <Route 
+            path="/game/:levelId" 
+            element={<Navigate to="/dashboard" replace />} 
           />
         </Routes>
       </GameProvider>
@@ -54,3 +74,4 @@ function App() {
 }
 
 export default App;
+

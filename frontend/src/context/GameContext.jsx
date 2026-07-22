@@ -64,12 +64,39 @@ export const GameProvider = ({ children }) => {
     }
   };
 
+  /**
+   * Track stage completion within a region.
+   * stageProgress = { regionId: completedCount }
+   * e.g., { 1: 2 } means region 1 has stages 1 and 2 completed
+   */
+  const updateStageProgress = (regionId, stageId) => {
+    if (user) {
+      const currentProgress = user.stageProgress || {};
+      const currentCompleted = currentProgress[regionId] || 0;
+      const newCompleted = Math.max(currentCompleted, stageId);
+      
+      const updatedProgress = { ...currentProgress, [regionId]: newCompleted };
+      
+      // Also update the region-level progress (for Dashboard lock/unlock)
+      // A region is "complete" when all its stages are done
+      const newLevel = Math.max(user.level || 1, regionId + 1);
+      
+      const updatedUser = { 
+        ...user, 
+        stageProgress: updatedProgress,
+        level: newLevel
+      };
+      setUser(updatedUser);
+    }
+  };
+
   const value = {
     user,
     loading,
     login,
     logout,
-    updateProgress
+    updateProgress,
+    updateStageProgress
   };
 
   return (
@@ -78,3 +105,4 @@ export const GameProvider = ({ children }) => {
     </GameContext.Provider>
   );
 };
+

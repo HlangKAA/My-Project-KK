@@ -1,0 +1,450 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap');
+
+/* ============================================
+   REGION MAP — Stage Selection Gothic Theme
+   ============================================ */
+
+.rmap-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: #1a0a0a;
+    color: #f1e8e0;
+}
+
+/* ─── Navbar ─── */
+.rmap-navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+    height: 56px;
+    background: rgba(20, 8, 8, 0.97);
+    border-bottom: 1px solid rgba(220, 38, 38, 0.2);
+    flex-shrink: 0;
+    z-index: 50;
+}
+
+.rmap-nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.rmap-nav-brand-icon {
+    width: 32px;
+    height: 32px;
+    background: #dc2626;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    color: #fff;
+}
+
+.rmap-nav-brand-text {
+    font-family: 'Cinzel', serif;
+    font-weight: 800;
+    font-size: 1rem;
+    color: #fff;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.rmap-nav-center {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'Cinzel', serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #dc2626;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    background: rgba(220, 38, 38, 0.08);
+    padding: 0.4rem 1rem;
+    border-radius: 6px;
+    border: 1px solid rgba(220, 38, 38, 0.2);
+}
+
+.rmap-nav-actions {
+    display: flex;
+    align-items: center;
+}
+
+.rmap-back-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #a89080;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.rmap-back-btn:hover {
+    background: rgba(220, 38, 38, 0.15);
+    border-color: rgba(220, 38, 38, 0.3);
+    color: #fff;
+}
+
+/* ─── Main Content ─── */
+.rmap-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3rem 2rem;
+    position: relative;
+    overflow: hidden;
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(220, 38, 38, 0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 20% 80%, rgba(127, 29, 29, 0.08) 0%, transparent 40%),
+        radial-gradient(ellipse at 80% 60%, rgba(220, 38, 38, 0.04) 0%, transparent 40%);
+}
+
+/* Background particles */
+.rmap-bg-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.rmap-bg-particle {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: rgba(220, 38, 38, 0.3);
+    border-radius: 50%;
+    animation: rmapParticleFloat 6s ease-in-out infinite;
+}
+
+@keyframes rmapParticleFloat {
+    0%, 100% { opacity: 0; transform: translateY(0) scale(0.5); }
+    50% { opacity: 1; transform: translateY(-40px) scale(1); }
+}
+
+/* ─── Region Header ─── */
+.rmap-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    position: relative;
+    z-index: 2;
+}
+
+.rmap-header-badge {
+    margin-bottom: 0.8rem;
+}
+
+.rmap-header-region-num {
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #dc2626;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    background: rgba(220, 38, 38, 0.1);
+    padding: 0.4rem 1.2rem;
+    border-radius: 20px;
+    border: 1px solid rgba(220, 38, 38, 0.2);
+}
+
+.rmap-title {
+    font-family: 'Cinzel', serif;
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: #fff;
+    margin: 0.8rem 0 0.3rem;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    text-shadow: 0 0 40px rgba(220, 38, 38, 0.2);
+}
+
+.rmap-subtitle {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    color: #dc2626;
+    margin: 0 0 0.6rem;
+    letter-spacing: 2px;
+    font-weight: 600;
+}
+
+.rmap-description {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    color: #a89080;
+    max-width: 500px;
+    margin: 0 auto;
+    line-height: 1.6;
+    font-style: italic;
+}
+
+/* ─── Stage Timeline ─── */
+.rmap-timeline {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    max-width: 600px;
+    width: 100%;
+    z-index: 2;
+}
+
+.rmap-timeline-line {
+    position: absolute;
+    left: 28px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(
+        180deg,
+        rgba(220, 38, 38, 0.4) 0%,
+        rgba(220, 38, 38, 0.15) 50%,
+        rgba(255, 255, 255, 0.05) 100%
+    );
+}
+
+/* ─── Stage Node ─── */
+.rmap-stage-node {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    position: relative;
+}
+
+/* Timeline Dot */
+.rmap-stage-dot {
+    width: 58px;
+    height: 58px;
+    flex-shrink: 0;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rmap-stage-dot-inner {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    transition: all 0.3s;
+    position: relative;
+    z-index: 2;
+}
+
+.rmap-stage-node.active .rmap-stage-dot-inner {
+    background: linear-gradient(135deg, #dc2626, #991b1b);
+    border: 3px solid rgba(220, 38, 38, 0.6);
+    color: #fff;
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.4);
+}
+
+.rmap-stage-node.complete .rmap-stage-dot-inner {
+    background: linear-gradient(135deg, #16a34a, #15803d);
+    border: 3px solid rgba(22, 163, 74, 0.6);
+    color: #fff;
+    box-shadow: 0 0 15px rgba(22, 163, 74, 0.3);
+}
+
+.rmap-stage-node.locked .rmap-stage-dot-inner {
+    background: rgba(40, 20, 20, 0.8);
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    color: #555;
+}
+
+/* Active pulse ring */
+.rmap-stage-dot-pulse {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    border: 2px solid rgba(220, 38, 38, 0.4);
+    animation: rmapDotPulse 2s ease-in-out infinite;
+    z-index: 1;
+}
+
+@keyframes rmapDotPulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+    50% { transform: translate(-50%, -50%) scale(1.25); opacity: 0; }
+}
+
+/* ─── Stage Card ─── */
+.rmap-stage-card {
+    flex: 1;
+    background: rgba(30, 12, 12, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 14px;
+    padding: 1.4rem 1.6rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(8px);
+}
+
+.rmap-stage-card.active {
+    border-color: rgba(220, 38, 38, 0.3);
+    background: rgba(40, 15, 15, 0.8);
+    box-shadow: 0 4px 20px rgba(220, 38, 38, 0.1);
+}
+
+.rmap-stage-card.active:hover {
+    border-color: rgba(220, 38, 38, 0.5);
+    transform: translateX(8px);
+    box-shadow: 0 8px 30px rgba(220, 38, 38, 0.2);
+}
+
+.rmap-stage-card.complete {
+    border-color: rgba(22, 163, 74, 0.2);
+}
+
+.rmap-stage-card.complete:hover {
+    border-color: rgba(22, 163, 74, 0.4);
+    transform: translateX(8px);
+}
+
+.rmap-stage-card.locked {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Card Header */
+.rmap-stage-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.6rem;
+}
+
+.rmap-stage-number {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    color: #a89080;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+.rmap-stage-type {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+}
+
+.rmap-stage-type.story {
+    color: #f59e0b;
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.rmap-stage-type.challenge {
+    color: #dc2626;
+    background: rgba(220, 38, 38, 0.1);
+    border: 1px solid rgba(220, 38, 38, 0.2);
+}
+
+.rmap-stage-name {
+    font-family: 'Cinzel', serif;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #fff;
+    margin: 0 0 0.4rem;
+    letter-spacing: 1px;
+}
+
+.rmap-stage-desc {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.82rem;
+    color: #a89080;
+    margin: 0 0 1rem;
+    line-height: 1.5;
+}
+
+/* Card Footer */
+.rmap-stage-card-footer {
+    display: flex;
+    align-items: center;
+}
+
+.rmap-stage-status {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.rmap-stage-status.complete {
+    color: #4ade80;
+}
+
+.rmap-stage-status.locked {
+    color: #555;
+}
+
+.rmap-stage-enter-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.4rem;
+    background: #dc2626;
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
+}
+
+.rmap-stage-enter-btn:hover {
+    background: #ef4444;
+    box-shadow: 0 6px 25px rgba(220, 38, 38, 0.5);
+    transform: translateY(-2px);
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+    .rmap-content {
+        padding: 2rem 1rem;
+    }
+
+    .rmap-title {
+        font-size: 1.8rem;
+    }
+
+    .rmap-stage-card {
+        padding: 1rem 1.2rem;
+    }
+
+    .rmap-nav-center {
+        display: none;
+    }
+}

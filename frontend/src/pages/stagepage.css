@@ -1,0 +1,527 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/* ============================================
+   STAGE PAGE — Story Intro + IDE Slide-in
+   ============================================ */
+
+/* ═══════════════════════════════════════════
+   STORY INTRO — Full-screen Scene
+   ═══════════════════════════════════════════ */
+
+.stage-story-page {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+    background: #0a0505;
+}
+
+/* ─── Background Scene ─── */
+.stage-story-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+        radial-gradient(ellipse at 50% 85%, rgba(30, 12, 12, 0.9) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 20%, rgba(40, 10, 10, 0.5) 0%, transparent 60%),
+        linear-gradient(180deg, #050208 0%, #0a0510 20%, #120a15 40%, #1a0a0a 70%, #0d0505 100%);
+}
+
+/* ─── Tower ─── */
+.stage-story-tower {
+    position: absolute;
+    bottom: 12%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+}
+
+.tower-body {
+    width: 120px;
+    height: 280px;
+    background: linear-gradient(180deg, #1a1020 0%, #0d0810 40%, #150a10 100%);
+    border: 1px solid rgba(220, 38, 38, 0.12);
+    border-radius: 8px 8px 0 0;
+    position: relative;
+    box-shadow:
+        0 0 60px rgba(0, 0, 0, 0.8),
+        inset 0 0 30px rgba(0, 0, 0, 0.5);
+}
+
+.tower-window {
+    position: absolute;
+    width: 20px;
+    height: 30px;
+    background: rgba(220, 38, 38, 0.15);
+    border: 1px solid rgba(220, 38, 38, 0.25);
+    border-radius: 10px 10px 0 0;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 30px;
+    box-shadow: 0 0 15px rgba(220, 38, 38, 0.2);
+    animation: windowFlicker 4s ease-in-out infinite;
+}
+
+.tower-window.w2 {
+    top: 100px;
+    animation-delay: 1.5s;
+}
+
+.tower-window.w3 {
+    top: 170px;
+    animation-delay: 0.8s;
+}
+
+@keyframes windowFlicker {
+    0%, 100% { opacity: 0.6; background: rgba(220, 38, 38, 0.15); }
+    50% { opacity: 1; background: rgba(220, 38, 38, 0.3); }
+}
+
+.tower-roof {
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 75px solid transparent;
+    border-right: 75px solid transparent;
+    border-bottom: 40px solid #1a1020;
+    filter: drop-shadow(0 -2px 8px rgba(220, 38, 38, 0.1));
+}
+
+.tower-spire {
+    position: absolute;
+    top: -80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 45px;
+    background: linear-gradient(180deg, rgba(220, 38, 38, 0.6), #1a1020);
+    border-radius: 2px;
+}
+
+.tower-glow {
+    position: absolute;
+    top: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 12px;
+    height: 12px;
+    background: #dc2626;
+    border-radius: 50%;
+    box-shadow: 0 0 30px rgba(220, 38, 38, 0.6), 0 0 60px rgba(220, 38, 38, 0.3);
+    animation: towerGlowPulse 3s ease-in-out infinite;
+}
+
+@keyframes towerGlowPulse {
+    0%, 100% { box-shadow: 0 0 30px rgba(220, 38, 38, 0.6), 0 0 60px rgba(220, 38, 38, 0.3); }
+    50% { box-shadow: 0 0 50px rgba(220, 38, 38, 0.8), 0 0 100px rgba(220, 38, 38, 0.4); }
+}
+
+/* Ambient Particles */
+.stage-story-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 3;
+}
+
+.story-particle {
+    position: absolute;
+    background: rgba(220, 38, 38, 0.4);
+    border-radius: 50%;
+    animation: storyParticleRise 5s ease-in-out infinite;
+}
+
+@keyframes storyParticleRise {
+    0% { opacity: 0; transform: translateY(0) scale(0.3); }
+    30% { opacity: 1; transform: translateY(-30px) scale(1); }
+    100% { opacity: 0; transform: translateY(-120px) translateX(20px) scale(0.2); }
+}
+
+/* Ground Fog */
+.stage-story-fog {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 20%;
+    background: linear-gradient(180deg, transparent 0%, rgba(10, 5, 5, 0.8) 60%, #0a0505 100%);
+    z-index: 3;
+}
+
+/* ─── Story Indicator (top) ─── */
+.stage-story-indicator {
+    position: absolute;
+    top: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    z-index: 10;
+    animation: fadeInDown 1s ease;
+}
+
+.stage-story-region {
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #dc2626;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+}
+
+.stage-story-divider {
+    color: rgba(255, 255, 255, 0.2);
+}
+
+.stage-story-stage {
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #a89080;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* ─── NPC Character ─── */
+.stage-npc {
+    position: absolute;
+    bottom: 25%;
+    left: 20%;
+    z-index: 5;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stage-npc.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.stage-npc-sprite {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6d28d9, #4c1d95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: #fff;
+    position: relative;
+    border: 3px solid rgba(109, 40, 217, 0.5);
+    box-shadow: 0 0 30px rgba(109, 40, 217, 0.3);
+    animation: npcFloat 4s ease-in-out infinite;
+}
+
+.stage-npc-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    border: 2px solid rgba(109, 40, 217, 0.2);
+    animation: npcGlowPulse 3s ease-in-out infinite;
+}
+
+@keyframes npcFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes npcGlowPulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+    50% { transform: translate(-50%, -50%) scale(1.15); opacity: 0; }
+}
+
+.stage-npc-name-tag {
+    text-align: center;
+    margin-top: 0.8rem;
+}
+
+.stage-npc-name {
+    display: block;
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: #c4b5fd;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.stage-npc-title {
+    display: block;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.65rem;
+    color: #8b5cf6;
+    margin-top: 0.2rem;
+    letter-spacing: 1px;
+}
+
+/* ─── Dialog Box ─── */
+.stage-dialog-area {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 2rem 3rem 3rem;
+    z-index: 10;
+    cursor: pointer;
+}
+
+.stage-dialog-box {
+    max-width: 700px;
+    margin: 0 auto;
+    background: rgba(15, 8, 20, 0.92);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(109, 40, 217, 0.3);
+    border-radius: 16px;
+    padding: 1.5rem 2rem;
+    animation: dialogFadeIn 0.4s ease;
+    position: relative;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+}
+
+.stage-dialog-box.mysterious {
+    border-color: rgba(109, 40, 217, 0.4);
+}
+
+.stage-dialog-box.nostalgic {
+    border-color: rgba(59, 130, 246, 0.3);
+}
+
+.stage-dialog-box.serious {
+    border-color: rgba(220, 38, 38, 0.3);
+}
+
+.stage-dialog-box.encouraging {
+    border-color: rgba(22, 163, 74, 0.3);
+}
+
+@keyframes dialogFadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.stage-dialog-speaker {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.8rem;
+}
+
+.stage-dialog-speaker i {
+    color: #8b5cf6;
+    font-size: 0.9rem;
+}
+
+.stage-dialog-speaker span {
+    font-family: 'Cinzel', serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #c4b5fd;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.stage-dialog-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    color: #e8e0f0;
+    line-height: 1.7;
+    margin: 0;
+    min-height: 50px;
+}
+
+.stage-dialog-next {
+    text-align: right;
+    margin-top: 0.8rem;
+}
+
+.stage-dialog-next span {
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    color: #a89080;
+    letter-spacing: 1px;
+    animation: nextBlink 1.5s ease-in-out infinite;
+}
+
+.stage-dialog-next i {
+    margin-left: 0.3rem;
+    font-size: 0.6rem;
+}
+
+@keyframes nextBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+/* Typing indicator */
+.stage-dialog-typing {
+    display: flex;
+    gap: 4px;
+    margin-top: 0.6rem;
+}
+
+.typing-dot {
+    width: 6px;
+    height: 6px;
+    background: #8b5cf6;
+    border-radius: 50%;
+    animation: typingBounce 1.2s ease-in-out infinite;
+}
+
+.typing-dot:nth-child(2) { animation-delay: 0.15s; }
+.typing-dot:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes typingBounce {
+    0%, 100% { opacity: 0.3; transform: translateY(0); }
+    50% { opacity: 1; transform: translateY(-4px); }
+}
+
+/* ─── Enter Tower Button ─── */
+.stage-enter-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    margin: 1.5rem auto 0;
+    padding: 1rem 2.5rem;
+    background: linear-gradient(135deg, #dc2626, #991b1b);
+    border: 2px solid rgba(220, 38, 38, 0.5);
+    border-radius: 12px;
+    color: #fff;
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 6px 30px rgba(220, 38, 38, 0.4);
+    animation: enterBtnAppear 0.5s ease;
+}
+
+.stage-enter-btn:hover {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    box-shadow: 0 8px 40px rgba(220, 38, 38, 0.6);
+    transform: translateY(-3px);
+}
+
+.stage-enter-btn-glow {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    animation: enterBtnShimmer 3s ease-in-out infinite;
+}
+
+@keyframes enterBtnShimmer {
+    0% { left: -100%; }
+    50% { left: 100%; }
+    100% { left: 100%; }
+}
+
+@keyframes enterBtnAppear {
+    from { opacity: 0; transform: scale(0.9) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ─── Skip Button ─── */
+.stage-skip-btn {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: #a89080;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.stage-skip-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+/* ═══════════════════════════════════════════
+   IDE PHASE — Slide-in Animation
+   ═══════════════════════════════════════════ */
+
+.stage-game-page {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: #1a0a0a;
+    color: #f1e8e0;
+    overflow: hidden;
+}
+
+/* IDE slide-in animation class */
+.stage-game-page.ide-slide-in {
+    animation: ideSlideIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes ideSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(60px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* IDE slide-in for code panel specifically */
+.stage-game-page.ide-slide-in .game-code-panel {
+    animation: codePanelSlide 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes codePanelSlide {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.stage-game-page.ide-slide-in .game-scene {
+    animation: sceneReveal 0.7s ease;
+}
+
+@keyframes sceneReveal {
+    from { opacity: 0.3; }
+    to { opacity: 1; }
+}

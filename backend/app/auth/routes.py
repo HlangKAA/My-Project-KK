@@ -71,7 +71,7 @@ def send_verification_email(email, token, username):
 def send_password_reset_email(email, token, username):
     """Send password reset email to user"""
     try:
-        reset_url = url_for('auth.reset_password_page', token=token, _external=True)
+        reset_url = f"http://localhost:5173/reset-password/{token}"
         
         msg = Message(
             'Reset Your Password - Lost Spectrum',

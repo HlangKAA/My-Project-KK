@@ -108,7 +108,7 @@ const Dashboard = () => {
                             return (
                                 <Link
                                     key={region.id}
-                                    to={status !== 'locked' ? `/game/${region.id}` : '#'}
+                                    to={status !== 'locked' ? `/region/${region.id}` : '#'}
                                     className="dash-region"
                                     style={{ top: region.top, left: region.left }}
                                     onClick={(e) => status === 'locked' && e.preventDefault()}
