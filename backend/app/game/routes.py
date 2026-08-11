@@ -18,7 +18,7 @@ def level_select():
     conn = get_db_connection()
     if conn:
         try:
-            cursor = conn.cursor(dictionary=True)
+            cursor = conn.cursor()
             cursor.execute("SELECT current_level FROM game_progress WHERE player_id = %s", (session['player_id'],))
             result = cursor.fetchone()
             if result:

@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, jsonify, session, redirect, url_for
 from flask_mail import Message
 from werkzeug.security import generate_password_hash, check_password_hash
-from mysql.connector import Error
+from psycopg2 import Error
 from datetime import datetime, timedelta
 import secrets
 from app import mail
@@ -157,7 +157,7 @@ def verify_email(token):
                              message='Database connection failed')
     
     try:
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
         
         cursor.execute("""
             SELECT player_id, username, email, is_verified, token_expiry 
@@ -228,7 +228,7 @@ def resend_verification():
                 'message': 'Database connection failed'
             }), 500
         
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
         
         cursor.execute("""
             SELECT player_id, username, email, is_verified 
@@ -313,7 +313,7 @@ def signup():
                 'message': 'Database connection failed'
             }), 500
         
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
         
         cursor.execute("SELECT player_id FROM players WHERE email = %s", (email,))
         if cursor.fetchone():
@@ -342,11 +342,12 @@ def signup():
             INSERT INTO players (username, email, password, date_joined, 
                                is_verified, verification_token, token_expiry) 
             VALUES (%s, %s, %s, NOW(), TRUE, %s, %s)
+            RETURNING player_id
         """
         cursor.execute(insert_query, (name, email, hashed_password, token, expiry))
+        res = cursor.fetchone()
+        player_id = res['player_id'] if res else getattr(cursor, 'lastrowid', None)
         connection.commit()
-        
-        player_id = cursor.lastrowid
         
         cursor.close()
         connection.close()
@@ -393,7 +394,7 @@ def login():
                 'message': 'Database connection failed'
             }), 500
         
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
         
         cursor.execute("""
             SELECT player_id, username, email, password, is_verified 
@@ -481,7 +482,7 @@ def forgot_password():
                 'message': 'Database connection failed'
             }), 500
         
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
         
         cursor.execute("""
             SELECT player_id, username, email 
@@ -556,7 +557,7 @@ def reset_password():
                 'message': 'Database connection failed'
             }), 500
         
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
         
         cursor.execute("""
             SELECT player_id, username, reset_token_expiry 

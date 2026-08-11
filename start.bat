@@ -22,7 +22,7 @@ timeout /t 3 /nobreak >nul
 echo  [2/2] Starting Frontend (Vite :5173)...
 cd /d "%~dp0frontend"
 
-start "LostSpectrum-Frontend" cmd /k "npm run dev"
+start "LostSpectrum-Frontend" cmd /k "npm.cmd run dev"
 
 :: Wait for Vite to boot
 timeout /t 4 /nobreak >nul
