@@ -1,12 +1,94 @@
+<div align="center">
+
 # 🌈 The Lost Spectrum
 
-An educational web game that teaches **Python programming** through a fantasy narrative. Players progress through themed Regions and Stages, writing real Python code to solve puzzles involving variables, lists, conditionals, and RGB color theory.
+**An educational web game teaching Python programming through a fantasy narrative**
+
+Write real Python code to restore color to a grayscale world!
+
+[![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
+[![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+
+</div>
+
+---
+
+## 📋 Overview
+
+**The Lost Spectrum** is an ongoing educational web game that teaches **Python programming** and **computer vision concepts** through an immersive fantasy narrative. Players progress through themed **Regions** and **Stages**, writing real Python code to solve puzzles involving variables, lists, conditionals, and RGB color theory — bridging learning and creative problem-solving.
+
+## ✨ Features
+
+| Feature | Description |
+|---------|-------------|
+| 🎮 **Interactive Gameplay** | Write real Python code to solve puzzles and progress |
+| 🐍 **In-Browser Python** | Execute Python code directly in the browser using Skulpt |
+| 🗺️ **Region & Stage System** | Multi-region world map with progressive difficulty |
+| 📖 **Grimoire (Spell Book)** | In-game reference guide for Python concepts |
+| 🏆 **Level Completion** | Track progress and unlock new stages |
+| 🔐 **Authentication** | Full user system with signup, login, email verification |
+| 🔑 **Password Recovery** | Forgot password & reset via email |
+| 📊 **Dashboard** | View progress, stats, and game history |
+| 🎨 **Themed Regions** | Red Forest, Whispering Caverns, Ash Peaks, and more |
+| 🖥️ **Code Editor** | Built-in code editor with syntax highlighting |
 
 ## 🏗️ Architecture
 
-- **Backend**: Python (Flask) — API, authentication, game logic
-- **Frontend**: React (Vite) — UI, animations, in-browser Python execution (Skulpt)
-- **Database**: PostgreSQL on **Supabase** (Cloud) — via Transaction Pooler
+```
+My-Project-KK/
+├── backend/                           # Flask API Server
+│   ├── app/
+│   │   ├── __init__.py                # Flask app factory
+│   │   ├── db.py                      # Database connection (Supabase)
+│   │   ├── auth/
+│   │   │   └── routes.py             # Authentication endpoints
+│   │   ├── game/
+│   │   │   ├── routes.py             # Game API endpoints
+│   │   │   └── levels.py             # Level definitions
+│   │   ├── main/
+│   │   │   └── routes.py             # Main routes
+│   │   ├── templates/                 # Jinja2 templates (auth pages)
+│   │   └── static/                    # Static assets
+│   ├── requirements.txt
+│   └── run.py                         # Entry point
+├── frontend/                          # React + Vite SPA
+│   ├── src/
+│   │   ├── pages/
+│   │   │   ├── GamePage.jsx           # Main game interface
+│   │   │   ├── StagePage.jsx          # Individual stage view
+│   │   │   ├── RegionMap.jsx          # World map navigation
+│   │   │   ├── Dashboard.jsx          # User dashboard
+│   │   │   ├── Login.jsx              # Login page
+│   │   │   └── Register.jsx           # Registration page
+│   │   ├── components/
+│   │   │   ├── CodeEditor.jsx         # Python code editor
+│   │   │   ├── GameVisualizer.jsx     # Visual output display
+│   │   │   ├── Grimoire.jsx           # In-game spell book
+│   │   │   └── LevelComplete.jsx      # Level completion screen
+│   │   ├── hooks/
+│   │   │   └── usePythonInterpreter.js  # Skulpt Python execution
+│   │   ├── context/
+│   │   │   └── GameContext.jsx        # Game state management
+│   │   └── data/
+│   │       └── stageData.js           # Stage/level configurations
+│   └── package.json
+└── start.bat                          # One-click startup script
+```
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| **Backend** | Python, Flask |
+| **Frontend** | React, Vite |
+| **Python in Browser** | Skulpt (in-browser Python interpreter) |
+| **Database** | PostgreSQL on Supabase (Cloud) |
+| **Authentication** | Flask sessions, email verification |
+| **Styling** | Custom CSS with animations |
+| **HTTP Client** | Axios |
 
 ## ⚙️ Prerequisites
 
@@ -15,16 +97,16 @@ An educational web game that teaches **Python programming** through a fantasy na
 | **Python** | 3.10+ | [python.org](https://www.python.org/downloads/) *(tick "Add to PATH")* |
 | **Node.js** | 18+ LTS | [nodejs.org](https://nodejs.org/) |
 
-> **Note:** No local database installation required — the project uses Supabase (Cloud PostgreSQL).
+> **Note:** No local database installation required — the project uses **Supabase** (Cloud PostgreSQL).
 
-## 🚀 Quick Start (One Click)
+## 🚀 Getting Started
 
-Double-click **`start.bat`** in the project root.  
-It will start both servers and open the browser automatically.
+### Quick Start (One Click)
+Double-click **`start.bat`** in the project root — it will start both servers and open the browser automatically.
 
-## 🛠️ Manual Setup
+### Manual Setup
 
-### 1. Backend Setup (First Time)
+#### 1. Backend Setup
 ```powershell
 cd backend
 python -m venv venv
@@ -32,62 +114,49 @@ python -m venv venv
 pip install -r requirements.txt
 ```
 
-### 2. Frontend Setup (First Time)
+#### 2. Frontend Setup
 ```powershell
 cd frontend
 npm install
 ```
 
-### 3. Environment Variables
-Create or update `backend/.env` with:
+#### 3. Environment Variables
+Create `backend/.env` with:
 ```env
 MAIL_USERNAME=your_email@gmail.com
 MAIL_PASSWORD=your_app_password
 MAIL_DEFAULT_SENDER=your_email@gmail.com
 SECRET_KEY=your_secret_key
-
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_KEY=your_supabase_anon_key
-DATABASE_URL=postgresql://postgres.your-project:your-password@aws-0-region.pooler.supabase.com:6543/postgres
+DATABASE_URL=your_supabase_connection_string
 ```
 
-### 4. Run Servers
-
-**Terminal 1 — Backend:**
+#### 4. Run the Application
 ```powershell
-cd backend
-.\venv\Scripts\activate
-python run.py
-```
-→ Runs on **http://localhost:5000**
+# Backend
+cd backend && python run.py
 
-**Terminal 2 — Frontend:**
-```powershell
-cd frontend
-npm run dev
+# Frontend (new terminal)
+cd frontend && npm run dev
 ```
-→ Runs on **http://localhost:5173**
 
 ## 🎮 How to Play
-Open **http://localhost:5173** in your browser.
 
-## 📂 Project Structure
-```
-├── backend/                # Flask API server
-│   ├── app/
-│   │   ├── auth/           # Authentication routes (signup, login, password reset)
-│   │   ├── game/           # Game routes (levels, progress)
-│   │   ├── main/           # Main routes (root, dashboard)
-│   │   ├── db.py           # PostgreSQL/Supabase database connection
-│   │   └── __init__.py     # Flask app factory & blueprint registration
-│   ├── .env                # Environment variables (not committed)
-│   ├── requirements.txt    # Python dependencies
-│   └── run.py              # Entry point
-├── frontend/               # React SPA (Vite)
-│   ├── src/
-│   │   ├── pages/          # Page components
-│   │   ├── components/     # Reusable UI components
-│   │   └── context/        # React Context (auth, game state)
-│   └── package.json        # Node.js dependencies
-└── start.bat               # One-click launcher (Windows)
-```
+1. **Create an account** and verify your email
+2. **Explore the world map** — choose a region to begin
+3. **Select a stage** — each stage teaches a specific Python concept
+4. **Read the challenge** and use the **Grimoire** for hints
+5. **Write Python code** in the built-in editor
+6. **Run your code** — see visual results in real-time
+7. **Complete the level** and unlock the next stage!
+
+## 📄 License
+
+This project is for educational purposes.
+
+---
+
+<div align="center">
+
+**Made with ❤️ — Learn Python, Save the Spectrum!**
+
+</div>
