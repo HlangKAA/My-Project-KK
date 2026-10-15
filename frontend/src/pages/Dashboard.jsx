@@ -17,7 +17,7 @@ const REGIONS = [
     },
     {
         id: 2,
-        name: 'ASH PEAKS',
+        name: "THE SCHOLAR'S ARCHIVE",
         image: regionAshPeaks,
         top: '28%',
         left: '55%',
@@ -25,11 +25,19 @@ const REGIONS = [
     },
     {
         id: 3,
-        name: 'WHISPERING CAVERNS',
-        image: regionWhisperingCaverns,
+        name: 'ASH PEAKS',
+        image: regionAshPeaks,
         top: '62%',
         left: '52%',
         essence: { name: 'Azure Focus', color: '#3b82f6', pct: 10, potency: 'DEPLETED' }
+    },
+    {
+        id: 4,
+        name: 'WHISPERING CAVERNS',
+        image: regionWhisperingCaverns,
+        top: '75%',
+        left: '35%',
+        essence: { name: 'Prismatic Convergence', color: '#8b5cf6', pct: 0, potency: 'SEALED' }
     }
 ];
 

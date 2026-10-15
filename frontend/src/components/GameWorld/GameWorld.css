@@ -1,0 +1,481 @@
+/*  ═══════════════════════════════════════════════════
+    GameWorld CSS — Tile map, entities, wizard, effects
+    ═══════════════════════════════════════════════════ */
+
+/* ─── Viewport ─── */
+.gw-viewport {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #0a0a0a;
+    border-radius: 8px;
+    cursor: default;
+    user-select: none;
+}
+
+.gw-world {
+    position: absolute;
+    transition: transform 0.18s ease-out;
+    image-rendering: pixelated;
+}
+
+.gw-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    color: #888;
+    font-size: 1.1rem;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+/* ─── Tiles ─── */
+.gw-tiles {
+    position: absolute;
+    inset: 0;
+}
+
+.gw-tile {
+    position: absolute;
+    box-sizing: border-box;
+}
+
+/* Tile Themes */
+.tile-grass {
+    background: #1a3a1a;
+    background-image: 
+        radial-gradient(circle at 20% 40%, rgba(34, 70, 34, 0.6) 1px, transparent 1px),
+        radial-gradient(circle at 70% 80%, rgba(34, 70, 34, 0.4) 1px, transparent 1px),
+        radial-gradient(circle at 50% 20%, rgba(40, 80, 40, 0.3) 1px, transparent 1px);
+}
+
+.tile-dark-grass {
+    background: #122a12;
+    background-image: 
+        radial-gradient(circle at 30% 60%, rgba(20, 50, 20, 0.5) 1px, transparent 1px);
+}
+
+.tile-path {
+    background: #3d2e1a;
+    background-image: 
+        radial-gradient(circle at 40% 50%, rgba(80, 60, 30, 0.4) 2px, transparent 2px),
+        radial-gradient(circle at 70% 30%, rgba(80, 60, 30, 0.3) 1px, transparent 1px);
+    border: 1px solid rgba(60, 45, 20, 0.3);
+}
+
+.tile-tree {
+    background: #0d1f0d;
+    position: relative;
+}
+.tile-tree::after {
+    content: '🌲';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -55%);
+    font-size: 28px;
+    filter: brightness(0.7) saturate(0.6);
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.tile-water {
+    background: linear-gradient(135deg, #0c2d48, #1a4a6e);
+    animation: tile-water-shimmer 4s ease-in-out infinite;
+}
+@keyframes tile-water-shimmer {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.85; }
+}
+
+.tile-stone {
+    background: #2a2a2a;
+    background-image: 
+        linear-gradient(135deg, rgba(60,60,60,0.3) 25%, transparent 25%),
+        linear-gradient(225deg, rgba(60,60,60,0.3) 25%, transparent 25%);
+    border: 1px solid rgba(80,80,80,0.3);
+}
+
+.tile-flowers {
+    background: #1a3a1a;
+    position: relative;
+}
+.tile-flowers::after {
+    content: '🌸';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 16px;
+    opacity: 0.7;
+}
+
+.tile-bridge {
+    background: #4a3520;
+    border: 2px solid #5a4530;
+    background-image: repeating-linear-gradient(
+        90deg,
+        rgba(80,60,30,0.3) 0px,
+        rgba(80,60,30,0.3) 8px,
+        transparent 8px,
+        transparent 16px
+    );
+}
+
+.tile-ruins {
+    background: #1a1a2a;
+    position: relative;
+}
+.tile-ruins::after {
+    content: '🏚️';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 22px;
+    opacity: 0.6;
+}
+
+/* ─── Grid Overlay ─── */
+.gw-grid-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: 
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+}
+
+/* ─── Entities ─── */
+.gw-entities {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.gw-entity {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    z-index: 5;
+    transition: transform 0.2s, filter 0.3s;
+}
+
+.gw-entity i {
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+    transition: color 0.5s;
+}
+
+/* NPC specific */
+.gw-entity-npc {
+    animation: entity-hover 3s ease-in-out infinite;
+}
+.gw-entity-npc i {
+    font-size: 24px;
+}
+
+@keyframes entity-hover {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+
+.gw-entity-exclaim {
+    position: absolute;
+    top: -8px;
+    right: 2px;
+    width: 16px;
+    height: 16px;
+    background: #fbbf24;
+    color: #1a1a1a;
+    border-radius: 50%;
+    font-size: 10px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: exclaim-bounce 1.5s ease-in-out infinite;
+    box-shadow: 0 0 8px rgba(251, 191, 36, 0.5);
+    z-index: 10;
+}
+
+@keyframes exclaim-bounce {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-4px) scale(1.1); }
+}
+
+/* Boss specific */
+.gw-entity-boss .gw-entity-boss-aura {
+    position: absolute;
+    inset: -8px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(220,38,38,0.2) 0%, transparent 70%);
+    animation: boss-aura-pulse 2s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes boss-aura-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.2); opacity: 1; }
+}
+
+/* Door specific */
+.gw-entity-door {
+    font-size: 26px;
+}
+.gw-entity-locked i {
+    color: #78716c !important;
+}
+.gw-entity-unlocked i {
+    color: #fbbf24 !important;
+    animation: door-glow 2s ease-in-out infinite;
+}
+@keyframes door-glow {
+    0%, 100% { filter: drop-shadow(0 0 4px rgba(251,191,36,0.3)); }
+    50% { filter: drop-shadow(0 0 12px rgba(251,191,36,0.6)); }
+}
+
+/* Puzzle specific */
+.gw-entity-puzzle i {
+    font-size: 20px;
+}
+
+/* Completed entity */
+.gw-entity-completed {
+    opacity: 0.5;
+}
+.gw-entity-check {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 14px;
+    height: 14px;
+    background: #22c55e;
+    color: white;
+    border-radius: 50%;
+    font-size: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+/* Blocked entity */
+.gw-entity-blocked {
+    opacity: 0.25;
+    filter: grayscale(1);
+}
+
+/* Restored scenery (color wave) */
+.gw-entity-restored i {
+    animation: color-restore-pop 0.5s ease-out;
+}
+@keyframes color-restore-pop {
+    0% { transform: scale(0.5); opacity: 0; }
+    60% { transform: scale(1.3); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Animated scenery (campfire etc) */
+.gw-entity-animated i {
+    animation: scenery-flicker 1s ease-in-out infinite alternate;
+}
+@keyframes scenery-flicker {
+    0% { transform: scale(1); filter: brightness(0.9); }
+    100% { transform: scale(1.05); filter: brightness(1.1); }
+}
+
+/* ─── Wizard ─── */
+.gw-wizard {
+    position: absolute;
+    z-index: 10;
+    transition: left 0.15s ease-out, top 0.15s ease-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gw-dir-left .wizard-sprite-container {
+    transform: scaleX(-1);
+}
+
+.gw-moving .wizard-sprite-container {
+    animation: wizard-walk-bob 0.3s ease-in-out;
+}
+
+@keyframes wizard-walk-bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+
+/* ─── Ambient Particles ─── */
+.gw-ambient-particles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+    overflow: hidden;
+}
+
+.gw-ambient-particle {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    opacity: 0;
+    animation: ambient-float 8s ease-in-out infinite;
+}
+
+.gw-particle-forest {
+    background: rgba(220, 38, 38, 0.4);
+    box-shadow: 0 0 4px rgba(220, 38, 38, 0.3);
+}
+
+.gw-particle-archive {
+    background: rgba(22, 163, 106, 0.4);
+    box-shadow: 0 0 4px rgba(22, 163, 106, 0.3);
+}
+
+@keyframes ambient-float {
+    0% { opacity: 0; transform: translateY(0) translateX(0); }
+    20% { opacity: 0.6; }
+    80% { opacity: 0.4; }
+    100% { opacity: 0; transform: translateY(-60px) translateX(20px); }
+}
+
+/* ─── Interaction Prompt ─── */
+.gw-interact-prompt {
+    position: absolute;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.85);
+    border: 1px solid rgba(251, 191, 36, 0.3);
+    border-radius: 8px;
+    padding: 8px 16px;
+    color: #fef3c7;
+    font-size: 0.85rem;
+    font-family: 'JetBrains Mono', monospace;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 20;
+    animation: prompt-appear 0.2s ease-out;
+    white-space: nowrap;
+    backdrop-filter: blur(8px);
+}
+
+.gw-interact-prompt.completed {
+    border-color: rgba(34, 197, 94, 0.3);
+    color: #86efac;
+}
+
+@keyframes prompt-appear {
+    from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.gw-prompt-key {
+    background: rgba(251, 191, 36, 0.2);
+    border: 1px solid rgba(251, 191, 36, 0.4);
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #fbbf24;
+}
+
+/* ─── World Effect Message ─── */
+.gw-effect-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 30;
+    animation: effect-msg-appear 0.5s ease-out;
+}
+
+.gw-effect-message-inner {
+    background: rgba(0, 0, 0, 0.9);
+    border: 2px solid rgba(251, 191, 36, 0.5);
+    border-radius: 12px;
+    padding: 16px 28px;
+    color: #fef3c7;
+    font-size: 1rem;
+    font-family: 'JetBrains Mono', monospace;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 0 40px rgba(251, 191, 36, 0.2);
+}
+
+.gw-effect-message-inner i {
+    color: #fbbf24;
+    font-size: 1.2rem;
+    animation: magic-spin 2s linear infinite;
+}
+
+@keyframes magic-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes effect-msg-appear {
+    from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+/* ─── Controls Hint ─── */
+.gw-controls-hint {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    opacity: 0.35;
+    z-index: 15;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+.gw-viewport:hover .gw-controls-hint {
+    opacity: 0.15;
+}
+
+.gw-hint-keys {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.gw-hint-keys > div {
+    display: flex;
+    gap: 2px;
+}
+
+.gw-key {
+    width: 24px;
+    height: 24px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    color: rgba(255,255,255,0.5);
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.gw-hint-text {
+    font-size: 0.6rem;
+    color: rgba(255,255,255,0.4);
+    font-family: 'JetBrains Mono', monospace;
+}

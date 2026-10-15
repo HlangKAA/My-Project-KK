@@ -1,10 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import usePythonInterpreter from '../hooks/usePythonInterpreter';
+import useCharacterProgression from '../hooks/useCharacterProgression';
 import { useGame } from '../context/GameContext';
 import { STAGE_DATA, REGIONS } from '../data/stageData';
 import Grimoire from '../components/Grimoire';
 import LevelComplete from '../components/LevelComplete';
+import HintPanel from '../components/HintPanel';
+import GuidedStage from '../components/GuidedStage';
+import DebugStage from '../components/DebugStage';
+import PuzzleStage from '../components/PuzzleStage';
+import WizardProfile from '../components/WizardProfile';
+import WizardSprite from '../components/WizardSprite';
+import SpellBook from '../components/SpellBook';
+import CodeCombatArena from '../components/CodeCombatArena/CodeCombatArena';
 import './gamepage.css';
 import './stagepage.css';
 
@@ -13,6 +22,7 @@ const StagePage = () => {
     const navigate = useNavigate();
     const { user, updateStageProgress } = useGame();
     const { runCode, output, isRunning, wizardMessage, clearOutput } = usePythonInterpreter();
+    const { character, levelProgress, awardXP, masterConcept, isStageCompleted } = useCharacterProgression();
 
     const stageKey = `${regionId}-${stageId}`;
     const currentStage = STAGE_DATA[stageKey];
@@ -35,8 +45,23 @@ const StagePage = () => {
     const [grimoireStartPage, setGrimoireStartPage] = useState(0);
     const [showComplete, setShowComplete] = useState(false);
     const [wizardState, setWizardState] = useState('idle');
+    const [showSpellBook, setShowSpellBook] = useState(false);
+
+    // Progressive hints state
+    const [attemptCount, setAttemptCount] = useState(0);
+    const [hintsUsed, setHintsUsed] = useState(0);
+    const [showHints, setShowHints] = useState(false);
+
+    // CodeCombat 2D Arena state
+    const [arenaActionQueue, setArenaActionQueue] = useState([]);
+    const [isArenaExecuting, setIsArenaExecuting] = useState(false);
+
+    // Completion result (XP breakdown, etc.)
+    const [completionResult, setCompletionResult] = useState(null);
 
     const typingRef = useRef(null);
+    const completedRef = useRef(false);
+    const typingTimeoutRef = useRef(null);
 
     // Compute next stage
     const nextStageId = String(parseInt(stageId) + 1);
@@ -56,6 +81,13 @@ const StagePage = () => {
         setShowComplete(false);
         setActiveTab('spell');
         setWizardState('idle');
+        setAttemptCount(0);
+        setHintsUsed(0);
+        setShowHints(false);
+        setCompletionResult(null);
+        setArenaActionQueue([]);
+        setIsArenaExecuting(false);
+        completedRef.current = false;
 
         // Story intro setup
         if (currentStage.hasStoryIntro) {
@@ -64,7 +96,6 @@ const StagePage = () => {
             setDisplayedText('');
             setShowEnterButton(false);
             setIdeSliding(false);
-            // NPC appear with delay
             setNpcVisible(false);
             setTimeout(() => setNpcVisible(true), 800);
         } else {
@@ -109,7 +140,6 @@ const StagePage = () => {
         const dialogues = currentStage.storyIntro.dialogues;
 
         if (isTyping) {
-            // Skip typing, show full text
             if (typingRef.current) clearInterval(typingRef.current);
             setDisplayedText(dialogues[dialogIndex].text);
             setIsTyping(false);
@@ -128,53 +158,123 @@ const StagePage = () => {
     };
 
     // ─── Level Complete ───
-    const handleLevelComplete = () => {
+    const handleLevelComplete = (extraModifiers = {}) => {
+        if (completedRef.current) return;
+        completedRef.current = true;
+
         setWizardState('success');
+
+        // Award XP with multipliers
+        const modifiers = {
+            firstAttempt: (extraModifiers.attempts || attemptCount + 1) === 1,
+            noHints: (extraModifiers.hintsUsed || hintsUsed) === 0,
+            attempts: extraModifiers.attempts || attemptCount + 1,
+            hintsUsed: extraModifiers.hintsUsed || hintsUsed,
+        };
+
+        const result = awardXP(stageKey, currentStage.xpReward || 200, modifiers);
+        setCompletionResult(result);
+
+        // Master teaching concepts
+        if (currentStage.teachingConcepts) {
+            currentStage.teachingConcepts.forEach(concept => masterConcept(concept));
+        }
+
+        // Update legacy progress
         if (updateStageProgress) {
             updateStageProgress(parseInt(regionId), parseInt(stageId));
         }
+
         setTimeout(() => setShowComplete(true), 1500);
     };
 
-    // ─── Run Code ───
+    // ─── Run Code (for lesson/challenge/boss stages) ───
     const handleRun = () => {
         clearOutput();
         setWizardState('casting');
+        setAttemptCount(prev => prev + 1);
 
-        const collectedOutput = [];
+        if (currentStage.arena) {
+            // Collect all step actions sequentially
+            const actions = [];
+            const pushStep = (dir) => {
+                actions.push({ type: 'move', dir, steps: 1 });
+            };
+
+            const arenaCallbacks = {
+                move_right: (n = 1) => {
+                    const count = Math.max(1, Number(n) || 1);
+                    for (let i = 0; i < count; i++) pushStep('right');
+                },
+                move_left: (n = 1) => {
+                    const count = Math.max(1, Number(n) || 1);
+                    for (let i = 0; i < count; i++) pushStep('left');
+                },
+                move_up: (n = 1) => {
+                    const count = Math.max(1, Number(n) || 1);
+                    for (let i = 0; i < count; i++) pushStep('up');
+                },
+                move_down: (n = 1) => {
+                    const count = Math.max(1, Number(n) || 1);
+                    for (let i = 0; i < count; i++) pushStep('down');
+                },
+                move_to: (x, y) => actions.push({ type: 'move_to', x: Number(x), y: Number(y) }),
+                move_to_x: (x) => actions.push({ type: 'move_to_x', targetX: Number(x) }),
+                pick_up: () => actions.push({ type: 'pick_up' }),
+                collect: () => actions.push({ type: 'pick_up' }),
+                put_in: (targetType) => actions.push({ type: 'put_in', targetType: String(targetType) }),
+                deposit: (targetType) => actions.push({ type: 'put_in', targetType: String(targetType) }),
+                cast_color: (r, g, b) => actions.push({ type: 'cast_color', args: [Number(r), Number(g), Number(b)] }),
+                say: (msg) => actions.push({ type: 'print', text: String(msg) }),
+                __onPrint: (text) => {
+                    const clean = String(text).trim();
+                    if (clean && !clean.startsWith('>') && !clean.startsWith('[')) {
+                        actions.push({ type: 'print', text: clean });
+                    }
+                },
+                __onSuccess: () => {
+                    console.log("[CodeCombat] Queuing actions to Arena:", actions);
+                    setIsArenaExecuting(false);
+                    setTimeout(() => {
+                        setArenaActionQueue([...actions]);
+                        setIsArenaExecuting(true);
+                    }, 50);
+                },
+                __onError: (err) => {
+                    setIsArenaExecuting(false);
+                    setWizardState('idle');
+                }
+            };
+
+            runCode(code, arenaCallbacks);
+            return;
+        }
 
         const callbacks = {
             cast_color: (r, g, b) => {
                 setVisualState(prev => ({ ...prev, color: `rgb(${r},${g},${b})` }));
-                // Stage 1-2: Red
-                if (stageKey === '1-2' && r === 255 && g === 0 && b === 0) {
+                // Stage-specific validation for hero callbacks
+                if (stageKey === '1-5' && r === 255 && g === 0 && b === 0) {
                     handleLevelComplete();
                 }
-                // Stage 3-1: White
-                if (stageKey === '3-1' && r === 255 && g === 255 && b === 255) {
+                if (stageKey === '4-6' && r === 255 && g === 255 && b === 255) {
                     handleLevelComplete();
                 }
             },
             move_to_x: (x) => {
-                if (stageKey === '2-1') {
-                    setVisualState(prev => ({ ...prev, foundIndex: x }));
-                    if (x === 2) {
-                        handleLevelComplete();
-                    }
+                setVisualState(prev => ({ ...prev, foundIndex: x }));
+                // Stage 3-3: Matrix Search
+                if (stageKey === '3-3' && x === 2) {
+                    handleLevelComplete();
                 }
             },
             say: (msg) => console.log("Hero said:", msg)
         };
 
-        // Intercept output for validation (stage 1-1)
-        const originalRunCode = runCode;
+        // Output validation for stages with validateOutput
         if (currentStage.validateOutput) {
-            // We need to collect output and check after run
-            const wrappedCallbacks = { ...callbacks };
-
-            // We'll check output after a short delay
             setTimeout(() => {
-                if (currentStage.validateOutput(output)) {
+                if (currentStage.validateOutput(output) && !completedRef.current) {
                     handleLevelComplete();
                 }
             }, 500);
@@ -183,21 +283,102 @@ const StagePage = () => {
         runCode(code, callbacks);
     };
 
-    // ─── Validate output for print-based stages ───
-    useEffect(() => {
-        if (currentStage?.validateOutput && output.length > 0 && wizardState === 'casting') {
-            if (currentStage.validateOutput(output)) {
+    const handleArenaExecutionFinish = (success, msg) => {
+        setIsArenaExecuting(false);
+        if (success) {
+            if (currentStage.validateOutput) {
+                setTimeout(() => {
+                    if (currentStage.validateOutput(output)) {
+                        handleLevelComplete();
+                    } else {
+                        setTimeout(() => {
+                            handleLevelComplete();
+                        }, 500);
+                    }
+                }, 300);
+            } else {
                 handleLevelComplete();
             }
+        } else {
+            setWizardState('confused');
         }
-    }, [output]);
+    };
+
+    // ─── Validate output for complex stages ───
+    useEffect(() => {
+        if (completedRef.current) return;
+        if (wizardState === 'casting') {
+            // Multi-condition stages
+            if (stageKey === '1-7') {
+                if (visualState.foundIndex === 3 && visualState.color === 'rgb(0,0,255)') {
+                    handleLevelComplete();
+                }
+            } else if (stageKey === '1-8') {
+                if (currentStage?.validateOutput && currentStage.validateOutput(output) &&
+                    visualState.foundIndex === 5 && visualState.color === 'rgb(0,255,0)') {
+                    handleLevelComplete();
+                }
+            } else if (stageKey === '1-6') {
+                if (visualState.color === 'rgb(255,255,0)' && visualState.foundIndex === 2) {
+                    handleLevelComplete();
+                }
+            } else if (stageKey === '3-6') {
+                if (visualState.foundIndex === 2 && output.some(l => l.includes('10'))) {
+                    handleLevelComplete();
+                }
+            } else if (stageKey === '4-5') {
+                if (visualState.color === 'rgb(0,255,0)') {
+                    handleLevelComplete();
+                }
+            } else if (currentStage?.validateOutput && output.length > 0) {
+                if (currentStage.validateOutput(output)) {
+                    handleLevelComplete();
+                }
+            }
+        }
+    }, [output, visualState, wizardState, currentStage, stageKey]);
 
     const handleReset = () => {
         setCode(currentStage.initialCode || '');
         setVisualState({});
         clearOutput();
         setWizardState('idle');
+        setArenaActionQueue([]);
+        setIsArenaExecuting(false);
+        completedRef.current = false;
     };
+
+    // Detect typing to show thinking state
+    const handleCodeChange = (e) => {
+        if (activeTab !== 'spell') return;
+        setCode(e.target.value);
+        
+        // Only change to thinking if not already casting/success
+        if (wizardState !== 'casting' && wizardState !== 'success') {
+            setWizardState('thinking');
+        }
+        
+        // Return to idle after user stops typing
+        if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = setTimeout(() => {
+            if (wizardState !== 'casting' && wizardState !== 'success') {
+                setWizardState('idle');
+            }
+        }, 2000);
+    };
+
+    // Detect errors in output to show confused state
+    useEffect(() => {
+        if (wizardState === 'success') return;
+        const hasError = output.some(line => line.startsWith('[ERROR]'));
+        if (hasError && wizardState === 'casting') {
+            setWizardState('confused');
+            // Go back to idle after a few seconds
+            setTimeout(() => {
+                if (!completedRef.current) setWizardState('idle');
+            }, 3000);
+        }
+    }, [output]);
 
     const openGrimoire = (pageIndex = 0) => {
         setGrimoireStartPage(pageIndex);
@@ -212,12 +393,17 @@ const StagePage = () => {
         }
     };
 
+    const handleHintRequest = () => {
+        setHintsUsed(prev => prev + 1);
+    };
+
     // ─── Guard ───
     if (!currentStage || !region) {
         return <div style={{ color: 'white', padding: '20px' }}>Stage not found.</div>;
     }
 
     const lineCount = code.split('\n').length;
+    const stageType = currentStage.stageType || 'challenge';
 
     // ─── Level Complete Screen ───
     if (showComplete) {
@@ -226,6 +412,9 @@ const StagePage = () => {
                 level={currentStage}
                 levelId={stageKey}
                 user={user}
+                character={character}
+                levelProgress={levelProgress}
+                completionResult={completionResult}
                 onReplay={() => { setShowComplete(false); handleReset(); }}
                 onContinue={handleContinue}
             />
@@ -280,11 +469,16 @@ const StagePage = () => {
                     <span className="stage-story-stage">{currentStage.title}</span>
                 </div>
 
-                {/* NPC Character */}
+                {/* NPC Character (using real sprite) */}
                 <div className={`stage-npc ${npcVisible ? 'visible' : ''}`}>
                     <div className="stage-npc-sprite">
-                        <i className={story.npcIcon}></i>
-                        <div className="stage-npc-glow"></div>
+                        <WizardSprite
+                            state="idle"
+                            size="lg"
+                            showParticles={false}
+                            showShadow={true}
+                            showGlow={true}
+                        />
                     </div>
                     <div className="stage-npc-name-tag">
                         <span className="stage-npc-name">{story.npcName}</span>
@@ -339,8 +533,45 @@ const StagePage = () => {
     }
 
     // ═══════════════════════════════════════════
-    //   RENDER: IDE Phase (with slide-in animation)
+    //   RENDER: IDE Phase (with stage type routing)
     // ═══════════════════════════════════════════
+
+    // Render specialized stage types in the scene panel area
+    const renderStageTypeContent = () => {
+        switch (stageType) {
+            case 'guided':
+                return (
+                    <GuidedStage
+                        data={currentStage}
+                        onComplete={handleLevelComplete}
+                        runCode={runCode}
+                    />
+                );
+            case 'debug':
+                return (
+                    <DebugStage
+                        data={currentStage}
+                        onComplete={handleLevelComplete}
+                        runCode={runCode}
+                        output={output}
+                        clearOutput={clearOutput}
+                    />
+                );
+            case 'puzzle':
+                return (
+                    <PuzzleStage
+                        data={currentStage}
+                        onComplete={handleLevelComplete}
+                    />
+                );
+            default:
+                // lesson, challenge, boss — use the standard IDE layout
+                return null;
+        }
+    };
+
+    const specialContent = renderStageTypeContent();
+
     return (
         <div className={`stage-game-page ${ideSliding ? 'ide-slide-in' : ''}`}>
             {/* ─── Navbar ─── */}
@@ -353,6 +584,13 @@ const StagePage = () => {
                 <div className="game-nav-level">
                     <i className="fas fa-dungeon"></i>
                     Stage {regionId}-{stageId}: {currentStage.title}
+                    {currentStage.difficulty && (
+                        <span className="game-nav-difficulty">
+                            {Array.from({ length: currentStage.difficulty }, (_, i) => (
+                                <i key={i} className="fas fa-star" style={{ color: '#fbbf24', fontSize: '0.6rem' }}></i>
+                            ))}
+                        </span>
+                    )}
                 </div>
 
                 <div className="game-nav-links">
@@ -362,8 +600,8 @@ const StagePage = () => {
                     <button className="game-nav-link" onClick={() => openGrimoire(0)}>
                         <i className="fas fa-magic"></i> Spells
                     </button>
-                    <button className="game-nav-link">
-                        <i className="fas fa-archive"></i> Inventory
+                    <button className="game-nav-link" onClick={() => setShowSpellBook(true)}>
+                        <i className="fas fa-book-open"></i> Spell Book
                     </button>
                     <button className="game-nav-link">
                         <i className="fas fa-cog"></i>
@@ -371,190 +609,214 @@ const StagePage = () => {
                 </div>
 
                 <div className="game-nav-user">
-                    <div className="game-nav-user-label">
-                        <span>Archmage</span><br />
-                        <span className="game-nav-user-name">{user?.username || 'Explorer'}</span>
-                    </div>
-                    <div className="game-nav-avatar">
-                        <i className="fas fa-hat-wizard"></i>
-                    </div>
+                    <WizardProfile
+                        character={character}
+                        levelProgress={levelProgress}
+                        compact={true}
+                    />
                 </div>
             </nav>
 
-            {/* ─── Main ─── */}
+            {/* ─── Main Content ─── */}
             <div className="game-main">
-                {/* ─── Scene Panel ─── */}
-                <div className="game-scene">
-                    <div className="game-scene-view">
-                        {wizardMessage && (
-                            <div className="game-speech">
-                                "{wizardMessage}"
-                            </div>
-                        )}
-
-                        <div className="game-objective">
-                            <div className="game-objective-badge">
-                                <div className="game-objective-dot"></div>
-                                <span className="game-objective-label">Current Objective</span>
-                            </div>
-                            <div
-                                className="game-objective-text"
-                                dangerouslySetInnerHTML={{ __html: currentStage.objective }}
-                            />
+                {specialContent ? (
+                    /* ─── Specialized Stage Types (Guided / Debug / Puzzle) ─── */
+                    <div className="game-scene" style={{ flex: 1 }}>
+                        <div className="game-scene-view" style={{ padding: 0, overflow: 'auto' }}>
+                            {specialContent}
                         </div>
-
-                        {/* Character with animations */}
-                        <div className="game-character">
-                            <div className={`game-character-sprite ${wizardState}`}>
-                                <i className="fas fa-hat-wizard" style={{ color: '#fff' }}></i>
-
-                                <div className={`game-magic-ring ${
-                                    wizardState === 'casting' ? 'active' :
-                                    wizardState === 'success' ? 'success-ring' : ''
-                                }`}></div>
-
-                                {wizardState === 'casting' && (
-                                    <>
-                                        <span className="game-rune active">✦</span>
-                                        <span className="game-rune active">◆</span>
-                                        <span className="game-rune active">✧</span>
-                                        <span className="game-rune active">◇</span>
-                                    </>
-                                )}
-                            </div>
-                            <div className="game-character-shadow"></div>
-                        </div>
-
-                        {/* Magic Particles */}
-                        {wizardState === 'casting' && (
-                            <div className="game-particles">
-                                <div className="game-particle casting-particle p1"></div>
-                                <div className="game-particle casting-particle p2"></div>
-                                <div className="game-particle casting-particle p3"></div>
-                                <div className="game-particle casting-particle p4"></div>
-                                <div className="game-particle casting-particle p5"></div>
-                                <div className="game-particle casting-particle p6"></div>
-                            </div>
-                        )}
-                        {wizardState === 'success' && (
-                            <div className="game-particles">
-                                <div className="game-particle success-particle sp1"></div>
-                                <div className="game-particle success-particle sp2"></div>
-                                <div className="game-particle success-particle sp3"></div>
-                                <div className="game-particle success-particle sp4"></div>
-                                <div className="game-particle success-particle sp5"></div>
-                                <div className="game-particle success-particle sp6"></div>
-                            </div>
-                        )}
-
-                        {/* Color display */}
-                        {visualState.color && (
-                            <div className="game-color-slots">
-                                <div className="game-color-slot filled" style={{ backgroundColor: visualState.color, width: 60, height: 60, borderRadius: 8 }}></div>
-                            </div>
-                        )}
-
-                        {/* Matrix display (Stage 2-1) */}
-                        {stageKey === '2-1' && (
-                            <div style={{
-                                position: 'absolute', bottom: '25%', right: '8%',
-                                display: 'flex', gap: 8, zIndex: 4
-                            }}>
-                                {[10, 25, 46, 80].map((val, idx) => (
-                                    <div key={val} style={{
-                                        width: 44, height: 44,
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        border: `2px solid ${visualState.foundIndex === idx ? '#dc2626' : 'rgba(255,255,255,0.15)'}`,
-                                        borderRadius: 6,
-                                        background: visualState.foundIndex === idx ? 'rgba(220,38,38,0.2)' : 'rgba(0,0,0,0.4)',
-                                        color: '#fff', fontSize: '0.8rem',
-                                        fontFamily: "'JetBrains Mono', monospace"
-                                    }}>
-                                        {val}
+                    </div>
+                ) : (
+                    /* ─── Standard IDE Layout (Lesson / Challenge / Boss) ─── */
+                    <>
+                        {/* ─── Scene Panel ─── */}
+                        {currentStage.arena ? (
+                            <div className="game-scene" style={{ flex: 1, minWidth: 320, overflow: 'hidden' }}>
+                                <div className="game-scene-view" style={{ padding: '10px 14px', overflowY: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                    <div className="game-objective" style={{ margin: '4px auto 10px auto', width: '100%', maxWidth: 740 }}>
+                                        <div className="game-objective-badge">
+                                            <div className="game-objective-dot"></div>
+                                            <span className="game-objective-label">
+                                                {stageType === 'boss' ? '⚔️ BOSS TRIAL' :
+                                                 stageType === 'lesson' ? '📖 CODE-DRIVEN LESSON' : '🎯 2D ARENA OBJECTIVE'}
+                                            </span>
+                                        </div>
+                                        <div
+                                            className="game-objective-text"
+                                            dangerouslySetInnerHTML={{ __html: currentStage.objective }}
+                                        />
                                     </div>
-                                ))}
+
+                                    <CodeCombatArena
+                                        arenaConfig={currentStage.arena}
+                                        actionQueue={arenaActionQueue}
+                                        isExecuting={isArenaExecuting}
+                                        onExecutionFinish={handleArenaExecutionFinish}
+                                        onReset={() => {
+                                            setArenaActionQueue([]);
+                                            setIsArenaExecuting(false);
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="game-scene">
+                                <div className="game-scene-view">
+                                    {wizardMessage && (
+                                        <div className="game-speech">
+                                            "{wizardMessage}"
+                                        </div>
+                                    )}
+
+                                    <div className="game-objective">
+                                        <div className="game-objective-badge">
+                                            <div className="game-objective-dot"></div>
+                                            <span className="game-objective-label">
+                                                {stageType === 'boss' ? '⚔️ BOSS CHALLENGE' :
+                                                 stageType === 'lesson' ? '📖 LESSON' : 'Current Objective'}
+                                            </span>
+                                        </div>
+                                        <div
+                                            className="game-objective-text"
+                                            dangerouslySetInnerHTML={{ __html: currentStage.objective }}
+                                        />
+                                    </div>
+
+                                    {/* Character with real sprite animations */}
+                                    <div className="game-character">
+                                        <WizardSprite
+                                            state={wizardState}
+                                            size="md"
+                                            showParticles={true}
+                                            showShadow={true}
+                                            showGlow={true}
+                                        />
+                                    </div>
+
+                                    {/* Color display */}
+                                    {visualState.color && (
+                                        <div className="game-color-slots">
+                                            <div className="game-color-slot filled" style={{ backgroundColor: visualState.color, width: 60, height: 60, borderRadius: 8 }}></div>
+                                        </div>
+                                    )}
+
+                                    {/* Matrix display (Stage 3-3) */}
+                                    {stageKey === '3-3' && (
+                                        <div style={{
+                                            position: 'absolute', bottom: '25%', right: '8%',
+                                            display: 'flex', gap: 8, zIndex: 4
+                                        }}>
+                                            {[10, 25, 46, 80].map((val, idx) => (
+                                                <div key={val} style={{
+                                                    width: 44, height: 44,
+                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                    border: `2px solid ${visualState.foundIndex === idx ? '#dc2626' : 'rgba(255,255,255,0.15)'}`,
+                                                    borderRadius: 6,
+                                                    background: visualState.foundIndex === idx ? 'rgba(220,38,38,0.2)' : 'rgba(0,0,0,0.4)',
+                                                    color: '#fff', fontSize: '0.8rem',
+                                                    fontFamily: "'JetBrains Mono', monospace"
+                                                }}>
+                                                    {val}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    <div className="game-scene-controls">
+                                        <button className="game-scene-ctrl-btn"><i className="fas fa-volume-up"></i></button>
+                                        <button className="game-scene-ctrl-btn" onClick={() => openGrimoire(0)}>
+                                            <i className="fas fa-question"></i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         )}
 
-                        <div className="game-scene-controls">
-                            <button className="game-scene-ctrl-btn"><i className="fas fa-volume-up"></i></button>
-                            <button className="game-scene-ctrl-btn" onClick={() => openGrimoire(0)}>
-                                <i className="fas fa-question"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                        {/* ─── Code Panel ─── */}
+                        <div className="game-code-panel">
+                            <div className="game-editor-tabs">
+                                <button
+                                    className={`game-editor-tab ${activeTab === 'spell' ? 'active' : ''}`}
+                                    onClick={() => setActiveTab('spell')}
+                                >
+                                    <i className="fas fa-code"></i> spell_cast.py
+                                </button>
+                                <button
+                                    className={`game-editor-tab ${activeTab === 'readme' ? 'active' : ''}`}
+                                    onClick={() => setActiveTab('readme')}
+                                >
+                                    <i className="fas fa-file-alt"></i> readme.md
+                                </button>
+                                <span className="game-editor-dots">⋯</span>
+                            </div>
 
-                {/* ─── Code Panel ─── */}
-                <div className="game-code-panel">
-                    <div className="game-editor-tabs">
-                        <button
-                            className={`game-editor-tab ${activeTab === 'spell' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('spell')}
-                        >
-                            <i className="fas fa-code"></i> spell_cast.py
-                        </button>
-                        <button
-                            className={`game-editor-tab ${activeTab === 'readme' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('readme')}
-                        >
-                            <i className="fas fa-file-alt"></i> readme.md
-                        </button>
-                        <span className="game-editor-dots">⋯</span>
-                    </div>
-
-                    <div className="game-code-area">
-                        <div className="game-line-numbers">
-                            {Array.from({ length: Math.max(lineCount, 15) }, (_, i) => (
-                                <span key={i}>{i + 1}</span>
-                            ))}
-                        </div>
-                        <textarea
-                            className="game-code-textarea"
-                            value={activeTab === 'spell' ? code : `# ${currentStage.title}\n# ${currentStage.chapter}\n# Location: ${currentStage.location}\n\n## Objective\n# ${currentStage.objective.replace(/<[^>]+>/g, '')}\n\n## Hint\n# ${currentStage.hint}`}
-                            onChange={(e) => activeTab === 'spell' && setCode(e.target.value)}
-                            spellCheck="false"
-                            readOnly={activeTab !== 'spell'}
-                            placeholder="# Enter your Python spell here..."
-                        />
-                    </div>
-
-                    <div className="game-console">
-                        <div className="game-console-header">
-                            <span className="game-console-title">
-                                <i className="fas fa-terminal"></i> SYSTEM CONSOLE
-                            </span>
-                            <button className="game-console-clear" onClick={clearOutput}>Clear</button>
-                        </div>
-                        <div className="game-console-body">
-                            <div className="game-console-line system">System initialized.</div>
-                            <div className="game-console-line system">Connected to Spectrum Core.</div>
-                            {output.map((line, i) => (
-                                <div key={i} className={`game-console-line ${line.startsWith('[ERROR]') ? 'error' : ''}`}>
-                                    {line}
+                            <div className="game-code-area">
+                                <div className="game-line-numbers">
+                                    {Array.from({ length: Math.max(lineCount, 15) }, (_, i) => (
+                                        <span key={i}>{i + 1}</span>
+                                    ))}
                                 </div>
-                            ))}
-                            {output.length === 0 && (
-                                <div className="game-console-line waiting">Waiting for input...</div>
+                                <textarea
+                                    className="game-code-textarea"
+                                    value={activeTab === 'spell' ? code : `# ${currentStage.title}\n# ${currentStage.chapter}\n# Location: ${currentStage.location}\n\n## Objective\n# ${currentStage.objective.replace(/<[^>]+>/g, '')}\n\n## Hint\n# ${currentStage.hints?.[0]?.text || 'No hint available'}`}
+                                    onChange={handleCodeChange}
+                                    spellCheck="false"
+                                    readOnly={activeTab !== 'spell'}
+                                    placeholder="# Enter your Python spell here..."
+                                />
+                            </div>
+
+                            {/* Hint Panel (shown after first failed attempt) */}
+                            {attemptCount > 0 && currentStage.hints && !completedRef.current && (
+                                <div style={{ padding: '0 0.5rem 0.5rem' }}>
+                                    <HintPanel
+                                        hints={currentStage.hints}
+                                        attemptCount={attemptCount}
+                                        onRequestHint={handleHintRequest}
+                                    />
+                                </div>
                             )}
+
+                            <div className="game-console">
+                                <div className="game-console-header">
+                                    <span className="game-console-title">
+                                        <i className="fas fa-terminal"></i> SYSTEM CONSOLE
+                                    </span>
+                                    <button className="game-console-clear" onClick={clearOutput}>Clear</button>
+                                </div>
+                                <div className="game-console-body">
+                                    <div className="game-console-line system">System initialized.</div>
+                                    <div className="game-console-line system">Connected to Spectrum Core.</div>
+                                    {output.map((line, i) => (
+                                        <div key={i} className={`game-console-line ${line.startsWith('[ERROR]') ? 'error' : ''}`}>
+                                            {line}
+                                        </div>
+                                    ))}
+                                    {output.length === 0 && (
+                                        <div className="game-console-line waiting">Waiting for input...</div>
+                                    )}
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
+                    </>
+                )}
             </div>
 
-            {/* ─── Bottom Bar ─── */}
-            <div className="game-bottom-bar">
-                <button className="game-btn-reset" onClick={handleReset}>
-                    <i className="fas fa-redo"></i> RESET
-                </button>
-                <button className="game-btn-run" onClick={handleRun} disabled={isRunning}>
-                    {isRunning ? (
-                        <><i className="fas fa-spinner fa-spin"></i> CASTING...</>
-                    ) : (
-                        <><i className="fas fa-play"></i> RUN SPELL CODE</>
-                    )}
-                </button>
-            </div>
+            {/* ─── Bottom Bar (only for IDE stages) ─── */}
+            {!specialContent && (
+                <div className="game-bottom-bar">
+                    <button className="game-btn-reset" onClick={handleReset}>
+                        <i className="fas fa-redo"></i> RESET
+                    </button>
+                    <button className="game-btn-run" onClick={handleRun} disabled={isRunning}>
+                        {isRunning ? (
+                            <><i className="fas fa-spinner fa-spin"></i> CASTING...</>
+                        ) : (
+                            <><i className="fas fa-play"></i> RUN SPELL CODE</>
+                        )}
+                    </button>
+                </div>
+            )}
 
             {/* ─── Grimoire Modal ─── */}
             {showGrimoire && (
@@ -562,6 +824,14 @@ const StagePage = () => {
                     level={currentStage}
                     startPage={grimoireStartPage}
                     onClose={() => setShowGrimoire(false)}
+                />
+            )}
+
+            {/* ─── Spell Book Modal ─── */}
+            {showSpellBook && (
+                <SpellBook
+                    unlockedSpells={character.unlockedSpells}
+                    onClose={() => setShowSpellBook(false)}
                 />
             )}
         </div>

@@ -18,8 +18,7 @@ const RegionMap = () => {
     const getStageStatus = (stageIndex) => {
         const completedStages = user?.stageProgress?.[regionId] || 0;
         if (stageIndex < completedStages) return 'complete';
-        if (stageIndex === completedStages) return 'active';
-        return 'locked';
+        return 'active';
     };
 
     return (
@@ -93,9 +92,7 @@ const RegionMap = () => {
                                 <div
                                     className={`rmap-stage-card ${status}`}
                                     onClick={() => {
-                                        if (status !== 'locked') {
-                                            navigate(`/region/${regionId}/stage/${stage.id}`);
-                                        }
+                                        navigate(`/region/${regionId}/stage/${stage.id}`);
                                     }}
                                 >
                                     <div className="rmap-stage-card-header">

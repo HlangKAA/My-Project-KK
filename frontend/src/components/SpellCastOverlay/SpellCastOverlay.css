@@ -1,0 +1,477 @@
+/*  ═══════════════════════════════════════════════════
+    SpellCastOverlay CSS — Code editor popup styles
+    ═══════════════════════════════════════════════════ */
+
+/* ─── Overlay backdrop ─── */
+.sco-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(6px);
+    animation: sco-fade-in 0.3s ease-out;
+}
+
+@keyframes sco-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* ─── Main panel ─── */
+.sco-panel {
+    position: relative;
+    width: min(90vw, 700px);
+    max-height: 90vh;
+    background: #111318;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(100, 160, 255, 0.05);
+    animation: sco-slide-up 0.3s ease-out;
+}
+
+.sco-panel.sco-boss {
+    border-color: rgba(220, 38, 38, 0.3);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(220, 38, 38, 0.1);
+}
+
+.sco-panel.sco-success {
+    border-color: rgba(34, 197, 94, 0.4);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(34, 197, 94, 0.15);
+}
+
+@keyframes sco-slide-up {
+    from { opacity: 0; transform: translateY(30px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ─── Header ─── */
+.sco-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.sco-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sco-header-left > i {
+    font-size: 1.2rem;
+    color: #fbbf24;
+}
+
+.sco-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #f0e8e0;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.sco-difficulty {
+    display: flex;
+    gap: 2px;
+}
+.sco-difficulty i {
+    font-size: 0.55rem;
+    color: #fbbf24;
+}
+
+.sco-close {
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+.sco-close:hover {
+    color: #dc2626;
+    background: rgba(220, 38, 38, 0.1);
+}
+
+/* ─── Boss HP Bar ─── */
+.sco-boss-bar {
+    padding: 10px 16px;
+    background: rgba(220, 38, 38, 0.05);
+    border-bottom: 1px solid rgba(220, 38, 38, 0.1);
+}
+
+.sco-boss-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    font-size: 0.8rem;
+    color: #f87171;
+    font-family: 'JetBrains Mono', monospace;
+}
+.sco-boss-info i { font-size: 0.9rem; }
+.sco-boss-phase {
+    margin-left: auto;
+    color: #888;
+    font-size: 0.7rem;
+}
+
+.sco-boss-hp-track {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.sco-boss-hp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #dc2626, #ef4444);
+    border-radius: 4px;
+    transition: width 0.8s ease-out;
+}
+.sco-boss-hp-fill.shield-crack {
+    animation: hp-flash 0.5s ease-out;
+}
+.sco-boss-hp-fill.take-damage {
+    animation: hp-flash 0.5s ease-out;
+}
+.sco-boss-hp-fill.defeated {
+    background: #333;
+}
+
+@keyframes hp-flash {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(2); }
+}
+
+.sco-boss-dialog {
+    margin-top: 8px;
+    font-size: 0.75rem;
+    color: #fca5a5;
+    font-style: italic;
+    font-family: 'JetBrains Mono', monospace;
+}
+.sco-boss-dialog.take-damage {
+    animation: dialog-shake 0.3s ease-out;
+}
+.sco-boss-speaker {
+    font-weight: 700;
+    margin-right: 4px;
+}
+
+@keyframes dialog-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+}
+
+/* ─── Objective ─── */
+.sco-objective {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 16px;
+    background: rgba(251, 191, 36, 0.04);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    font-size: 0.8rem;
+    color: #d4c8b8;
+    font-family: 'JetBrains Mono', monospace;
+    line-height: 1.5;
+}
+
+.sco-objective-dot {
+    width: 6px;
+    height: 6px;
+    min-width: 6px;
+    border-radius: 50%;
+    background: #fbbf24;
+    margin-top: 5px;
+    box-shadow: 0 0 6px rgba(251, 191, 36, 0.4);
+}
+
+.sco-objective .hl {
+    color: #fbbf24;
+    font-weight: 600;
+    background: rgba(251, 191, 36, 0.1);
+    padding: 1px 4px;
+    border-radius: 3px;
+}
+
+/* ─── Code Editor ─── */
+.sco-editor {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.sco-editor-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    font-size: 0.7rem;
+    color: #888;
+    font-family: 'JetBrains Mono', monospace;
+}
+.sco-editor-header i {
+    color: #60a5fa;
+    font-size: 0.65rem;
+}
+
+.sco-editor-body {
+    display: flex;
+    flex: 1;
+    min-height: 120px;
+    max-height: 200px;
+    overflow: auto;
+}
+
+.sco-line-numbers {
+    display: flex;
+    flex-direction: column;
+    padding: 8px 0;
+    min-width: 36px;
+    text-align: right;
+    background: rgba(0, 0, 0, 0.2);
+    border-right: 1px solid rgba(255, 255, 255, 0.04);
+}
+.sco-line-numbers span {
+    font-size: 0.7rem;
+    line-height: 1.7;
+    padding-right: 8px;
+    color: #444;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.sco-textarea {
+    flex: 1;
+    border: none;
+    outline: none;
+    resize: none;
+    background: transparent;
+    color: #e0d8d0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    line-height: 1.7;
+    padding: 8px 12px;
+    tab-size: 4;
+}
+.sco-textarea::placeholder {
+    color: #444;
+}
+
+/* ─── Console ─── */
+.sco-console {
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.sco-console-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 16px;
+    background: rgba(0, 0, 0, 0.2);
+    font-size: 0.7rem;
+    color: #888;
+    font-family: 'JetBrains Mono', monospace;
+}
+.sco-console-header i {
+    color: #22c55e;
+    font-size: 0.65rem;
+}
+
+.sco-console-clear {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: #555;
+    font-size: 0.65rem;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+}
+.sco-console-clear:hover { color: #888; }
+
+.sco-console-body {
+    max-height: 100px;
+    overflow-y: auto;
+    padding: 6px 16px;
+    background: rgba(0, 0, 0, 0.15);
+}
+
+.sco-console-line {
+    font-size: 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: #a0e8a0;
+    line-height: 1.6;
+}
+.sco-console-line.dim { color: #555; }
+.sco-console-line.error { color: #f87171; }
+
+/* ─── Hints ─── */
+.sco-hint {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(251, 191, 36, 0.06);
+    border-top: 1px solid rgba(251, 191, 36, 0.1);
+    font-size: 0.75rem;
+    color: #fef3c7;
+    font-family: 'JetBrains Mono', monospace;
+    line-height: 1.5;
+}
+.sco-hint i {
+    color: #fbbf24;
+    margin-top: 2px;
+}
+.sco-hint-more {
+    background: none;
+    border: none;
+    color: #fbbf24;
+    cursor: pointer;
+    font-size: 0.7rem;
+    text-decoration: underline;
+    font-family: 'JetBrains Mono', monospace;
+    white-space: nowrap;
+    margin-left: auto;
+}
+
+/* ─── Actions ─── */
+.sco-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(0, 0, 0, 0.15);
+}
+
+.sco-actions-left {
+    display: flex;
+    gap: 6px;
+}
+
+.sco-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 14px;
+    font-size: 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.sco-btn-grimoire {
+    background: rgba(124, 58, 237, 0.15);
+    color: #a78bfa;
+    border: 1px solid rgba(124, 58, 237, 0.2);
+}
+.sco-btn-grimoire:hover {
+    background: rgba(124, 58, 237, 0.25);
+}
+
+.sco-btn-hint {
+    background: rgba(251, 191, 36, 0.1);
+    color: #fbbf24;
+    border: 1px solid rgba(251, 191, 36, 0.2);
+}
+.sco-btn-hint:hover {
+    background: rgba(251, 191, 36, 0.2);
+}
+
+.sco-btn-reset {
+    background: rgba(255, 255, 255, 0.05);
+    color: #888;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.sco-btn-reset:hover {
+    color: #bbb;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.sco-btn-run {
+    background: linear-gradient(135deg, #16a34a, #22c55e);
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    font-weight: 600;
+    box-shadow: 0 2px 10px rgba(34, 197, 94, 0.3);
+}
+.sco-btn-run:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+}
+.sco-btn-run:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+.sco-btn-run.success {
+    background: linear-gradient(135deg, #22c55e, #4ade80);
+}
+
+.sco-shortcut {
+    font-size: 0.6rem;
+    opacity: 0.6;
+    margin-left: 4px;
+}
+
+/* ─── Success Overlay ─── */
+.sco-success-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    animation: sco-fade-in 0.5s ease-out;
+    backdrop-filter: blur(4px);
+}
+
+.sco-success-content {
+    text-align: center;
+    animation: sco-success-pop 0.5s ease-out;
+}
+
+.sco-success-icon {
+    font-size: 3rem;
+    margin-bottom: 12px;
+}
+
+.sco-success-content h3 {
+    font-size: 1.4rem;
+    color: #4ade80;
+    margin: 0 0 8px;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.sco-success-content p {
+    font-size: 1rem;
+    color: #fbbf24;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+}
+
+@keyframes sco-success-pop {
+    0% { transform: scale(0.5); opacity: 0; }
+    60% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+}

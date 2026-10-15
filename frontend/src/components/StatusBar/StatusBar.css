@@ -1,0 +1,79 @@
+/*  ═══════════════════════════════════════════════════
+    StatusBar CSS
+    ═══════════════════════════════════════════════════ */
+
+.sb-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 16px;
+    background: rgba(0, 0, 0, 0.6);
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(8px);
+    font-family: 'JetBrains Mono', monospace;
+}
+
+/* ─── Stat (HP / MP) ─── */
+.sb-stat {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.sb-stat-icon {
+    font-size: 0.75rem;
+}
+.sb-hp-icon i { color: #ef4444; }
+.sb-mp-icon i { color: #60a5fa; }
+
+.sb-stat-track {
+    width: 80px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.sb-stat-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.5s ease-out;
+}
+
+.sb-hp-fill {
+    background: linear-gradient(90deg, #dc2626, #ef4444);
+}
+
+.sb-mp-fill {
+    background: linear-gradient(90deg, #2563eb, #60a5fa);
+}
+
+.sb-stat-value {
+    font-size: 0.65rem;
+    color: #888;
+    min-width: 24px;
+}
+
+/* ─── Divider ─── */
+.sb-divider {
+    width: 1px;
+    height: 16px;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* ─── Quest / XP / Zone ─── */
+.sb-quest, .sb-xp, .sb-zone {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.7rem;
+    color: #888;
+}
+
+.sb-quest i { color: #fbbf24; font-size: 0.65rem; }
+.sb-xp i { color: #a78bfa; font-size: 0.65rem; }
+.sb-xp span { color: #a78bfa; }
+.sb-zone {
+    margin-left: auto;
+}
+.sb-zone i { color: #dc2626; font-size: 0.6rem; }

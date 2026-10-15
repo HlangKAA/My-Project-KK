@@ -25,6 +25,14 @@ export const GameProvider = ({ children }) => {
       } catch (error) {
         // Not logged in or error
         console.log("Session check failed/Not logged in");
+        console.log("Using Mock User (Backend Offline / Bypass enabled)");
+        setUser({
+          player_id: 'mock-123',
+          username: 'GuestWizard',
+          email: 'guest@lostspectrum.com',
+          level: 99, // Max level to unlock regions
+          stageProgress: {}
+        });
       } finally {
         setLoading(false);
       }

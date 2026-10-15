@@ -49,7 +49,12 @@ const usePythonInterpreter = () => {
     setWizardMessage("Casting spell...");
 
     window.Sk.configure({
-      output: (text) => log(text),
+      output: (text) => {
+        log(text);
+        if (heroCallbacks.__onPrint) {
+          heroCallbacks.__onPrint(text);
+        }
+      },
       read: builtinRead,
       // Execution limit to prevent infinite loops (optional config)
       execLimit: 5000,
@@ -75,10 +80,18 @@ const usePythonInterpreter = () => {
     heroModule.$d = {};
 
     // Explicitly binding known API methods to ensure safety
-    // You can expand this list or iterate over keys of heroCallbacks
     const apiMethods = [
       "cast_color",
       "move_to_x",
+      "move_right",
+      "move_left",
+      "move_up",
+      "move_down",
+      "move_to",
+      "pick_up",
+      "collect",
+      "put_in",
+      "deposit",
       "scan_light",
       "collect_fragment",
       "avoid_shadow",
@@ -90,9 +103,16 @@ const usePythonInterpreter = () => {
         heroModule.$d[method] = createFunc(heroCallbacks[method]);
       } else {
         // Default no-op if not provided
-        heroModule.$d[method] = createFunc(() =>
-          console.log(`[Hero] ${method} called (no callback provided)`),
+        heroModule.$d[method] = createFunc((...args) =>
+          console.log(`[Hero] ${method} called (no callback provided)`, args),
         );
+      }
+    });
+
+    // Also bind any extra callbacks dynamically
+    Object.keys(heroCallbacks).forEach((key) => {
+      if (!heroModule.$d[key]) {
+        heroModule.$d[key] = createFunc(heroCallbacks[key]);
       }
     });
 
@@ -107,6 +127,9 @@ const usePythonInterpreter = () => {
         setIsRunning(false);
         log("\n> Spell Execution Finished.");
         setWizardMessage("Spell execution complete!");
+        if (heroCallbacks.__onSuccess) {
+          heroCallbacks.__onSuccess(mod);
+        }
       },
       function (err) {
         setIsRunning(false);
@@ -124,8 +147,13 @@ const usePythonInterpreter = () => {
           }
         }
         setWizardMessage(foundHint);
+        if (heroCallbacks.__onError) {
+          heroCallbacks.__onError(errStr);
+        }
       },
     );
+
+    return myPromise;
   }, []);
 
   return {

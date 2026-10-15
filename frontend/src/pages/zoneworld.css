@@ -1,0 +1,131 @@
+/*  ═══════════════════════════════════════════════════
+    ZoneWorld CSS — Main game page styles
+    ═══════════════════════════════════════════════════ */
+
+.zw-page {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: #0a0a0a;
+    color: #f1e8e0;
+    overflow: hidden;
+}
+
+.zw-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: #0a0a0a;
+    color: #f1e8e0;
+    gap: 16px;
+}
+.zw-error h2 { font-family: 'JetBrains Mono', monospace; }
+.zw-error button {
+    padding: 8px 20px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #f1e8e0;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+/* ─── Navbar ─── */
+.zw-navbar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 8px 16px;
+    background: rgba(15, 15, 20, 0.95);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    z-index: 50;
+    backdrop-filter: blur(8px);
+}
+
+.zw-nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.zw-nav-brand-icon {
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg, rgba(220, 38, 38, 0.2), rgba(220, 38, 38, 0.05));
+    border: 1px solid rgba(220, 38, 38, 0.3);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    color: #dc2626;
+}
+
+.zw-nav-brand-text {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #f0e8e0;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.5px;
+}
+
+.zw-nav-zone {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 6px;
+    font-size: 0.75rem;
+    color: #ccc;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.zw-nav-zone i {
+    color: #dc2626;
+    font-size: 0.7rem;
+}
+
+.zw-nav-subtitle {
+    color: #666;
+    font-size: 0.65rem;
+    margin-left: 4px;
+}
+
+.zw-nav-actions {
+    margin-left: auto;
+}
+
+.zw-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    color: #999;
+    font-size: 0.7rem;
+    font-family: 'JetBrains Mono', monospace;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.zw-nav-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ddd;
+}
+
+.zw-nav-profile {
+    margin-left: 8px;
+}
+
+/* ─── Game Area ─── */
+.zw-game-area {
+    flex: 1;
+    min-height: 0;
+    position: relative;
+    overflow: hidden;
+}

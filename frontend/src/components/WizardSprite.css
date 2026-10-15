@@ -1,0 +1,327 @@
+/* ==============================================
+   WizardSprite.css
+   Reusable Wizard Character Animations
+   ============================================== */
+
+/* --- Container --- */
+.wizard-sprite-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- Sprite Image --- */
+.ws-sprite {
+  mix-blend-mode: multiply;
+  image-rendering: auto;
+  position: relative;
+  z-index: 2;
+  transition: opacity 0.15s ease;
+}
+
+.ws-sprite.ws-transitioning {
+  opacity: 0.5;
+  transform: scale(0.95);
+}
+
+/* --- Glow Ring --- */
+.ws-glow-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.4s ease, width 0.4s ease, height 0.4s ease;
+}
+
+/* Size variants for glow ring */
+.ws-size-sm .ws-glow-ring { width: 60px; height: 60px; }
+.ws-size-md .ws-glow-ring { width: 110px; height: 110px; }
+.ws-size-lg .ws-glow-ring { width: 180px; height: 180px; }
+
+/* Glow states */
+.ws-glow-ring.ws-state-idle {
+  opacity: 0.3;
+  background: radial-gradient(ellipse, var(--glow-color, rgba(100,160,255,0.3)), transparent 70%);
+  animation: wsGlowPulse 4s ease-in-out infinite;
+}
+
+.ws-glow-ring.ws-state-casting {
+  opacity: 0.7;
+  background: radial-gradient(ellipse, var(--glow-color, rgba(255,150,50,0.5)), transparent 65%);
+  animation: wsGlowPulse 1s ease-in-out infinite, wsGlowRotate 3s linear infinite;
+}
+
+.ws-glow-ring.ws-state-success {
+  opacity: 0.8;
+  background: radial-gradient(ellipse, var(--glow-color, rgba(100,255,100,0.4)), transparent 65%);
+  animation: wsGlowExpand 0.8s ease-out forwards;
+}
+
+.ws-glow-ring.ws-state-thinking {
+  opacity: 0.4;
+  background: radial-gradient(ellipse, var(--glow-color, rgba(180,140,255,0.3)), transparent 70%);
+  animation: wsGlowPulse 3s ease-in-out infinite;
+}
+
+.ws-glow-ring.ws-state-alert {
+  opacity: 0.5;
+  background: radial-gradient(ellipse, var(--glow-color, rgba(255,80,80,0.4)), transparent 65%);
+  animation: wsGlowPulse 1.5s ease-in-out infinite;
+}
+
+.ws-glow-ring.ws-state-pointing,
+.ws-glow-ring.ws-state-confused,
+.ws-glow-ring.ws-state-holdstaff {
+  opacity: 0.35;
+  background: radial-gradient(ellipse, var(--glow-color, rgba(100,200,255,0.3)), transparent 70%);
+  animation: wsGlowPulse 3s ease-in-out infinite;
+}
+
+/* ==============================================
+   State Animations (applied to container)
+   ============================================== */
+
+/* Idle - gentle float + breathe */
+.ws-anim-idle .ws-sprite {
+  animation: wsIdle 4s ease-in-out infinite;
+}
+
+@keyframes wsIdle {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-6px) scale(1.02); }
+}
+
+/* Casting - shake + energy pulse */
+.ws-anim-casting .ws-sprite {
+  animation: wsCasting 0.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 15px rgba(255, 150, 50, 0.6));
+}
+
+@keyframes wsCasting {
+  0%, 100% { transform: translateX(0) translateY(-2px) scale(1.05); }
+  15% { transform: translateX(-3px) translateY(-4px) scale(1.07); }
+  30% { transform: translateX(2px) translateY(-1px) scale(1.04); }
+  45% { transform: translateX(-2px) translateY(-5px) scale(1.08); }
+  60% { transform: translateX(3px) translateY(-2px) scale(1.05); }
+  75% { transform: translateX(-1px) translateY(-3px) scale(1.06); }
+}
+
+/* Success - bounce + celebrate */
+.ws-anim-success .ws-sprite {
+  animation: wsSuccess 0.7s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px rgba(100, 255, 100, 0.5));
+}
+
+@keyframes wsSuccess {
+  0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+  20% { transform: translateY(-18px) rotate(-3deg) scale(1.1); }
+  40% { transform: translateY(-5px) rotate(2deg) scale(1.02); }
+  60% { transform: translateY(-15px) rotate(-2deg) scale(1.08); }
+  80% { transform: translateY(-3px) rotate(1deg) scale(1.01); }
+}
+
+/* Thinking - subtle sway */
+.ws-anim-thinking .ws-sprite {
+  animation: wsThinking 3.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px rgba(180, 140, 255, 0.3));
+}
+
+@keyframes wsThinking {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-3px) rotate(1.5deg); }
+  75% { transform: translateY(-2px) rotate(-1deg); }
+}
+
+/* Alert - tense pulse */
+.ws-anim-alert .ws-sprite {
+  animation: wsAlert 1.2s ease-in-out infinite;
+  filter: drop-shadow(0 0 10px rgba(255, 80, 80, 0.4));
+}
+
+@keyframes wsAlert {
+  0%, 100% { transform: scale(1) translateY(0); }
+  30% { transform: scale(1.06) translateY(-3px); }
+  60% { transform: scale(1.02) translateY(-1px); }
+}
+
+/* Pointing - forward bob */
+.ws-anim-pointing .ws-sprite {
+  animation: wsPointing 2s ease-in-out infinite;
+}
+
+@keyframes wsPointing {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(6px); }
+}
+
+/* Confused - wobble */
+.ws-anim-confused .ws-sprite {
+  animation: wsConfused 2s ease-in-out infinite;
+}
+
+@keyframes wsConfused {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  20% { transform: rotate(-4deg) translateY(-2px); }
+  40% { transform: rotate(3deg) translateY(-1px); }
+  60% { transform: rotate(-2deg) translateY(-3px); }
+  80% { transform: rotate(3deg) translateY(-1px); }
+}
+
+/* Staff - power glow */
+.ws-anim-staff .ws-sprite {
+  animation: wsStaff 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 12px rgba(200, 80, 50, 0.4));
+}
+
+@keyframes wsStaff {
+  0%, 100% { 
+    transform: translateY(0); 
+    filter: drop-shadow(0 0 8px rgba(200, 80, 50, 0.3));
+  }
+  50% { 
+    transform: translateY(-4px); 
+    filter: drop-shadow(0 0 20px rgba(200, 80, 50, 0.7));
+  }
+}
+
+/* ==============================================
+   Glow Keyframes
+   ============================================== */
+
+@keyframes wsGlowPulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: inherit; }
+  50% { transform: translate(-50%, -50%) scale(1.15); }
+}
+
+@keyframes wsGlowRotate {
+  from { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
+  to { transform: translate(-50%, -50%) rotate(360deg) scale(1); }
+}
+
+@keyframes wsGlowExpand {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+  100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+}
+
+/* ==============================================
+   Particles
+   ============================================== */
+
+.ws-particles {
+  position: absolute;
+  inset: -20%;
+  pointer-events: none;
+  z-index: 3;
+  overflow: visible;
+}
+
+.ws-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  bottom: 20%;
+  opacity: 0;
+}
+
+.ws-particle-casting {
+  background: #f97316;
+  box-shadow: 0 0 6px #f97316;
+  animation: wsParticleRise 1.5s ease-out infinite;
+}
+
+.ws-particle-success {
+  background: #22c55e;
+  box-shadow: 0 0 8px #22c55e;
+  animation: wsParticleBurst 1s ease-out infinite;
+}
+
+@keyframes wsParticleRise {
+  0% { opacity: 0; transform: translateY(0) scale(0.5); }
+  15% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-80px) translateX(var(--drift, 10px)) scale(0.2); }
+}
+
+@keyframes wsParticleBurst {
+  0% { opacity: 1; transform: translate(0, 0) scale(1); }
+  100% { 
+    opacity: 0; 
+    transform: translate(
+      calc(var(--drift, 10px) * 3), 
+      calc(-40px - var(--drift, 10px) * 2)
+    ) scale(0.3); 
+  }
+}
+
+/* Vary particle drift */
+.ws-particle:nth-child(1) { --drift: -15px; }
+.ws-particle:nth-child(2) { --drift: 12px; }
+.ws-particle:nth-child(3) { --drift: -8px; }
+.ws-particle:nth-child(4) { --drift: 20px; }
+.ws-particle:nth-child(5) { --drift: -20px; }
+.ws-particle:nth-child(6) { --drift: 5px; }
+.ws-particle:nth-child(7) { --drift: -12px; }
+.ws-particle:nth-child(8) { --drift: 18px; }
+
+/* ==============================================
+   Shadow
+   ============================================== */
+
+.ws-shadow {
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(0,0,0,0.4) 0%, transparent 70%);
+  z-index: 0;
+}
+
+.ws-size-sm .ws-shadow { width: 50px; height: 10px; }
+.ws-size-md .ws-shadow { width: 80px; height: 14px; }
+.ws-size-lg .ws-shadow { width: 130px; height: 20px; }
+
+/* Shadow states */
+.ws-shadow-idle {
+  animation: wsShadowIdle 4s ease-in-out infinite;
+}
+
+.ws-shadow-casting {
+  animation: wsShadowCasting 0.5s ease-in-out infinite;
+  background: radial-gradient(ellipse, rgba(255,100,0,0.3) 0%, transparent 70%);
+}
+
+.ws-shadow-success {
+  animation: wsShadowSuccess 0.7s ease-in-out infinite;
+  background: radial-gradient(ellipse, rgba(0,200,0,0.3) 0%, transparent 70%);
+}
+
+@keyframes wsShadowIdle {
+  0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.5; }
+  50% { transform: translateX(-50%) scale(0.85); opacity: 0.3; }
+}
+
+@keyframes wsShadowCasting {
+  0%, 100% { transform: translateX(-50%) scale(1.1); opacity: 0.6; }
+  50% { transform: translateX(-50%) scale(0.9); opacity: 0.4; }
+}
+
+@keyframes wsShadowSuccess {
+  0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.5; }
+  50% { transform: translateX(-50%) scale(1.3); opacity: 0.7; }
+}
+
+/* --- Walking Animation (for GameWorld movement) --- */
+.ws-anim-walking .ws-sprite {
+  animation: wsWalkBob 0.3s ease-in-out infinite;
+}
+
+@keyframes wsWalkBob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}

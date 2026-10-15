@@ -1,0 +1,477 @@
+/*  ═══════════════════════════════════════════════════
+    CodeCombatArena.css — Styling for 2D Interactive Grid
+    ═══════════════════════════════════════════════════ */
+
+.cca-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: radial-gradient(circle at 50% 30%, #1e1b4b 0%, #0f172a 60%, #030712 100%);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    padding: 12px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* ─── Toolbar ─── */
+.cca-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.cca-toolbar-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #e2e8f0;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.cca-toolbar-title i {
+    color: #818cf8;
+}
+
+.cca-log-banner {
+    font-size: 0.75rem;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: rgba(129, 140, 248, 0.15);
+    border: 1px solid rgba(129, 140, 248, 0.3);
+    color: #c7d2fe;
+    font-weight: 500;
+    text-transform: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.cca-toolbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cca-speed-btns {
+    display: flex;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 6px;
+    padding: 2px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.cca-speed-btn {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    padding: 2px 8px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cca-speed-btn.active {
+    background: #4f46e5;
+    color: #fff;
+    box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+}
+
+.cca-reset-btn {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #cbd5e1;
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s ease;
+}
+
+.cca-reset-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+}
+
+/* ─── Flasks Summary Bar ─── */
+.cca-flasks-summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 12px;
+    padding: 6px 12px;
+    background: rgba(0, 0, 0, 0.35);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.cca-flasks-summary-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.cca-flasks-list {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.cca-flask-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    font-size: 0.75rem;
+    color: #cbd5e1;
+    transition: all 0.3s ease;
+}
+
+.cca-flask-chip i {
+    color: var(--flask-color, #a855f7);
+}
+
+.cca-flask-chip.filled {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: #10b981;
+    color: #a7f3d0;
+}
+
+.cca-flask-chip-val {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #10b981;
+    margin-left: 4px;
+}
+
+.cca-flask-chip.error {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: #ef4444;
+    color: #fca5a5;
+    animation: shake 0.4s ease;
+}
+
+/* ─── Grid Viewport ─── */
+.cca-grid-viewport {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.12);
+    background: #090d16;
+}
+
+.cca-grid {
+    display: grid;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.cca-cell {
+    position: relative;
+    box-sizing: border-box;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 2px;
+}
+
+.cca-cell.cell-even {
+    background: rgba(255, 255, 255, 0.015);
+}
+
+.cca-cell.cell-odd {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.cca-cell.cell-obstacle {
+    background: #1f2937;
+    border-color: #374151;
+}
+
+.cca-cell-coord {
+    font-size: 0.55rem;
+    color: rgba(255, 255, 255, 0.15);
+    font-family: monospace;
+    user-select: none;
+    line-height: 1;
+}
+
+/* ─── Flask Object on Grid ─── */
+.cca-flask-obj {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    transition: all 0.3s ease;
+}
+
+.cca-flask-icon-wrapper {
+    position: relative;
+    font-size: 1.5rem;
+    filter: drop-shadow(0 0 8px var(--flask-theme));
+    animation: floatSlow 3s ease-in-out infinite;
+}
+
+.cca-flask-obj.filled .cca-flask-icon-wrapper {
+    filter: drop-shadow(0 0 16px var(--flask-theme)) brightness(1.3);
+}
+
+.cca-flask-tag {
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 1px 4px;
+    border-radius: 4px;
+    border: 1px solid var(--flask-theme);
+    margin-top: -2px;
+}
+
+.cca-flask-content-badge {
+    position: absolute;
+    bottom: -14px;
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: #10b981;
+    background: rgba(0, 0, 0, 0.85);
+    padding: 1px 5px;
+    border-radius: 4px;
+    white-space: nowrap;
+    border: 1px solid #10b981;
+    z-index: 6;
+    animation: popIn 0.3s ease;
+}
+
+.cca-flask-obj.shake-err {
+    animation: shake 0.4s ease;
+}
+
+/* ─── Ground Item (Value Crystal) ─── */
+.cca-ground-item {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 4;
+}
+
+.cca-item-crystal {
+    font-size: 1.25rem;
+    filter: drop-shadow(0 0 10px var(--item-color));
+    animation: floatBob 2.5s ease-in-out infinite;
+}
+
+.cca-item-badge {
+    font-size: 0.65rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.75);
+    border: 1px solid var(--item-color);
+    padding: 1px 5px;
+    border-radius: 4px;
+    margin-top: 2px;
+    white-space: nowrap;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+}
+
+/* ─── Altar Object ─── */
+.cca-altar-obj {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: #94a3b8;
+    z-index: 4;
+}
+
+.cca-altar-obj.activated {
+    color: #fbbf24;
+    filter: drop-shadow(0 0 16px rgba(251, 191, 36, 0.8));
+}
+
+.cca-altar-label {
+    font-size: 0.6rem;
+    color: #cbd5e1;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 1px 4px;
+    border-radius: 4px;
+    margin-top: 2px;
+    white-space: nowrap;
+}
+
+/* ─── Brazier Object ─── */
+.cca-brazier-obj {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    z-index: 4;
+}
+
+.cca-brazier-obj.lit {
+    filter: drop-shadow(0 0 14px var(--brazier-color));
+}
+
+.cca-brazier-name {
+    font-size: 0.55rem;
+    color: #94a3b8;
+    margin-top: 2px;
+}
+
+/* ─── Hero Character ─── */
+.cca-hero {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.cca-hero.left .cca-hero-sprite-wrap {
+    transform: scaleX(-1);
+}
+
+.cca-hero-sprite-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cca-hero-carrying {
+    position: absolute;
+    top: -24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 12;
+    animation: floatBob 2s ease-in-out infinite;
+}
+
+.cca-carrying-badge {
+    font-size: 0.65rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    color: #fff;
+    background: #1e1b4b;
+    border: 2px solid #818cf8;
+    padding: 2px 7px;
+    border-radius: 999px;
+    white-space: nowrap;
+    box-shadow: 0 0 12px rgba(129, 140, 248, 0.6);
+}
+
+/* ─── Keyframe Animations ─── */
+@keyframes floatBob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+
+@keyframes floatSlow {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-2px); }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-4px); }
+    40%, 80% { transform: translateX(4px); }
+}
+
+@keyframes popIn {
+    0% { transform: scale(0.6); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-2px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Gate Object ─── */
+.cca-gate-obj {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 6;
+    color: #e0e7ff;
+    transition: all 0.4s ease;
+}
+
+.cca-gate-obj i {
+    font-size: 1.6rem;
+    color: #a855f7;
+    filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.6));
+    transition: all 0.3s ease;
+}
+
+.cca-gate-obj.unlocked i {
+    color: #4ade80;
+    filter: drop-shadow(0 0 16px rgba(74, 222, 128, 0.9));
+    transform: scale(1.15);
+}
+
+.cca-gate-label {
+    position: absolute;
+    bottom: -16px;
+    font-size: 0.6rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    color: #c084fc;
+    white-space: nowrap;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+
+.cca-gate-glow {
+    position: absolute;
+    inset: -6px;
+    border-radius: 8px;
+    background: radial-gradient(circle, rgba(74, 222, 128, 0.4) 0%, transparent 70%);
+    animation: pulseGate 1.5s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes pulseGate {
+    0%, 100% { opacity: 0.5; transform: scale(0.95); }
+    50% { opacity: 1; transform: scale(1.1); }
+}
+

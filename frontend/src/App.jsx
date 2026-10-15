@@ -1,16 +1,23 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { GameProvider, useGame } from './context/GameContext';
 
 // Pages
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
+import CharacterDemo from './pages/CharacterDemo';
+import SpriteEditor from './pages/SpriteEditor';
 import Dashboard from './pages/Dashboard';
 import RegionMap from './pages/RegionMap';
 import StagePage from './pages/StagePage';
-import ForgotPassword from './pages/ForgotPassword';
-import ResetPassword from './pages/ResetPassword';
+
+// Redirect old /world/:zoneId to code-driven /region/:regionId
+const WorldRedirect = () => {
+  const { zoneId } = useParams();
+  return <Navigate to={`/region/${zoneId || 1}`} replace />;
+};
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children }) => {
@@ -34,6 +41,8 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route path="/demo-characters" element={<CharacterDemo />} />
+          <Route path="/sprite-editor" element={<SpriteEditor />} />
           
           <Route 
             path="/dashboard" 
@@ -58,6 +67,16 @@ function App() {
             element={
               <ProtectedRoute>
                 <StagePage />
+              </ProtectedRoute>
+            } 
+          />
+
+          {/* Redirect /world/:zoneId to code-driven /region/:zoneId */}
+          <Route 
+            path="/world/:zoneId" 
+            element={
+              <ProtectedRoute>
+                <WorldRedirect />
               </ProtectedRoute>
             } 
           />

@@ -1,0 +1,698 @@
+/* ==============================================
+   CharacterDemo.css
+   Wizard Sprite Animation System
+   ============================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap');
+
+/* --- Layout Container --- */
+.character-demo-container {
+  padding: 40px 20px;
+  background: linear-gradient(170deg, #0a0a1a 0%, #0f1b2d 40%, #1a0f2e 70%, #0a0a1a 100%);
+  min-height: 100vh;
+  color: white;
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Ambient background particles */
+.character-demo-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(2px 2px at 10% 20%, rgba(100, 180, 255, 0.3), transparent),
+    radial-gradient(2px 2px at 30% 60%, rgba(180, 100, 255, 0.2), transparent),
+    radial-gradient(1px 1px at 50% 10%, rgba(255, 200, 100, 0.3), transparent),
+    radial-gradient(2px 2px at 70% 40%, rgba(100, 255, 200, 0.2), transparent),
+    radial-gradient(1px 1px at 90% 80%, rgba(255, 100, 180, 0.3), transparent),
+    radial-gradient(1px 1px at 20% 90%, rgba(100, 180, 255, 0.2), transparent),
+    radial-gradient(2px 2px at 60% 70%, rgba(255, 255, 100, 0.15), transparent),
+    radial-gradient(1px 1px at 80% 15%, rgba(180, 100, 255, 0.25), transparent);
+  animation: ambientDrift 20s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes ambientDrift {
+  0% { opacity: 0.6; transform: translateY(0); }
+  100% { opacity: 1; transform: translateY(-20px); }
+}
+
+/* --- Page Title --- */
+.demo-title {
+  font-family: 'Cinzel', serif;
+  font-size: 2.2rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #ffd700, #ff8c00, #ffd700);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-align: center;
+  margin-bottom: 8px;
+  z-index: 1;
+  letter-spacing: 2px;
+}
+
+.demo-subtitle {
+  color: rgba(180, 200, 255, 0.6);
+  font-size: 0.9rem;
+  text-align: center;
+  margin-bottom: 40px;
+  z-index: 1;
+  font-weight: 300;
+}
+
+/* --- Main Showcase Area --- */
+.showcase-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  z-index: 1;
+  width: 100%;
+  max-width: 900px;
+}
+
+/* --- Character Stage (Where the wizard stands) --- */
+.character-stage {
+  position: relative;
+  width: 280px;
+  height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  background: radial-gradient(ellipse at center bottom, rgba(100, 140, 255, 0.08) 0%, transparent 70%);
+}
+
+/* Magic circle under the character */
+.character-stage::before {
+  content: '';
+  position: absolute;
+  bottom: 10px;
+  width: 180px;
+  height: 40px;
+  background: radial-gradient(ellipse, rgba(100, 160, 255, 0.25), transparent 70%);
+  border-radius: 50%;
+  animation: magicCirclePulse 3s ease-in-out infinite;
+}
+
+@keyframes magicCirclePulse {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.15); opacity: 0.8; }
+}
+
+/* Magical particles around the character */
+.magic-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: 20px;
+}
+
+.magic-particles .particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  opacity: 0;
+}
+
+.magic-particles .particle:nth-child(1) {
+  background: #ffd700;
+  left: 20%;
+  animation: particleFloat 3s 0s ease-in-out infinite;
+}
+.magic-particles .particle:nth-child(2) {
+  background: #64b5f6;
+  left: 40%;
+  animation: particleFloat 3.5s 0.5s ease-in-out infinite;
+}
+.magic-particles .particle:nth-child(3) {
+  background: #ce93d8;
+  left: 60%;
+  animation: particleFloat 2.8s 1s ease-in-out infinite;
+}
+.magic-particles .particle:nth-child(4) {
+  background: #81c784;
+  left: 75%;
+  animation: particleFloat 3.2s 1.5s ease-in-out infinite;
+}
+.magic-particles .particle:nth-child(5) {
+  background: #ffab91;
+  left: 85%;
+  animation: particleFloat 3.8s 0.8s ease-in-out infinite;
+}
+.magic-particles .particle:nth-child(6) {
+  background: #80deea;
+  left: 30%;
+  animation: particleFloat 4s 2s ease-in-out infinite;
+}
+
+@keyframes particleFloat {
+  0% { 
+    bottom: 10%; 
+    opacity: 0; 
+    transform: scale(0.5) translateX(0);
+  }
+  20% { opacity: 0.8; }
+  80% { opacity: 0.6; }
+  100% { 
+    bottom: 90%; 
+    opacity: 0; 
+    transform: scale(1.2) translateX(20px);
+  }
+}
+
+/* Show more particles when casting */
+.character-stage.casting .magic-particles .particle {
+  animation-duration: 1.5s !important;
+}
+.character-stage.casting::before {
+  background: radial-gradient(ellipse, rgba(255, 200, 50, 0.4), transparent 70%);
+  animation: magicCirclePulse 1s ease-in-out infinite;
+}
+
+.character-stage.celebrating::before {
+  background: radial-gradient(ellipse, rgba(100, 255, 100, 0.35), transparent 70%);
+}
+
+/* ==============================================
+   Sprite Display
+   Image: 661 x 377px
+   Layout: 6 columns × 2 rows
+   Each sprite: ~110px × ~188px
+   ============================================== */
+
+.sprite-display {
+  width: 200px;
+  height: 230px;
+  background-image: url('/wizard-sprites.png');
+  background-repeat: no-repeat;
+  
+  /* Scale the background so each sprite fills the display area 
+     Total width: 6 sprites → 200px * 6 = 1200px
+     Total height: 2 rows → 230px * 2 = 460px */
+  background-size: 1200px 460px;
+  
+  /* Hide white background on dark theme */
+  mix-blend-mode: multiply;
+  
+  /* Smooth transition between poses */
+  transition: 
+    background-position 0.15s ease-out,
+    transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    filter 0.3s ease;
+  
+  cursor: pointer;
+  position: relative;
+  z-index: 2;
+  
+  /* Prevent image from being blurry */
+  image-rendering: auto;
+  
+  /* Breathing animation default */
+  animation: breathe 4s ease-in-out infinite;
+}
+
+/* --- Breathing idle animation --- */
+@keyframes breathe {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-4px); }
+}
+
+/* ==============================================
+   Sprite Positions (12 poses)
+   Row 1 (top): poses 0-5
+   Row 2 (bottom): poses 6-11
+   Each column offset: -200px
+   Each row offset: -230px
+   ============================================== */
+
+/* Row 1 */
+.sprite-display.pose-idle       { background-position: 0px 0px; }
+.sprite-display.pose-alert      { background-position: -200px 0px; }
+.sprite-display.pose-cast-orb   { background-position: -400px 0px; }
+.sprite-display.pose-cast-spell { background-position: -600px 0px; }
+.sprite-display.pose-celebrate  { background-position: -800px 0px; }
+.sprite-display.pose-victory    { background-position: -1000px 0px; }
+
+/* Row 2 */
+.sprite-display.pose-hold-staff    { background-position: 0px -230px; }
+.sprite-display.pose-magic-channel { background-position: -200px -230px; }
+.sprite-display.pose-point         { background-position: -400px -230px; }
+.sprite-display.pose-think         { background-position: -600px -230px; }
+.sprite-display.pose-confused      { background-position: -800px -230px; }
+.sprite-display.pose-staff-display { background-position: -1000px -230px; }
+
+/* --- State-specific animations --- */
+
+/* Casting poses get glow */
+.sprite-display.pose-cast-orb,
+.sprite-display.pose-cast-spell,
+.sprite-display.pose-magic-channel {
+  animation: castGlow 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 12px rgba(255, 200, 50, 0.5));
+}
+
+@keyframes castGlow {
+  0%, 100% { 
+    transform: translateY(0px) scale(1); 
+    filter: drop-shadow(0 0 12px rgba(255, 200, 50, 0.4));
+  }
+  50% { 
+    transform: translateY(-6px) scale(1.02); 
+    filter: drop-shadow(0 0 25px rgba(255, 200, 50, 0.8));
+  }
+}
+
+/* Celebration poses bounce */
+.sprite-display.pose-celebrate,
+.sprite-display.pose-victory {
+  animation: celebrateBounce 0.6s ease-in-out infinite;
+  filter: drop-shadow(0 0 15px rgba(100, 255, 100, 0.4));
+}
+
+@keyframes celebrateBounce {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  25% { transform: translateY(-12px) rotate(-2deg); }
+  75% { transform: translateY(-12px) rotate(2deg); }
+}
+
+/* Think pose - subtle head tilt */
+.sprite-display.pose-think {
+  animation: thinkSway 3s ease-in-out infinite;
+}
+
+@keyframes thinkSway {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px) rotate(1deg); }
+}
+
+/* Alert pose - slight tension */
+.sprite-display.pose-alert {
+  animation: alertPulse 1.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px rgba(255, 100, 100, 0.3));
+}
+
+@keyframes alertPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+/* Point pose */
+.sprite-display.pose-point {
+  animation: pointBob 2s ease-in-out infinite;
+}
+
+@keyframes pointBob {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(5px); }
+}
+
+/* Hold staff / Staff display */
+.sprite-display.pose-hold-staff,
+.sprite-display.pose-staff-display {
+  filter: drop-shadow(0 0 10px rgba(200, 50, 50, 0.3));
+  animation: staffGlow 3s ease-in-out infinite;
+}
+
+@keyframes staffGlow {
+  0%, 100% { 
+    filter: drop-shadow(0 0 8px rgba(200, 50, 50, 0.3)); 
+    transform: translateY(0);
+  }
+  50% { 
+    filter: drop-shadow(0 0 18px rgba(200, 80, 50, 0.6)); 
+    transform: translateY(-3px);
+  }
+}
+
+/* Confused pose - wobble */
+.sprite-display.pose-confused {
+  animation: confusedWobble 2s ease-in-out infinite;
+}
+
+@keyframes confusedWobble {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-3deg); }
+  75% { transform: rotate(3deg); }
+}
+
+/* ==============================================
+   Animation Classes (independent of pose position)
+   Used when crop data overrides CSS positions
+   ============================================== */
+
+.sprite-display.anim-breathe {
+  animation: breathe 4s ease-in-out infinite;
+}
+
+.sprite-display.anim-cast {
+  animation: castGlow 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 12px rgba(255, 200, 50, 0.5));
+}
+
+.sprite-display.anim-celebrate {
+  animation: celebrateBounce 0.6s ease-in-out infinite;
+  filter: drop-shadow(0 0 15px rgba(100, 255, 100, 0.4));
+}
+
+.sprite-display.anim-think {
+  animation: thinkSway 3s ease-in-out infinite;
+}
+
+.sprite-display.anim-alert {
+  animation: alertPulse 1.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px rgba(255, 100, 100, 0.3));
+}
+
+.sprite-display.anim-point {
+  animation: pointBob 2s ease-in-out infinite;
+}
+
+.sprite-display.anim-staff {
+  filter: drop-shadow(0 0 10px rgba(200, 50, 50, 0.3));
+  animation: staffGlow 3s ease-in-out infinite;
+}
+
+.sprite-display.anim-confused {
+  animation: confusedWobble 2s ease-in-out infinite;
+}
+
+/* ==============================================
+   Pose Name Label
+   ============================================== */
+
+.pose-name-label {
+  font-family: 'Cinzel', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.95);
+  text-align: center;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.pose-name-label .pose-emoji {
+  font-size: 1.3rem;
+}
+
+/* ==============================================
+   Dialogue Box
+   ============================================== */
+
+.dialogue-box {
+  position: relative;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, rgba(244, 236, 216, 0.95), rgba(255, 248, 230, 0.95));
+  color: #2a1f0e;
+  border: 3px solid #8b7355;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 380px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 4px 15px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(139, 115, 85, 0.3);
+  transition: all 0.3s ease;
+  line-height: 1.5;
+}
+
+/* Speech bubble arrow */
+.dialogue-box::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-bottom: 12px solid #8b7355;
+}
+.dialogue-box::after {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  border-bottom: 9px solid rgba(244, 236, 216, 0.95);
+}
+
+/* ==============================================
+   Controls Panel
+   ============================================== */
+
+.controls-panel {
+  width: 100%;
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.controls-section {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.controls-section-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: rgba(255, 200, 100, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+.controls-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.pose-btn {
+  background: linear-gradient(135deg, rgba(30, 35, 60, 0.9), rgba(20, 25, 50, 0.9));
+  color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(100, 120, 200, 0.2);
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.pose-btn:hover {
+  background: linear-gradient(135deg, rgba(50, 55, 90, 0.9), rgba(40, 45, 80, 0.9));
+  border-color: rgba(100, 160, 255, 0.4);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(100, 140, 255, 0.2);
+}
+
+.pose-btn.active {
+  background: linear-gradient(135deg, rgba(60, 80, 180, 0.6), rgba(100, 60, 180, 0.6));
+  border-color: rgba(140, 160, 255, 0.6);
+  color: white;
+  box-shadow: 
+    0 0 15px rgba(100, 140, 255, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.pose-btn .btn-emoji {
+  font-size: 1rem;
+}
+
+/* ==============================================
+   Auto-play Controls
+   ============================================== */
+
+.autoplay-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 4px;
+}
+
+.autoplay-btn {
+  background: linear-gradient(135deg, rgba(255, 200, 50, 0.15), rgba(255, 150, 50, 0.15));
+  color: #ffd700;
+  border: 1px solid rgba(255, 200, 50, 0.3);
+  padding: 10px 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.autoplay-btn:hover {
+  background: linear-gradient(135deg, rgba(255, 200, 50, 0.25), rgba(255, 150, 50, 0.25));
+  border-color: rgba(255, 200, 50, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(255, 200, 50, 0.2);
+}
+
+.autoplay-btn.playing {
+  background: linear-gradient(135deg, rgba(255, 80, 80, 0.2), rgba(255, 50, 50, 0.2));
+  color: #ff6b6b;
+  border-color: rgba(255, 80, 80, 0.4);
+}
+
+.autoplay-btn.playing:hover {
+  background: linear-gradient(135deg, rgba(255, 80, 80, 0.3), rgba(255, 50, 50, 0.3));
+}
+
+.speed-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.8rem;
+}
+
+.speed-control input[type="range"] {
+  width: 80px;
+  accent-color: #ffd700;
+}
+
+/* ==============================================
+   Back Link
+   ============================================== */
+
+.back-link {
+  margin-top: 40px;
+  z-index: 1;
+}
+
+.back-link a {
+  color: rgba(100, 180, 255, 0.7);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.back-link a:hover {
+  color: rgba(100, 180, 255, 1);
+  transform: translateX(-4px);
+}
+
+/* ==============================================
+   Pose transition animation
+   ============================================== */
+
+.sprite-display.transitioning {
+  animation: poseTransition 0.3s ease-out;
+}
+
+@keyframes poseTransition {
+  0% { transform: scale(0.92); opacity: 0.6; }
+  60% { transform: scale(1.04); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ==============================================
+   Responsive
+   ============================================== */
+
+@media (max-width: 768px) {
+  .character-demo-container {
+    padding: 24px 16px;
+  }
+
+  .demo-title {
+    font-size: 1.5rem;
+  }
+
+  .controls-grid {
+    gap: 6px;
+  }
+
+  .pose-btn {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+  }
+
+  .autoplay-controls {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .dialogue-box {
+    max-width: 300px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .sprite-display {
+    width: 160px;
+    height: 184px;
+    background-size: 960px 368px;
+  }
+
+  .sprite-display.pose-idle       { background-position: 0px 0px; }
+  .sprite-display.pose-alert      { background-position: -160px 0px; }
+  .sprite-display.pose-cast-orb   { background-position: -320px 0px; }
+  .sprite-display.pose-cast-spell { background-position: -480px 0px; }
+  .sprite-display.pose-celebrate  { background-position: -640px 0px; }
+  .sprite-display.pose-victory    { background-position: -800px 0px; }
+
+  .sprite-display.pose-hold-staff    { background-position: 0px -184px; }
+  .sprite-display.pose-magic-channel { background-position: -160px -184px; }
+  .sprite-display.pose-point         { background-position: -320px -184px; }
+  .sprite-display.pose-think         { background-position: -480px -184px; }
+  .sprite-display.pose-confused      { background-position: -640px -184px; }
+  .sprite-display.pose-staff-display { background-position: -800px -184px; }
+
+  .character-stage {
+    width: 220px;
+    height: 260px;
+  }
+}
