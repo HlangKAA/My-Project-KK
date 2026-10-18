@@ -1,10 +1,11 @@
 from flask import Flask
 from flask_mail import Mail
 import os
+from pathlib import Path
 from flask_cors import CORS
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(Path(__file__).resolve().parents[1] / '.env')
 
 app = Flask(__name__)
 # Allow requests from the React Frontend

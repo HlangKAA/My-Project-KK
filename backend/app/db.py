@@ -1,10 +1,11 @@
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from supabase import create_client, Client
 
-load_dotenv()
+load_dotenv(Path(__file__).resolve().parents[1] / '.env')
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
@@ -23,7 +24,7 @@ def get_db_connection():
     """Create database connection for PostgreSQL / Supabase"""
     try:
         if DB_URI:
-            connection = psycopg2.connect(DB_URI, cursor_factory=RealDictCursor)
+            connection = psycopg2.connect(DB_URI, cursor_factory=RealDictCursor, connect_timeout=10)
             return connection
             
         db_password = os.getenv("DB_PASSWORD")
@@ -41,6 +42,7 @@ def get_db_connection():
                 user=os.getenv("DB_USER", "postgres"),
                 password=db_password,
                 port=int(os.getenv("DB_PORT", 5432)),
+                connect_timeout=10,
                 cursor_factory=RealDictCursor
             )
             return connection

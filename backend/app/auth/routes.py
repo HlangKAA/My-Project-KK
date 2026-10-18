@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, request, jsonify, session, redirect, url_for
+from flask import Blueprint, render_template, request, jsonify, session, redirect, url_for, current_app
+from psycopg2.errors import UniqueViolation
 from flask_mail import Message
 from werkzeug.security import generate_password_hash, check_password_hash
 from psycopg2 import Error
@@ -629,11 +630,55 @@ def get_user():
             'message': 'Not logged in'
         }), 401
     
-    return jsonify({
-        'success': True,
-        'user': {
-            'player_id': session['player_id'],
-            'username': session['username'],
-            'email': session['email']
-        }
-    }), 200
+    connection = get_db_connection()
+    if connection is None:
+        return jsonify(message='Database connection failed'), 503
+    try:
+        with connection:
+            with connection.cursor() as cursor:
+                cursor.execute('SELECT player_id, username, email FROM public.players WHERE player_id = %s',
+                               (session['player_id'],))
+                user = cursor.fetchone()
+        if not user:
+            return jsonify(message='Please log in again.'), 401
+        return jsonify(success=True, user=dict(user))
+    except Exception:
+        current_app.logger.exception('Unable to load profile')
+        return jsonify(message='Unable to load profile. Please retry.'), 503
+    finally:
+        connection.close()
+
+
+@auth_bp.route('/api/profile', methods=['PATCH'])
+def update_profile():
+    if 'player_id' not in session:
+        return jsonify(message='Not logged in'), 401
+    data = request.get_json(silent=True)
+    name = data.get('username') if isinstance(data, dict) else None
+    if not isinstance(name, str) or not 1 <= len(name.strip()) <= 50 or not name.strip().isprintable():
+        return jsonify(message='Enter a player name of 1–50 printable characters.'), 400
+    name = name.strip()
+    connection = get_db_connection()
+    if connection is None:
+        return jsonify(message='Database connection failed. Please retry.'), 503
+    try:
+        with connection:
+            with connection.cursor() as cursor:
+                cursor.execute('SELECT player_id FROM public.players WHERE username = %s AND player_id <> %s',
+                               (name, session['player_id']))
+                if cursor.fetchone():
+                    return jsonify(message='This player name is already taken.'), 409
+                cursor.execute('UPDATE public.players SET username = %s WHERE player_id = %s RETURNING player_id, username, email',
+                               (name, session['player_id']))
+                user = cursor.fetchone()
+                if not user:
+                    return jsonify(message='Please log in again.'), 401
+        session['username'] = user['username']
+        return jsonify(success=True, user=dict(user))
+    except UniqueViolation:
+        return jsonify(message='This player name is already taken.'), 409
+    except Exception:
+        current_app.logger.exception('Unable to update profile')
+        return jsonify(message='Unable to save your name. Please retry.'), 503
+    finally:
+        connection.close()
