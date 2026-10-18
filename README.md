@@ -39,43 +39,45 @@ Write real Python code to restore color to a grayscale world!
 
 ```
 My-Project-KK/
-├── backend/                           # Flask API Server
+├── backend/                              # Flask API and Supabase persistence
 │   ├── app/
-│   │   ├── __init__.py                # Flask app factory
-│   │   ├── db.py                      # Database connection (Supabase)
+│   │   ├── __init__.py                   # Flask app factory and blueprint setup
+│   │   ├── db.py                         # PostgreSQL/Supabase connection
 │   │   ├── auth/
-│   │   │   └── routes.py             # Authentication endpoints
+│   │   │   └── routes.py                 # Login, registration, and profile routes
 │   │   ├── game/
-│   │   │   ├── routes.py             # Game API endpoints
-│   │   │   └── levels.py             # Level definitions
+│   │   │   ├── routes.py                 # Game, progress, and submission endpoints
+│   │   │   ├── progress.py               # Progress and submission persistence
+│   │   │   ├── levels.py                 # Level definitions
+│   │   │   └── catalog.json              # Stage catalog used by the API
 │   │   ├── main/
-│   │   │   └── routes.py             # Main routes
-│   │   ├── templates/                 # Jinja2 templates (auth pages)
-│   │   └── static/                    # Static assets
+│   │   │   └── routes.py                 # Main and dashboard routes
+│   │   ├── templates/                    # Jinja2 auth, game, and dashboard pages
+│   │   └── static/                       # Backend CSS and image assets
+│   ├── tests/                            # Backend progress and profile tests
+│   │   ├── test_progress.py
+│   │   └── test_profile.py
+│   ├── PROGRESS_PERSISTENCE.md            # Progress persistence setup and behavior
+│   ├── seed_game_catalog.sql              # SQL for loading the game catalog
 │   ├── requirements.txt
-│   └── run.py                         # Entry point
-├── frontend/                          # React + Vite SPA
+│   └── run.py                            # Flask entry point
+├── frontend/                             # React + Vite single-page app
 │   ├── src/
-│   │   ├── pages/
-│   │   │   ├── GamePage.jsx           # Main game interface
-│   │   │   ├── StagePage.jsx          # Individual stage view
-│   │   │   ├── RegionMap.jsx          # World map navigation
-│   │   │   ├── Dashboard.jsx          # User dashboard
-│   │   │   ├── Login.jsx              # Login page
-│   │   │   └── Register.jsx           # Registration page
-│   │   ├── components/
-│   │   │   ├── CodeEditor.jsx         # Python code editor
-│   │   │   ├── GameVisualizer.jsx     # Visual output display
-│   │   │   ├── Grimoire.jsx           # In-game spell book
-│   │   │   └── LevelComplete.jsx      # Level completion screen
-│   │   ├── hooks/
-│   │   │   └── usePythonInterpreter.js  # Skulpt Python execution
-│   │   ├── context/
-│   │   │   └── GameContext.jsx        # Game state management
-│   │   └── data/
-│   │       └── stageData.js           # Stage/level configurations
+│   │   ├── App.jsx                       # Client routes
+│   │   ├── api/axios.js                   # Shared API client
+│   │   ├── pages/                        # Game, stage, map, dashboard, auth, and profile pages
+│   │   ├── components/                   # Game UI, editor, visualizer, spell book, and profile controls
+│   │   ├── hooks/                        # Game world, progression, and Python interpreter
+│   │   ├── context/GameContext.jsx       # Game session and progress state
+│   │   └── data/                         # Stage, region, quest, and character data
+│   ├── public/                           # Public static assets
 │   └── package.json
-└── start.bat                          # One-click startup script
+├── scripts/
+│   └── export-game-catalog.mjs           # Exports the game catalog
+├── PROJECT_STATUS.md                     # Current project status
+├── implementation_plan.md                # Implementation plan
+├── start.bat                             # Starts the app locally
+└── README.md
 ```
 
 ## 🛠️ Tech Stack

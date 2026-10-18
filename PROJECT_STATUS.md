@@ -1,7 +1,7 @@
 # 🌈 The Lost Spectrum — Project Status
 
-> **Last Updated:** 2026-08-11  
-> **Analysis Method:** Full codebase audit (every source file read)
+> **Last Updated:** 2026-10-18
+> **Scope:** High-level architecture and current primary application flows
 
 ---
 
@@ -14,6 +14,33 @@ The application wraps Python concepts in a **Computer Vision / color-spectrum** 
 ---
 
 ## 2. Architecture & Tech Stack
+
+### Primary Project Structure
+
+```text
+My-Project-KK/
+├── backend/                         # Flask API and persistence
+│   ├── app/
+│   │   ├── auth/routes.py           # Authentication and profile name
+│   │   ├── game/
+│   │   │   ├── routes.py            # Progress, submissions, stage history
+│   │   │   ├── progress.py          # Progress and submission logic
+│   │   │   └── catalog.json         # Stage catalog used by the API
+│   │   ├── db.py                    # PostgreSQL/Supabase connection
+│   │   └── __init__.py              # Flask app and blueprint setup
+│   └── run.py                       # Backend entry point
+├── frontend/                        # React + Vite game client
+│   └── src/
+│       ├── App.jsx                  # Routes and protected pages
+│       ├── pages/                   # Dashboard, region, stage, profile
+│       ├── components/              # Game UI and reusable profile controls
+│       ├── context/GameContext.jsx  # Session, profile, and progress state
+│       ├── hooks/                   # Game logic and Python interpreter
+│       └── data/                    # Stage and character progression data
+└── PROJECT_STATUS.md
+```
+
+The React client handles gameplay and in-browser Python execution. It calls the Flask API for account, saved stage progress, submissions, and profile history. Flask uses the session to identify the player and PostgreSQL on Supabase to read and write account and game records.
 
 ### Frontend
 
@@ -53,7 +80,7 @@ The application wraps Python concepts in a **Computer Vision / color-spectrum** 
 
 ### 3.1 Frontend
 
-#### Pages & Routing (8 routes)
+#### Main Pages & Routing
 
 | Route | Page Component | Auth Required | Status |
 |---|---|---|---|
@@ -63,6 +90,7 @@ The application wraps Python concepts in a **Computer Vision / color-spectrum** 
 | `/forgot-password` | `ForgotPassword` | No | ✅ Calls `POST /api/forgot-password` |
 | `/reset-password/:token` | `ResetPassword` | No | ✅ Calls `POST /api/reset-password` |
 | `/dashboard` | `Dashboard` | **Yes** | ✅ Region map with lock/unlock/complete states |
+| `/profile` | `ProfilePage` | **Yes** | ✅ Edit player name; view level, XP, unlocked spells, mastered concepts, and stage history |
 | `/region/:regionId` | `RegionMap` | **Yes** | ✅ Stage timeline with status per stage |
 | `/region/:regionId/stage/:stageId` | `StagePage` | **Yes** | ✅ Full game IDE (see below) |
 
@@ -107,9 +135,9 @@ Each stage includes: `title`, `chapter`, `location`, `objective`, `initialCode`,
 
 #### State Management (`GameContext`)
 
-- React Context providing: `user`, `loading`, `login()`, `logout()`, `updateProgress()`, `updateStageProgress()`.
-- Session check on mount via `GET /api/user`.
-- **Client-side only** stage progress tracking (`user.stageProgress` = `{ regionId: completedStageCount }`). Progress is **not persisted** to the backend via the new region/stage API.
+- React Context provides the current user, session loading, login/logout, submission saving, and profile name updates.
+- On startup and login, the client loads the account and saved game progress from the backend.
+- Progress saved from successful stage submissions is reflected in the user context; character XP and level are also maintained in browser storage.
 
 #### UI Assets
 
@@ -129,6 +157,7 @@ Each stage includes: `title`, `chapter`, `location`, `objective`, `initialCode`,
 | `POST` | `/api/login` | Login (email, password) | ✅ Verifies hash, sets session (`player_id`, `username`, `email`) |
 | `POST` | `/api/logout` | Clears session | ✅ |
 | `GET` | `/api/user` | Returns current session user | ✅ |
+| `PATCH` | `/api/profile` | Updates the signed-in player's name | ✅ |
 | `POST` | `/api/forgot-password` | Generates reset token, sends email | ✅ |
 | `POST` | `/api/reset-password` | Validates token + updates password | ✅ |
 | `GET` | `/verify-email/<token>` | Verifies email via token | ✅ Renders server-side HTML result |
@@ -143,6 +172,9 @@ Each stage includes: `title`, `chapter`, `location`, `objective`, `initialCode`,
 | `GET` | `/levels` | Renders Jinja2 level select page | ✅ (Legacy — not used by React frontend) |
 | `GET` | `/game/<int:level_id>` | Returns level data as JSON | ✅ (Legacy — uses old 3-level `levels.py` data) |
 | `POST` | `/complete_level` | Saves level completion to `game_progress` table | ✅ (Legacy — not called by the new React StagePage) |
+| `GET` | `/api/progress` | Loads saved stage progress and achievements | ✅ |
+| `POST` | `/api/submissions` | Saves a stage attempt and updates progress on success | ✅ |
+| `GET` | `/api/profile/history` | Loads per-stage attempt, completion, and runtime history | ✅ |
 
 #### API Endpoints (Main Blueprint)
 
@@ -210,8 +242,8 @@ These are **legacy templates** from before the React frontend was built. They ar
 
 | # | Issue | Details |
 |---|---|---|
-| 1 | **No backend API for stage progress** | The React frontend tracks region/stage progress **only in client memory** (`GameContext`). There is no `POST /api/complete-stage` endpoint. Progress is lost on page refresh or logout. |
-| 2 | **Legacy vs. New data mismatch** | The backend `levels.py` has 3 flat levels, while the frontend `stageData.js` uses a region→stage hierarchy. They are completely out of sync. |
+| 1 | **XP is browser-local** | Stage completion and attempt history are stored on the backend, while character XP and level are kept in browser storage and do not automatically follow the player to another browser/device. |
+| 2 | **Legacy level endpoints remain** | `/levels`, `/game/<level_id>`, and `/complete_level` use the older flat level flow. The React app uses the catalog-backed progress and submission endpoints. |
 | 3 | **~~No SQL schema/migration files~~** | ✅ **Resolved** — Tables (`players`, `game_progress`, `player_stats`) are now created on Supabase Cloud via automated migration scripts. |
 | 4 | **`.env` file committed to Git** | Contains actual credentials (SMTP password, Supabase keys, secret key). This is a **security risk**. |
 | 5 | **No `axios` base URL configured** | The `api/axios.js` module creates an Axios instance but doesn't set a `baseURL`. The `GameContext` creates a **separate** Axios instance. Two Axios instances exist with different configurations. |
@@ -221,7 +253,7 @@ These are **legacy templates** from before the React frontend was built. They ar
 | # | Feature | Details |
 |---|---|---|
 | 6 | **Admin Dashboard** | No admin panel, user management, or analytics interface exists. |
-| 7 | **XP / Scoring system** | XP values (`+450`) are hardcoded in UI text. No actual XP calculation, storage, or leaderboard exists. |
+| 7 | **No cross-device XP history** | XP is calculated and shown in the game, but the server does not store earned XP per stage; the Profile page reads XP from local character progress. |
 | 8 | **Inventory system** | "Inventory" button exists in navbar but is non-functional (no route, no data). |
 | 9 | **Journal / Settings pages** | "JOURNAL" and "SETTINGS" buttons in the Dashboard navbar are non-functional. |
 | 10 | **Sound / Music** | `assets/sounds/` directory is empty. Volume button in game UI is non-functional. |
@@ -238,14 +270,9 @@ These are **legacy templates** from before the React frontend was built. They ar
 
 ## 5. Next Steps (Sprint Backlog)
 
-### 🏆 Priority 1 — Persist Stage Progress (Critical)
+### 🏆 Priority 1 — Persist Character XP
 
-**Build a `POST /api/complete-stage` endpoint** and update `GameContext` to call it on stage completion. Without this, all player progress is ephemeral.
-
-- Create a `stage_progress` table: `(player_id, region_id, stage_id, completed_at)`.
-- Add a `GET /api/progress` endpoint to load saved progress on login.
-- Update `GameContext.updateStageProgress()` to POST to the backend.
-- Load saved progress in the session check (`GET /api/user` or new endpoint).
+Move earned XP and level data from browser storage into the account's saved progress so it remains consistent across browsers and devices.
 
 ---
 
