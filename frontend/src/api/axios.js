@@ -2,6 +2,7 @@ import axios from "axios";
 
 // Create an Axios instance with default config
 const api = axios.create({
+  timeout: 20000,
   headers: {
     "Content-Type": "application/json",
   },

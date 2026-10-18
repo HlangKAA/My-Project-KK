@@ -740,6 +740,32 @@
 .wizard-stat label { color: #4b5563; font-size: 0.65rem; }
 
 /* Compact variant */
+.wizard-profile-trigger { cursor: pointer; font: inherit; color: inherit; }
+.wizard-profile-trigger:hover { background: rgba(255, 255, 255, 0.08); }
+.wizard-profile-trigger:focus-visible { outline: 2px solid #a78bfa; outline-offset: 4px; }
+.wizard-profile-dialog {
+    width: min(540px, calc(100vw - 32px));
+    max-height: calc(100dvh - 40px);
+    padding: 0;
+    border: 1px solid #475569;
+    border-radius: 16px;
+    background: #111827;
+    color: #e2e8f0;
+    overflow: auto;
+}
+.wizard-profile-dialog::backdrop { background: rgba(0, 0, 0, 0.75); }
+.wizard-profile-panel { padding: 24px; overflow-wrap: anywhere; }
+.wizard-profile-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.wizard-profile-heading h2 { margin: 0 0 16px; font-size: 1.25rem; }
+.wizard-profile-heading button {
+    cursor: pointer; padding: 8px 12px; border: 1px solid #64748b;
+    border-radius: 8px; background: #1e293b; color: white;
+}
+.wizard-profile-dialog li { margin-block: 8px; }
+@media (max-width: 480px) {
+    .wizard-profile-panel { padding: 16px; }
+    .wizard-profile-dialog .wizard-profile { flex-wrap: wrap; }
+}
 .wizard-profile.compact {
     padding: 0.3rem 0.6rem;
     gap: 0.5rem;

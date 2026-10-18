@@ -41,6 +41,7 @@ const usePythonInterpreter = () => {
   const runCode = useCallback((code, heroCallbacks = {}) => {
     if (!window.Sk) {
       setError("The magical engine (Skulpt) is not loaded!");
+      heroCallbacks.__onError?.('The magical engine (Skulpt) is not loaded!');
       return;
     }
 
@@ -111,7 +112,7 @@ const usePythonInterpreter = () => {
 
     // Also bind any extra callbacks dynamically
     Object.keys(heroCallbacks).forEach((key) => {
-      if (!heroModule.$d[key]) {
+      if (!key.startsWith('__') && !heroModule.$d[key]) {
         heroModule.$d[key] = createFunc(heroCallbacks[key]);
       }
     });
@@ -154,7 +155,7 @@ const usePythonInterpreter = () => {
     );
 
     return myPromise;
-  }, []);
+  }, [log]);
 
   return {
     output,

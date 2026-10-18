@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './stagetypes.css';
 
 /**
@@ -6,6 +7,7 @@ import './stagetypes.css';
  * ใช้ใน Dashboard, StagePage navbar, Level Complete
  */
 const WizardProfile = ({ character, levelProgress, compact = false, showXPBar = true }) => {
+    const navigate = useNavigate();
     if (!character || !levelProgress) return null;
 
     const { current, next, progress, xpInLevel, xpNeeded } = levelProgress;
@@ -13,7 +15,8 @@ const WizardProfile = ({ character, levelProgress, compact = false, showXPBar = 
 
     if (compact) {
         return (
-            <div className="wizard-profile compact">
+            <button type="button" className="wizard-profile compact wizard-profile-trigger"
+                aria-label="Open your profile" onClick={() => navigate('/profile')}>
                 <div className="wizard-avatar-compact" style={{ borderColor: current?.color || '#6b7280' }}>
                     <i className={current?.icon || 'fas fa-hat-wizard'} style={{ color: outfitColor }}></i>
                 </div>
@@ -26,7 +29,7 @@ const WizardProfile = ({ character, levelProgress, compact = false, showXPBar = 
                         <div className="wizard-xp-fill-compact" style={{ width: `${progress}%`, backgroundColor: current?.color || '#6b7280' }}></div>
                     </div>
                 )}
-            </div>
+            </button>
         );
     }
 

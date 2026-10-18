@@ -1,0 +1,59 @@
+.profile-page {
+    min-height: 100vh;
+    padding: 28px max(20px, calc((100vw - 980px) / 2)) 56px;
+    background: radial-gradient(ellipse at top, #321314, #110d12 60%);
+    color: #f1e8e0;
+}
+.profile-page-header { display: flex; align-items: center; gap: 28px; margin-bottom: 26px; }
+.profile-page-header h1 { margin: 0; font: 700 1.65rem Cinzel, serif; }
+.profile-back { color: #e7c4a8; text-decoration: none; }
+.profile-card, .profile-history-row {
+    border: 1px solid rgba(231, 196, 168, .2); border-radius: 14px;
+    background: rgba(24, 18, 22, .92); box-shadow: 0 15px 45px #0003;
+}
+.profile-card { padding: 24px; }
+.profile-summary { display: flex; align-items: center; gap: 18px; }
+.profile-emblem { width: 68px; height: 68px; display: grid; place-items: center; border-radius: 50%; background: #4a2023; color: #f6bf77; font-size: 1.7rem; }
+.profile-summary h2 { margin: 2px 0; font: 700 1.4rem Cinzel, serif; }
+.profile-summary p { margin: 4px 0; color: #c7b6aa; }
+.profile-summary .profile-kicker { color: #f6bf77; font-size: .76rem; text-transform: uppercase; letter-spacing: .12em; }
+.profile-xp-track { width: min(350px, 70vw); height: 7px; margin-top: 10px; overflow: hidden; border-radius: 9px; background: #42373a; }
+.profile-xp-track div { height: 100%; border-radius: inherit; background: linear-gradient(90deg, #d97706, #fbbf24); }
+.profile-name-form { margin: 26px 0 20px; }
+.profile-name-form label { display: block; margin-bottom: 7px; color: #e6c7ae; }
+.profile-name-controls { display: flex; gap: 8px; }
+.profile-name-controls input { flex: 1; min-width: 0; padding: 10px 12px; border: 1px solid #5e4b4d; border-radius: 8px; background: #171317; color: #fff; }
+.profile-name-controls button, .profile-replay { padding: 10px 14px; border: 1px solid #a66b43; border-radius: 8px; background: #512d25; color: #fff1df; cursor: pointer; text-decoration: none; }
+.profile-name-controls button:disabled { cursor: default; opacity: .55; }
+.profile-name-form p { min-height: 1em; margin: 6px 0 0; color: #9ee6b0; }
+.profile-name-form p[role="alert"] { color: #ff9b9b; }
+.profile-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.profile-stats div { display: flex; flex-direction: column; gap: 3px; padding: 12px; border-radius: 9px; background: #ffffff08; }
+.profile-stats strong { font-size: 1.25rem; color: #f6bf77; }
+.profile-stats span { color: #c7b6aa; font-size: .82rem; }
+.profile-collections { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 18px; }
+.profile-collection-card { padding: 18px 20px; border: 1px solid rgba(231, 196, 168, .18); border-radius: 12px; background: rgba(24, 18, 22, .8); }
+.profile-collection-card h2 { margin: 0 0 10px; font: 700 1.05rem Cinzel, serif; }
+.profile-collection-card ul { display: flex; flex-wrap: wrap; gap: 8px; padding: 0; list-style: none; }
+.profile-collection-card li { padding: 6px 10px; border-radius: 18px; background: #ffffff0c; color: #ecd0b8; }
+.profile-collection-card p { color: #b5a4a0; }
+.profile-history { margin-top: 32px; }
+.profile-history > h2 { font: 700 1.35rem Cinzel, serif; }
+.profile-history-list { display: grid; gap: 12px; }
+.profile-history-row { padding: 17px 20px; }
+.profile-stage-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.profile-stage-heading h3 { margin: 0; font-size: 1rem; }
+.profile-stage-heading p { margin: 4px 0; color: #b5a4a0; font-size: .82rem; }
+.profile-result { padding: 4px 9px; border-radius: 20px; background: #543d2d; color: #ffd799; font-size: .78rem; }
+.profile-result.passed { background: #183e30; color: #a5efc3; }
+.profile-history-row dl { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 16px 0; }
+.profile-history-row dl div { min-width: 0; }
+.profile-history-row dt { color: #b5a4a0; font-size: .75rem; }
+.profile-history-row dd { margin: 3px 0 0; overflow-wrap: anywhere; }
+@media (max-width: 620px) {
+    .profile-page-header { align-items: flex-start; flex-direction: column; gap: 12px; }
+    .profile-card { padding: 18px; }
+    .profile-collections { grid-template-columns: 1fr; }
+    .profile-history-row dl { grid-template-columns: repeat(2, 1fr); }
+    .profile-name-controls { flex-wrap: wrap; }
+}

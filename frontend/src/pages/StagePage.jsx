@@ -20,9 +20,9 @@ import './stagepage.css';
 const StagePage = () => {
     const { regionId, stageId } = useParams();
     const navigate = useNavigate();
-    const { user, updateStageProgress } = useGame();
+    const { user, saveAttempt } = useGame();
     const { runCode, output, isRunning, wizardMessage, clearOutput } = usePythonInterpreter();
-    const { character, levelProgress, awardXP, masterConcept, isStageCompleted } = useCharacterProgression();
+    const { character, levelProgress, awardXP, masterConcept } = useCharacterProgression();
 
     const stageKey = `${regionId}-${stageId}`;
     const currentStage = STAGE_DATA[stageKey];
@@ -50,7 +50,6 @@ const StagePage = () => {
     // Progressive hints state
     const [attemptCount, setAttemptCount] = useState(0);
     const [hintsUsed, setHintsUsed] = useState(0);
-    const [showHints, setShowHints] = useState(false);
 
     // CodeCombat 2D Arena state
     const [arenaActionQueue, setArenaActionQueue] = useState([]);
@@ -58,6 +57,24 @@ const StagePage = () => {
 
     // Completion result (XP breakdown, etc.)
     const [completionResult, setCompletionResult] = useState(null);
+
+    const [saving, setSaving] = useState(false);
+    const [saveError, setSaveError] = useState('');
+    const [saveStatus, setSaveStatus] = useState('');
+    const pendingSave = useRef(null);
+    const activeAttempt = useRef(null);
+    const saveInFlight = useRef(false);
+
+    useEffect(() => {
+        const warn = event => {
+            if (pendingSave.current || activeAttempt.current) {
+                event.preventDefault();
+                event.returnValue = '';
+            }
+        };
+        window.addEventListener('beforeunload', warn);
+        return () => window.removeEventListener('beforeunload', warn);
+    }, []);
 
     const typingRef = useRef(null);
     const completedRef = useRef(false);
@@ -83,11 +100,14 @@ const StagePage = () => {
         setWizardState('idle');
         setAttemptCount(0);
         setHintsUsed(0);
-        setShowHints(false);
         setCompletionResult(null);
         setArenaActionQueue([]);
         setIsArenaExecuting(false);
         completedRef.current = false;
+        activeAttempt.current = null;
+        pendingSave.current = null;
+        setSaveError('');
+        setSaveStatus('');
 
         // Story intro setup
         if (currentStage.hasStoryIntro) {
@@ -101,7 +121,7 @@ const StagePage = () => {
         } else {
             setStoryPhase('ide');
         }
-    }, [regionId, stageId, navigate, clearOutput]);
+    }, [regionId, stageId, navigate, clearOutput, currentStage]);
 
     // ─── Typewriter effect for dialog ───
     useEffect(() => {
@@ -166,10 +186,10 @@ const StagePage = () => {
 
         // Award XP with multipliers
         const modifiers = {
-            firstAttempt: (extraModifiers.attempts || attemptCount + 1) === 1,
-            noHints: (extraModifiers.hintsUsed || hintsUsed) === 0,
-            attempts: extraModifiers.attempts || attemptCount + 1,
-            hintsUsed: extraModifiers.hintsUsed || hintsUsed,
+            firstAttempt: (extraModifiers.attempts ?? attemptCount) === 1,
+            noHints: (extraModifiers.hintsUsed ?? hintsUsed) === 0,
+            attempts: extraModifiers.attempts ?? attemptCount,
+            hintsUsed: extraModifiers.hintsUsed ?? hintsUsed,
         };
 
         const result = awardXP(stageKey, currentStage.xpReward || 200, modifiers);
@@ -180,16 +200,53 @@ const StagePage = () => {
             currentStage.teachingConcepts.forEach(concept => masterConcept(concept));
         }
 
-        // Update legacy progress
-        if (updateStageProgress) {
-            updateStageProgress(parseInt(regionId), parseInt(stageId));
-        }
-
         setTimeout(() => setShowComplete(true), 1500);
     };
 
     // ─── Run Code (for lesson/challenge/boss stages) ───
+    // Retry the exact same attempt instead of inserting a duplicate row.
+    const persistAttempt = async (payload, modifiers = {}) => {
+        if (saveInFlight.current) return false;
+        pendingSave.current = { payload, modifiers };
+        saveInFlight.current = true;
+        setSaving(true);
+        setSaveError('');
+        setSaveStatus('');
+        try {
+            await saveAttempt(payload);
+            pendingSave.current = null;
+            setSaveStatus('Saved to your account');
+            if (payload.result === 'Success') handleLevelComplete(modifiers);
+            return true;
+        } catch (error) {
+            setSaveError(error.response?.data?.message || 'Could not save. Check your connection and retry.');
+            return false;
+        } finally {
+            saveInFlight.current = false;
+            setSaving(false);
+        }
+    };
+
+    const finishAttempt = result => {
+        const attempt = activeAttempt.current;
+        if (!attempt) return;
+        activeAttempt.current = null;
+        setIsArenaExecuting(false);
+        setWizardState(result === 'Success' ? 'success' : 'confused');
+        void persistAttempt({
+            stage_key: stageKey, code: attempt.code, result,
+            runtime: attempt.runtime ?? (performance.now() - attempt.started) / 1000,
+            submitted_at: attempt.submitted_at,
+        }, { attempts: attempt.number, hintsUsed });
+    };
+
+    const handleSpecialAttempt = (payload, modifiers) => persistAttempt({ ...payload, stage_key: stageKey }, modifiers);
+
     const handleRun = () => {
+        if (activeAttempt.current || pendingSave.current || saveInFlight.current) return;
+        completedRef.current = false;
+        activeAttempt.current = { code, submitted_at: new Date().toISOString(), started: performance.now(), number: attemptCount + 1 };
+        setSaveStatus('');
         clearOutput();
         setWizardState('casting');
         setAttemptCount(prev => prev + 1);
@@ -234,109 +291,53 @@ const StagePage = () => {
                 },
                 __onSuccess: () => {
                     console.log("[CodeCombat] Queuing actions to Arena:", actions);
+                    if (!activeAttempt.current) return;
+                    activeAttempt.current.runtime = (performance.now() - activeAttempt.current.started) / 1000;
+                    if (actions.length === 0) {
+                        finishAttempt('Fail');
+                        return;
+                    }
                     setIsArenaExecuting(false);
                     setTimeout(() => {
                         setArenaActionQueue([...actions]);
                         setIsArenaExecuting(true);
                     }, 50);
                 },
-                __onError: (err) => {
-                    setIsArenaExecuting(false);
-                    setWizardState('idle');
-                }
+                __onError: () => finishAttempt('Error')
             };
 
             runCode(code, arenaCallbacks);
             return;
         }
 
+        // Validate the final output of this run, not a stale React state snapshot.
+        const lines = [];
+        const state = {};
         const callbacks = {
+            __onPrint: text => lines.push(text),
             cast_color: (r, g, b) => {
-                setVisualState(prev => ({ ...prev, color: `rgb(${r},${g},${b})` }));
-                // Stage-specific validation for hero callbacks
-                if (stageKey === '1-5' && r === 255 && g === 0 && b === 0) {
-                    handleLevelComplete();
-                }
-                if (stageKey === '4-6' && r === 255 && g === 255 && b === 255) {
-                    handleLevelComplete();
-                }
+                state.color = `rgb(${r},${g},${b})`;
+                setVisualState(previous => ({ ...previous, color: state.color }));
             },
-            move_to_x: (x) => {
-                setVisualState(prev => ({ ...prev, foundIndex: x }));
-                // Stage 3-3: Matrix Search
-                if (stageKey === '3-3' && x === 2) {
-                    handleLevelComplete();
-                }
+            move_to_x: x => {
+                state.foundIndex = x;
+                setVisualState(previous => ({ ...previous, foundIndex: x }));
             },
-            say: (msg) => console.log("Hero said:", msg)
+            say: () => {},
+            __onError: () => finishAttempt('Error'),
+            __onSuccess: () => {
+                let success = currentStage.validateOutput ? currentStage.validateOutput(lines) : false;
+                if (stageKey === '3-3') success = state.foundIndex === 2;
+                if (stageKey === '3-6') success = state.foundIndex === 2 && lines.some(line => line.includes('10'));
+                if (stageKey === '4-5') success = state.color === 'rgb(0,255,0)';
+                if (stageKey === '4-6') success = state.color === 'rgb(255,255,255)';
+                finishAttempt(success ? 'Success' : 'Fail');
+            },
         };
-
-        // Output validation for stages with validateOutput
-        if (currentStage.validateOutput) {
-            setTimeout(() => {
-                if (currentStage.validateOutput(output) && !completedRef.current) {
-                    handleLevelComplete();
-                }
-            }, 500);
-        }
-
         runCode(code, callbacks);
     };
 
-    const handleArenaExecutionFinish = (success, msg) => {
-        setIsArenaExecuting(false);
-        if (success) {
-            if (currentStage.validateOutput) {
-                setTimeout(() => {
-                    if (currentStage.validateOutput(output)) {
-                        handleLevelComplete();
-                    } else {
-                        setTimeout(() => {
-                            handleLevelComplete();
-                        }, 500);
-                    }
-                }, 300);
-            } else {
-                handleLevelComplete();
-            }
-        } else {
-            setWizardState('confused');
-        }
-    };
-
-    // ─── Validate output for complex stages ───
-    useEffect(() => {
-        if (completedRef.current) return;
-        if (wizardState === 'casting') {
-            // Multi-condition stages
-            if (stageKey === '1-7') {
-                if (visualState.foundIndex === 3 && visualState.color === 'rgb(0,0,255)') {
-                    handleLevelComplete();
-                }
-            } else if (stageKey === '1-8') {
-                if (currentStage?.validateOutput && currentStage.validateOutput(output) &&
-                    visualState.foundIndex === 5 && visualState.color === 'rgb(0,255,0)') {
-                    handleLevelComplete();
-                }
-            } else if (stageKey === '1-6') {
-                if (visualState.color === 'rgb(255,255,0)' && visualState.foundIndex === 2) {
-                    handleLevelComplete();
-                }
-            } else if (stageKey === '3-6') {
-                if (visualState.foundIndex === 2 && output.some(l => l.includes('10'))) {
-                    handleLevelComplete();
-                }
-            } else if (stageKey === '4-5') {
-                if (visualState.color === 'rgb(0,255,0)') {
-                    handleLevelComplete();
-                }
-            } else if (currentStage?.validateOutput && output.length > 0) {
-                if (currentStage.validateOutput(output)) {
-                    handleLevelComplete();
-                }
-            }
-        }
-    }, [output, visualState, wizardState, currentStage, stageKey]);
+    const handleArenaExecutionFinish = success => finishAttempt(success ? 'Success' : 'Fail');
 
     const handleReset = () => {
         setCode(currentStage.initialCode || '');
@@ -366,19 +367,6 @@ const StagePage = () => {
             }
         }, 2000);
     };
-
-    // Detect errors in output to show confused state
-    useEffect(() => {
-        if (wizardState === 'success') return;
-        const hasError = output.some(line => line.startsWith('[ERROR]'));
-        if (hasError && wizardState === 'casting') {
-            setWizardState('confused');
-            // Go back to idle after a few seconds
-            setTimeout(() => {
-                if (!completedRef.current) setWizardState('idle');
-            }, 3000);
-        }
-    }, [output]);
 
     const openGrimoire = (pageIndex = 0) => {
         setGrimoireStartPage(pageIndex);
@@ -543,7 +531,8 @@ const StagePage = () => {
                 return (
                     <GuidedStage
                         data={currentStage}
-                        onComplete={handleLevelComplete}
+                        key={stageKey}
+                        onAttempt={handleSpecialAttempt}
                         runCode={runCode}
                     />
                 );
@@ -551,7 +540,8 @@ const StagePage = () => {
                 return (
                     <DebugStage
                         data={currentStage}
-                        onComplete={handleLevelComplete}
+                        key={stageKey}
+                        onAttempt={handleSpecialAttempt}
                         runCode={runCode}
                         output={output}
                         clearOutput={clearOutput}
@@ -561,7 +551,8 @@ const StagePage = () => {
                 return (
                     <PuzzleStage
                         data={currentStage}
-                        onComplete={handleLevelComplete}
+                        key={stageKey}
+                        onAttempt={handleSpecialAttempt}
                     />
                 );
             default:
@@ -594,7 +585,7 @@ const StagePage = () => {
                 </div>
 
                 <div className="game-nav-links">
-                    <button className="game-nav-link" onClick={() => navigate(`/region/${regionId}`)}>
+                    <button className="game-nav-link" disabled={isRunning || isArenaExecuting || saving || !!saveError} onClick={() => navigate(`/region/${regionId}`)}>
                         <i className="fas fa-map"></i> Map
                     </button>
                     <button className="game-nav-link" onClick={() => openGrimoire(0)}>
@@ -618,12 +609,21 @@ const StagePage = () => {
             </nav>
 
             {/* ─── Main Content ─── */}
+            <div role={saveError ? 'alert' : 'status'} style={{ padding: '8px 20px', color: saveError ? '#fca5a5' : '#86efac' }}>
+                {saving ? 'Saving progress...' : saveError || saveStatus}
+                {saveError && <button onClick={() => {
+                    const pending = pendingSave.current;
+                    if (pending) void persistAttempt(pending.payload, pending.modifiers);
+                }}>Retry save</button>}
+            </div>
             <div className="game-main">
                 {specialContent ? (
                     /* ─── Specialized Stage Types (Guided / Debug / Puzzle) ─── */
                     <div className="game-scene" style={{ flex: 1 }}>
                         <div className="game-scene-view" style={{ padding: 0, overflow: 'auto' }}>
-                            {specialContent}
+                            <fieldset disabled={saving || !!saveError} style={{ border: 0, margin: 0, padding: 0 }}>
+                                {specialContent}
+                            </fieldset>
                         </div>
                     </div>
                 ) : (
@@ -653,6 +653,7 @@ const StagePage = () => {
                                         isExecuting={isArenaExecuting}
                                         onExecutionFinish={handleArenaExecutionFinish}
                                         onReset={() => {
+                                            if (activeAttempt.current) finishAttempt('Fail');
                                             setArenaActionQueue([]);
                                             setIsArenaExecuting(false);
                                         }}
@@ -761,7 +762,7 @@ const StagePage = () => {
                                     value={activeTab === 'spell' ? code : `# ${currentStage.title}\n# ${currentStage.chapter}\n# Location: ${currentStage.location}\n\n## Objective\n# ${currentStage.objective.replace(/<[^>]+>/g, '')}\n\n## Hint\n# ${currentStage.hints?.[0]?.text || 'No hint available'}`}
                                     onChange={handleCodeChange}
                                     spellCheck="false"
-                                    readOnly={activeTab !== 'spell'}
+                                    readOnly={activeTab !== 'spell' || isRunning || isArenaExecuting || saving || !!saveError}
                                     placeholder="# Enter your Python spell here..."
                                 />
                             </div>
@@ -805,10 +806,10 @@ const StagePage = () => {
             {/* ─── Bottom Bar (only for IDE stages) ─── */}
             {!specialContent && (
                 <div className="game-bottom-bar">
-                    <button className="game-btn-reset" onClick={handleReset}>
+                    <button className="game-btn-reset" onClick={handleReset} disabled={isRunning || isArenaExecuting || saving || !!saveError}>
                         <i className="fas fa-redo"></i> RESET
                     </button>
-                    <button className="game-btn-run" onClick={handleRun} disabled={isRunning}>
+                    <button className="game-btn-run" onClick={handleRun} disabled={isRunning || isArenaExecuting || saving || !!saveError}>
                         {isRunning ? (
                             <><i className="fas fa-spinner fa-spin"></i> CASTING...</>
                         ) : (

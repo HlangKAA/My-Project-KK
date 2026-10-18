@@ -1,4 +1,6 @@
 import { useState, useCallback } from 'react';
+import { useGame } from '../context/GameContext';
+import { REGIONS, STAGE_DATA } from '../data/stageData';
 import { CHARACTER_LEVELS, calculateXP, calculateLevel, getLevelProgress, SPELLS, OUTFITS, checkOutfitUnlock } from '../data/characterData';
 
 /**
@@ -20,9 +22,9 @@ const DEFAULT_CHARACTER = {
     totalPlayTime: 0,
 };
 
-const loadCharacter = () => {
+const loadCharacter = (storageKey) => {
     try {
-        const saved = localStorage.getItem(STORAGE_KEY);
+        const saved = localStorage.getItem(storageKey);
         if (saved) {
             return { ...DEFAULT_CHARACTER, ...JSON.parse(saved) };
         }
@@ -32,25 +34,35 @@ const loadCharacter = () => {
     return { ...DEFAULT_CHARACTER };
 };
 
-const saveCharacter = (data) => {
+const saveCharacter = (data, storageKey) => {
     try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        localStorage.setItem(storageKey, JSON.stringify(data));
     } catch (e) {
         console.warn('Failed to save character data:', e);
     }
 };
 
 const useCharacterProgression = () => {
-    const [character, setCharacter] = useState(loadCharacter);
+    const { user } = useGame();
+    const storageKey = `${STORAGE_KEY}:${user?.player_id || 'guest'}`;
+    const [localCharacter, setCharacter] = useState(() => loadCharacter(storageKey));
+    // Stage ownership comes from the database; cosmetic/XP preferences stay local.
+    const completedStages = user?.completedStages || localCharacter.completedStages;
+    const character = {
+        ...localCharacter,
+        completedStages,
+        unlockedSpells: Object.entries(SPELLS).filter(([, spell]) => completedStages[spell.unlockStage]).map(([key]) => key),
+        conceptsMastered: [...new Set(Object.keys(completedStages).flatMap(key => STAGE_DATA[key]?.teachingConcepts || []))],
+    };
 
     // ─── Persist changes ───
     const updateCharacter = useCallback((updater) => {
         setCharacter(prev => {
             const next = typeof updater === 'function' ? updater(prev) : { ...prev, ...updater };
-            saveCharacter(next);
+            saveCharacter(next, storageKey);
             return next;
         });
-    }, []);
+    }, [storageKey]);
 
     // ─── Award XP and handle level ups ───
     const awardXP = useCallback((stageKey, baseXP, modifiers = {}) => {
@@ -166,9 +178,9 @@ const useCharacterProgression = () => {
     // ─── Reset character (for testing) ───
     const resetCharacter = useCallback(() => {
         const fresh = { ...DEFAULT_CHARACTER };
-        saveCharacter(fresh);
+        saveCharacter(fresh, storageKey);
         setCharacter(fresh);
-    }, []);
+    }, [storageKey]);
 
     return {
         character,
@@ -183,16 +195,9 @@ const useCharacterProgression = () => {
 
 // ─── Helper: determine which regions are fully completed ───
 function getCompletedRegions(completedStages) {
-    const regions = [];
-    // Region 1: stages 1-1 through 1-8
-    if (['1-1','1-2','1-3','1-4','1-5','1-6','1-7','1-8'].every(s => completedStages[s])) regions.push(1);
-    // Region 2: stages 2-1 through 2-6
-    if (['2-1','2-2','2-3','2-4','2-5','2-6'].every(s => completedStages[s])) regions.push(2);
-    // Region 3: stages 3-1 through 3-6
-    if (['3-1','3-2','3-3','3-4','3-5','3-6'].every(s => completedStages[s])) regions.push(3);
-    // Region 4: stages 4-1 through 4-6
-    if (['4-1','4-2','4-3','4-4','4-5','4-6'].every(s => completedStages[s])) regions.push(4);
-    return regions;
+    return Object.values(REGIONS)
+        .filter(region => region.stages.every(stage => completedStages[`${region.id}-${stage.id}`]))
+        .map(region => region.id);
 }
 
 export default useCharacterProgression;

@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useGame } from '../context/GameContext';
+import useCharacterProgression from '../hooks/useCharacterProgression';
+import WizardProfile from '../components/WizardProfile';
 import regionRedForest from '../assets/images/region-red-forest.png';
 import regionAshPeaks from '../assets/images/region-ash-peaks.png';
 import regionWhisperingCaverns from '../assets/images/region-whispering-caverns.png';
@@ -44,6 +46,7 @@ const REGIONS = [
 const Dashboard = () => {
     const { user, logout } = useGame();
     const navigate = useNavigate();
+    const { character, levelProgress } = useCharacterProgression();
     const userLevel = user?.level || 1;
 
     const getRegionStatus = (regionId) => {
@@ -80,9 +83,10 @@ const Dashboard = () => {
                         <div className="dash-user-role">SCHOLAR</div>
                         <div className="dash-user-name">{user?.username || 'Explorer'}</div>
                     </div>
-                    <div className="dash-avatar">
-                        <i className="fas fa-hat-wizard"></i>
-                    </div>
+                    <WizardProfile character={character} levelProgress={levelProgress} compact />
+                    <button className="dash-logout" onClick={() => navigate('/profile')} title="Open profile" aria-label="Open profile">
+                        <i className="fas fa-user-cog"></i>
+                    </button>
                     <button className="dash-logout" onClick={logout} title="Disconnect Session">
                         <i className="fas fa-sign-out-alt"></i>
                     </button>

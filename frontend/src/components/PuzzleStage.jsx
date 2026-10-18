@@ -6,7 +6,7 @@ import './stagetypes.css';
  * PuzzleStage — Multiple choice quiz / knowledge check
  * แสดงคำถามหลายข้อ ผู้เล่นต้องตอบถูกอย่างน้อย requiredCorrect ข้อ
  */
-const PuzzleStage = ({ data, onComplete }) => {
+const PuzzleStage = ({ data, onAttempt }) => {
     const puzzles = data.puzzles || [];
     const requiredCorrect = data.requiredCorrect || puzzles.length;
 
@@ -28,13 +28,17 @@ const PuzzleStage = ({ data, onComplete }) => {
         setSelectedAnswers(prev => ({ ...prev, [currentPuzzleIdx]: choiceIdx }));
     };
 
-    const handleSubmitAnswer = () => {
+    const handleSubmitAnswer = async () => {
         if (selectedAnswers[currentPuzzleIdx] === undefined) return;
 
         setAttemptCount(prev => prev + 1);
         const isCorrect = selectedAnswers[currentPuzzleIdx] === currentPuzzle.correctIndex;
         setSubmittedAnswers(prev => ({ ...prev, [currentPuzzleIdx]: isCorrect }));
         setShowExplanation(true);
+        if (!isCorrect) {
+            await onAttempt({ code: JSON.stringify({ type: 'quiz', question: currentPuzzleIdx, answer: selectedAnswers[currentPuzzleIdx] }),
+                result: 'Fail', runtime: 0, submitted_at: new Date().toISOString() }, { attempts: attemptCount + 1, hintsUsed });
+        }
     };
 
     const handleNextPuzzle = () => {
@@ -44,17 +48,13 @@ const PuzzleStage = ({ data, onComplete }) => {
         }
     };
 
-    const handleFinish = () => {
+    const handleFinish = async () => {
         if (totalCorrect >= requiredCorrect) {
-            setIsComplete(true);
-            setTimeout(() => {
-                onComplete({
-                    attempts: attemptCount,
-                    hintsUsed,
-                    correctCount: totalCorrect,
-                    totalCount: puzzles.length,
-                });
-            }, 1000);
+            const saved = await onAttempt({
+                code: JSON.stringify({ type: 'quiz', answers: selectedAnswers }),
+                result: 'Success', runtime: 0, submitted_at: new Date().toISOString(),
+            }, { attempts: attemptCount, hintsUsed, correctCount: totalCorrect, totalCount: puzzles.length });
+            if (saved) setIsComplete(true);
         }
     };
 
@@ -208,6 +208,7 @@ const PuzzleStage = ({ data, onComplete }) => {
                     <div className="guided-feedback wrong">
                         <i className="fas fa-redo"></i>
                         <span>Not enough correct answers. Review and try the ones you missed!</span>
+                        <button onClick={() => { setSubmittedAnswers({}); setSelectedAnswers({}); setCurrentPuzzleIdx(0); setShowExplanation(false); }}>Try again</button>
                     </div>
                 )}
             </div>

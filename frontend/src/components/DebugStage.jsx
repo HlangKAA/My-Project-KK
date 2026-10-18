@@ -6,7 +6,7 @@ import './stagetypes.css';
  * DebugStage — Find and fix bugs in code
  * แสดง buggy code ให้ผู้เล่นแก้ แล้วรัน validate output
  */
-const DebugStage = ({ data, onComplete, runCode, output = [], clearOutput }) => {
+const DebugStage = ({ data, onAttempt, runCode, output = [], clearOutput }) => {
     const [code, setCode] = useState(data.buggyCode || data.initialCode || '');
     const [attemptCount, setAttemptCount] = useState(0);
     const [hintsUsed, setHintsUsed] = useState(0);
@@ -14,44 +14,27 @@ const DebugStage = ({ data, onComplete, runCode, output = [], clearOutput }) => 
     const [resultStatus, setResultStatus] = useState(null); // null | 'success' | 'error'
 
     const handleRun = () => {
+        if (isRunning) return;
+        const started = performance.now();
+        const submitted_at = new Date().toISOString();
+        const lines = [];
         setAttemptCount(prev => prev + 1);
         setIsRunning(true);
         setResultStatus(null);
-        if (clearOutput) clearOutput();
-
-        const callbacks = {
-            cast_color: () => {},
-            move_to_x: () => {},
-            say: () => {},
-        };
-
-        if (runCode) {
-            runCode(code, callbacks);
-        }
-
-        // Check output after a delay
-        setTimeout(() => {
+        clearOutput?.();
+        const record = async result => {
+            setResultStatus(result === 'Success' ? 'success' : 'error');
+            await onAttempt({ code, result, submitted_at, runtime: (performance.now() - started) / 1000 },
+                { attempts: attemptCount + 1, hintsUsed });
             setIsRunning(false);
-        }, 600);
+        };
+        runCode(code, {
+            cast_color: () => {}, move_to_x: () => {}, say: () => {},
+            __onPrint: text => lines.push(text),
+            __onSuccess: () => { void record(data.validateOutput?.(lines) ? 'Success' : 'Fail'); },
+            __onError: () => { void record('Error'); },
+        });
     };
-
-    // Watch output for validation
-    React.useEffect(() => {
-        if (output.length > 0 && data.validateOutput) {
-            const hasError = output.some(line => line.startsWith('[ERROR]'));
-            if (hasError) {
-                setResultStatus('error');
-            } else if (data.validateOutput(output)) {
-                setResultStatus('success');
-                setTimeout(() => {
-                    onComplete({
-                        attempts: attemptCount,
-                        hintsUsed,
-                    });
-                }, 1500);
-            }
-        }
-    }, [output]);
 
     const handleReset = () => {
         setCode(data.buggyCode || data.initialCode || '');
@@ -100,6 +83,7 @@ const DebugStage = ({ data, onComplete, runCode, output = [], clearOutput }) => 
                     <textarea
                         className="debug-code-textarea"
                         value={code}
+                        readOnly={isRunning}
                         onChange={(e) => {
                             setCode(e.target.value);
                             setResultStatus(null);
@@ -157,7 +141,7 @@ const DebugStage = ({ data, onComplete, runCode, output = [], clearOutput }) => 
 
             {/* Actions */}
             <div className="stage-type-actions">
-                <button className="stage-type-btn secondary" onClick={handleReset}>
+                <button className="stage-type-btn secondary" onClick={handleReset} disabled={isRunning}>
                     <i className="fas fa-redo"></i> Reset Code
                 </button>
                 <button

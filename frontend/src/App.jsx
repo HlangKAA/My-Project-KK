@@ -12,6 +12,7 @@ import SpriteEditor from './pages/SpriteEditor';
 import Dashboard from './pages/Dashboard';
 import RegionMap from './pages/RegionMap';
 import StagePage from './pages/StagePage';
+import ProfilePage from './pages/ProfilePage';
 
 // Redirect old /world/:zoneId to code-driven /region/:regionId
 const WorldRedirect = () => {
@@ -44,7 +45,7 @@ function App() {
           <Route path="/demo-characters" element={<CharacterDemo />} />
           <Route path="/sprite-editor" element={<SpriteEditor />} />
           
-          <Route 
+          <Route
             path="/dashboard" 
             element={
               <ProtectedRoute>
@@ -53,6 +54,15 @@ function App() {
             } 
           />
           
+          <Route 
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+
           <Route 
             path="/region/:regionId" 
             element={

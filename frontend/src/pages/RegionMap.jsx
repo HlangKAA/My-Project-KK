@@ -4,6 +4,11 @@ import { useGame } from '../context/GameContext';
 import { REGIONS } from '../data/stageData';
 import './regionmap.css';
 
+const MAP_PARTICLES = Array.from({ length: 20 }, () => ({
+    left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%`,
+    animationDelay: `${Math.random() * 6}s`, animationDuration: `${4 + Math.random() * 4}s`,
+}));
+
 const RegionMap = () => {
     const { regionId } = useParams();
     const navigate = useNavigate();
@@ -16,8 +21,8 @@ const RegionMap = () => {
     }
 
     const getStageStatus = (stageIndex) => {
-        const completedStages = user?.stageProgress?.[regionId] || 0;
-        if (stageIndex < completedStages) return 'complete';
+        const key = `${regionId}-${region.stages[stageIndex].id}`;
+        if (user?.completedStages?.[key]) return 'complete';
         return 'active';
     };
 
@@ -46,13 +51,8 @@ const RegionMap = () => {
             <div className="rmap-content">
                 {/* Background particles */}
                 <div className="rmap-bg-particles">
-                    {Array.from({ length: 20 }, (_, i) => (
-                        <div key={i} className="rmap-bg-particle" style={{
-                            left: `${Math.random() * 100}%`,
-                            top: `${Math.random() * 100}%`,
-                            animationDelay: `${Math.random() * 6}s`,
-                            animationDuration: `${4 + Math.random() * 4}s`
-                        }}></div>
+                    {MAP_PARTICLES.map((style, i) => (
+                        <div key={i} className="rmap-bg-particle" style={style}></div>
                     ))}
                 </div>
 

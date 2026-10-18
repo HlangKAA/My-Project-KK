@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import HintPanel from './HintPanel';
 import './stagetypes.css';
 
@@ -6,7 +6,8 @@ import './stagetypes.css';
  * GuidedStage — Fill-in-the-blank coding exercise
  * ผู้เล่นเติม code ในช่องว่าง (___BLANK_N___) ตาม template
  */
-const GuidedStage = ({ data, onComplete, runCode }) => {
+const GuidedStage = ({ data, onAttempt, runCode }) => {
+    const [busy, setBusy] = useState(false);
     const [blankValues, setBlankValues] = useState({});
     const [submitted, setSubmitted] = useState(false);
     const [blankResults, setBlankResults] = useState({});
@@ -19,14 +20,14 @@ const GuidedStage = ({ data, onComplete, runCode }) => {
     const template = data.codeTemplate || '';
 
     // Build the actual code by replacing blanks with user input
-    const buildCode = useCallback(() => {
+    const buildCode = () => {
         let code = template;
         blanks.forEach(blank => {
             const value = blankValues[blank.id] || '';
             code = code.replace(`___${blank.id}___`, value);
         });
         return code;
-    }, [template, blanks, blankValues]);
+    };
 
     const handleBlankChange = (blankId, value) => {
         setBlankValues(prev => ({ ...prev, [blankId]: value }));
@@ -37,7 +38,11 @@ const GuidedStage = ({ data, onComplete, runCode }) => {
         }
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
+        if (busy) return;
+        setBusy(true);
+        const started = performance.now();
+        const submitted_at = new Date().toISOString();
         setAttemptCount(prev => prev + 1);
         setSubmitted(true);
 
@@ -57,24 +62,21 @@ const GuidedStage = ({ data, onComplete, runCode }) => {
         setBlankResults(results);
         setAllCorrect(correct);
 
-        if (correct) {
-            // Run the code to show output
-            const finalCode = buildCode();
-            if (runCode) {
-                setOutput([]);
-                runCode(finalCode, {
-                    cast_color: () => {},
-                    move_to_x: () => {},
-                    say: () => {},
-                });
-            }
-            // Delay completion to let animation play
-            setTimeout(() => {
-                onComplete({
-                    attempts: attemptCount + 1,
-                    hintsUsed,
-                });
-            }, 1500);
+        const finalCode = buildCode();
+        const record = async result => {
+            await onAttempt({ code: finalCode, result, submitted_at, runtime: (performance.now() - started) / 1000 },
+                { attempts: attemptCount + 1, hintsUsed });
+            setBusy(false);
+        };
+        if (correct && runCode) {
+            setOutput([]);
+            runCode(finalCode, {
+                cast_color: () => {}, move_to_x: () => {}, say: () => {},
+                __onSuccess: () => { void record('Success'); },
+                __onError: () => { setAllCorrect(false); void record('Error'); },
+            });
+        } else {
+            await record(correct ? 'Success' : 'Fail');
         }
     };
 
@@ -116,7 +118,7 @@ const GuidedStage = ({ data, onComplete, runCode }) => {
                                 placeholder={blank?.hint || '???'}
                                 spellCheck="false"
                                 autoComplete="off"
-                                disabled={allCorrect}
+                                disabled={allCorrect || busy}
                             />
                             {isCorrect === true && <i className="fas fa-check guided-blank-check"></i>}
                             {isWrong && <i className="fas fa-times guided-blank-cross"></i>}
@@ -204,7 +206,7 @@ const GuidedStage = ({ data, onComplete, runCode }) => {
             {/* Submit Button */}
             {!allCorrect && (
                 <div className="stage-type-actions">
-                    <button className="stage-type-btn primary" onClick={handleSubmit}>
+                    <button className="stage-type-btn primary" onClick={handleSubmit} disabled={busy}>
                         <i className="fas fa-check"></i> Check Answers
                     </button>
                 </div>

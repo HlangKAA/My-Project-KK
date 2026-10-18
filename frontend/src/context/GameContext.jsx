@@ -1,116 +1,88 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import axios from 'axios';
+﻿import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
+import api from '../api/axios';
 
 const GameContext = createContext();
-
+// Existing consumers import the context hook alongside its provider.
+// eslint-disable-next-line react-refresh/only-export-components
 export const useGame = () => useContext(GameContext);
 
-// Configure Axios
-const api = axios.create({
-  withCredentials: true // Important for cookies/session
-});
-
 export const GameProvider = ({ children }) => {
-  const [user, setUser] = useState(null); // { player_id, username, email }
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [sessionError, setSessionError] = useState('');
+  const generation = useRef(0);
 
-  // Initialize - Check if user is logged in (session check)
-  useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const res = await api.get('/api/user');
-        if (res.data.success) {
-          setUser(res.data.user);
-        }
-      } catch (error) {
-        // Not logged in or error
-        console.log("Session check failed/Not logged in");
-        console.log("Using Mock User (Backend Offline / Bypass enabled)");
-        setUser({
-          player_id: 'mock-123',
-          username: 'GuestWizard',
-          email: 'guest@lostspectrum.com',
-          level: 99, // Max level to unlock regions
-          stageProgress: {}
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    checkSession();
-  }, []);
+  const checkSession = async () => {
+    const version = ++generation.current;
+    setLoading(true);
+    setSessionError('');
+    try {
+      const account = await api.get('/api/user');
+      const saved = await api.get('/api/progress');
+      if (version === generation.current) setUser({ ...account.data.user, ...saved.data.progress });
+    } catch (error) {
+      if (version !== generation.current) return;
+      setUser(null);
+      if (error.response?.status !== 401) setSessionError('Cannot connect to your account. Please retry.');
+    } finally {
+      if (version === generation.current) setLoading(false);
+    }
+  };
+
+  useEffect(() => { checkSession(); }, []);
 
   const login = async (email, password) => {
+    const version = ++generation.current;
     try {
       const res = await api.post('/api/login', { email, password });
-      if (res.data.success) {
-        setUser(res.data.user);
-        return { success: true };
+      if (!res.data.success) return { success: false, message: res.data.message };
+      const saved = await api.get('/api/progress');
+      if (version === generation.current) {
+        setUser({ ...res.data.user, ...saved.data.progress });
+        setSessionError('');
       }
-      return { success: false, message: res.data.message };
+      return { success: true };
     } catch (error) {
-      console.error("Login failed", error);
-      return { success: false, message: error.response?.data?.message || "Login failed" };
+      return { success: false, message: error.response?.data?.message || 'Unable to log in and load progress. Please retry.' };
     }
   };
 
   const logout = async () => {
     try {
       await api.post('/api/logout');
+      ++generation.current;
       setUser(null);
-    } catch (error) {
-      console.error("Logout failed", error);
+    } catch {
+      setSessionError('Logout failed. Please retry.');
     }
   };
 
-  const updateProgress = (levelId) => {
-    if (user) {
-      const newLevel = Math.max(user.level || 1, levelId + 1);
-      const updatedUser = { ...user, level: newLevel };
-      setUser(updatedUser);
+  const saveAttempt = async (attempt) => {
+    const version = generation.current;
+    const res = await api.post('/api/submissions', attempt);
+    if (version === generation.current) {
+      setUser(previous => previous ? { ...previous, ...res.data.progress } : previous);
     }
+    return res.data;
   };
 
-  /**
-   * Track stage completion within a region.
-   * stageProgress = { regionId: completedCount }
-   * e.g., { 1: 2 } means region 1 has stages 1 and 2 completed
-   */
-  const updateStageProgress = (regionId, stageId) => {
-    if (user) {
-      const currentProgress = user.stageProgress || {};
-      const currentCompleted = currentProgress[regionId] || 0;
-      const newCompleted = Math.max(currentCompleted, stageId);
-      
-      const updatedProgress = { ...currentProgress, [regionId]: newCompleted };
-      
-      // Also update the region-level progress (for Dashboard lock/unlock)
-      // A region is "complete" when all its stages are done
-      const newLevel = Math.max(user.level || 1, regionId + 1);
-      
-      const updatedUser = { 
-        ...user, 
-        stageProgress: updatedProgress,
-        level: newLevel
-      };
-      setUser(updatedUser);
+  const updateProfile = async (username) => {
+    const version = generation.current;
+    const res = await api.patch('/api/profile', { username });
+    if (version === generation.current) {
+      setUser(previous => previous ? { ...previous, ...res.data.user } : previous);
     }
-  };
-
-  const value = {
-    user,
-    loading,
-    login,
-    logout,
-    updateProgress,
-    updateStageProgress
+    return res.data;
   };
 
   return (
-    <GameContext.Provider value={value}>
-      {!loading && children}
+    <GameContext.Provider value={{ user, loading, login, logout, saveAttempt, updateProfile }}>
+      {sessionError ? (
+        <div role="alert" style={{ padding: 32, color: 'white' }}>
+          <p>{sessionError}</p>
+          <button onClick={checkSession}>Retry connection</button>
+        </div>
+      ) : loading ? <p style={{ color: 'white', padding: 24 }}>Loading your progress...</p> : children}
     </GameContext.Provider>
   );
 };
-
