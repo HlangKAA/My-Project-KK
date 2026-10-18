@@ -9,6 +9,7 @@ import worldMap from '../assets/images/the-lost-spectrum-world-map.png';
 import regionRedForest from '../assets/images/region-red-forest.png';
 import regionAshPeaks from '../assets/images/region-ash-peaks.png';
 import regionWhisperingCaverns from '../assets/images/region-whispering-caverns.png';
+import thescholarsarchive from '../assets/images/the-scholars-archive.png';
 import './dashboard.css';
 
 const REGIONS = [
@@ -22,7 +23,7 @@ const REGIONS = [
     {
         id: 2,
         name: "THE SCHOLAR'S ARCHIVE",
-        image: regionAshPeaks,
+        image: thescholarsarchive,
         top: '45%',
         left: '65%',
     },
