@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { GameProvider, useGame } from './context/GameContext';
+import { LanguageProvider } from './i18n/LanguageContext';
 
 // Pages
 import Home from './pages/Home';
@@ -35,7 +36,7 @@ const ProtectedRoute = ({ children }) => {
 function App() {
   return (
     <Router>
-      <GameProvider>
+      <LanguageProvider><GameProvider>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
@@ -97,7 +98,7 @@ function App() {
             element={<Navigate to="/dashboard" replace />} 
           />
         </Routes>
-      </GameProvider>
+      </GameProvider></LanguageProvider>
     </Router>
   );
 }

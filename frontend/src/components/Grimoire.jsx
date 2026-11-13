@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './grimoire.css';
 
 const WHEEL_COLORS = [
-    { name: 'red', hex: '#dc2626', angle: 0 },
+    { name: 'red', hex: '#b88949', angle: 0 },
     { name: 'orange', hex: '#f97316', angle: 51 },
     { name: 'yellow', hex: '#eab308', angle: 103 },
     { name: 'green', hex: '#16a34a', angle: 154 },

@@ -77,41 +77,30 @@ export const CONCEPT_MAP = {
         icon: 'fas fa-sort-numeric-down',
         color: '#2dd4bf'
     },
-    'int-float': {
-        name: 'Numbers (int/float)',
-        region: 2,
-        prerequisites: ['variables'],
-        order: 8,
-        description: 'Integers are whole, floats have decimals — the building blocks of computation.',
-        icon: 'fas fa-calculator',
-        color: '#fb923c'
+    'color-brightness': {
+        name: 'Brightness', region: 2, prerequisites: ['rgb'], order: 8,
+        description: 'Add the same amount to each RGB channel to brighten an image.',
+        icon: 'fas fa-sun', color: '#fbbf24'
     },
-    'type-checking': {
-        name: 'type()',
-        region: 2,
-        prerequisites: ['int-float', 'strings'],
-        order: 9,
-        description: 'Reveal the true nature of any value with the type() inspection spell.',
-        icon: 'fas fa-microscope',
-        color: '#06b6d4'
+    'channel-tint': {
+        name: 'Channel Tint', region: 2, prerequisites: ['color-brightness'], order: 9,
+        description: 'Change one channel to tint a colored lens.',
+        icon: 'fas fa-eye', color: '#06b6d4'
     },
-    'type-conversion': {
-        name: 'Type Conversion',
-        region: 2,
-        prerequisites: ['type-checking'],
-        order: 10,
-        description: 'Transform one type into another — str(), int(), float().',
-        icon: 'fas fa-exchange-alt',
-        color: '#f472b6'
+    'color-inversion': {
+        name: 'Color Inversion', region: 2, prerequisites: ['channel-tint'], order: 10,
+        description: 'Subtract each channel from 255 to invert an image.',
+        icon: 'fas fa-adjust', color: '#a78bfa'
     },
-    'arithmetic': {
-        name: 'Arithmetic',
-        region: 2,
-        prerequisites: ['int-float'],
-        order: 11,
-        description: 'The ancient math operations — +, -, *, /, //, %, **.',
-        icon: 'fas fa-plus-minus',
-        color: '#818cf8'
+    'grayscale': {
+        name: 'Grayscale', region: 2, prerequisites: ['color-inversion'], order: 11,
+        description: 'Use the average of three channels for a gray shade.',
+        icon: 'fas fa-image', color: '#cbd5e1'
+    },
+    'palette-repair': {
+        name: 'Palette Repair', region: 2, prerequisites: ['grayscale'], order: 12,
+        description: 'Choose the right color transformation for each object.',
+        icon: 'fas fa-palette', color: '#f472b6'
     },
     'lists': {
         name: 'Lists',

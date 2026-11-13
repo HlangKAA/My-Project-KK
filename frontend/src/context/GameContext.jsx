@@ -1,4 +1,4 @@
-﻿import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
+import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
 import api from '../api/axios';
 
 const GameContext = createContext();

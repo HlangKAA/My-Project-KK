@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLanguage } from '../i18n/useLanguage';
 import HintPanel from './HintPanel';
 import './stagetypes.css';
 
@@ -7,6 +8,7 @@ import './stagetypes.css';
  * แสดงคำถามหลายข้อ ผู้เล่นต้องตอบถูกอย่างน้อย requiredCorrect ข้อ
  */
 const PuzzleStage = ({ data, onAttempt }) => {
+    const { isThai } = useLanguage();
     const puzzles = data.puzzles || [];
     const requiredCorrect = data.requiredCorrect || puzzles.length;
 
@@ -67,7 +69,7 @@ const PuzzleStage = ({ data, onAttempt }) => {
             <div className="stage-type-container puzzle-stage">
                 <div className="puzzle-complete">
                     <i className="fas fa-check-circle"></i>
-                    <h3>Puzzle Complete!</h3>
+                    <h3>{isThai ? 'ตอบครบแล้ว!' : 'Puzzle Complete!'}</h3>
                     <p>{data.completeMessage || `You got ${totalCorrect} out of ${puzzles.length} correct!`}</p>
                     <div className="puzzle-score">
                         <span className="puzzle-score-num">{totalCorrect}</span>
@@ -85,10 +87,10 @@ const PuzzleStage = ({ data, onAttempt }) => {
             <div className="stage-type-instruction">
                 <div className="stage-type-badge puzzle">
                     <i className="fas fa-puzzle-piece"></i>
-                    <span>KNOWLEDGE PUZZLE</span>
+                    <span>{isThai ? 'ปริศนาความรู้' : 'KNOWLEDGE PUZZLE'}</span>
                 </div>
                 <p className="stage-type-desc">
-                    Answer at least <strong>{requiredCorrect}</strong> out of <strong>{puzzles.length}</strong> questions correctly.
+                    {isThai ? <>ตอบให้ถูกอย่างน้อย <strong>{requiredCorrect}</strong> จาก <strong>{puzzles.length}</strong> ข้อ</> : <>Answer at least <strong>{requiredCorrect}</strong> out of <strong>{puzzles.length}</strong> questions correctly.</>}
                 </p>
             </div>
 
@@ -119,7 +121,7 @@ const PuzzleStage = ({ data, onAttempt }) => {
             {/* Question */}
             <div className="puzzle-question-card">
                 <div className="puzzle-question-number">
-                    Question {currentPuzzleIdx + 1} of {puzzles.length}
+                    {isThai ? 'ข้อ' : 'Question'} {currentPuzzleIdx + 1} {isThai ? 'จาก' : 'of'} {puzzles.length}
                 </div>
                 <h3 className="puzzle-question-text">{currentPuzzle.question}</h3>
 
@@ -170,7 +172,7 @@ const PuzzleStage = ({ data, onAttempt }) => {
 
             {/* Score */}
             <div className="puzzle-score-bar">
-                <span>Score: {totalCorrect} / {requiredCorrect} needed</span>
+                <span>{isThai ? 'คะแนน' : 'Score'}: {totalCorrect} / {requiredCorrect} {isThai ? 'ที่ต้องการ' : 'needed'}</span>
                 <div className="puzzle-score-fill" style={{ width: `${(totalCorrect / requiredCorrect) * 100}%` }}></div>
             </div>
 
@@ -191,24 +193,24 @@ const PuzzleStage = ({ data, onAttempt }) => {
                         onClick={handleSubmitAnswer}
                         disabled={selectedAnswers[currentPuzzleIdx] === undefined}
                     >
-                        <i className="fas fa-check"></i> Submit Answer
+                        <i className="fas fa-check"></i> {isThai ? 'ส่งคำตอบ' : 'Submit Answer'}
                     </button>
                 )}
                 {showExplanation && currentPuzzleIdx < puzzles.length - 1 && (
                     <button className="stage-type-btn primary" onClick={handleNextPuzzle}>
-                        Next Question <i className="fas fa-arrow-right"></i>
+                        {isThai ? 'ข้อถัดไป' : 'Next Question'} <i className="fas fa-arrow-right"></i>
                     </button>
                 )}
                 {allAnswered && totalCorrect >= requiredCorrect && (
                     <button className="stage-type-btn primary success" onClick={handleFinish}>
-                        <i className="fas fa-trophy"></i> Complete Puzzle!
+                        <i className="fas fa-trophy"></i> {isThai ? 'จบปริศนา!' : 'Complete Puzzle!'}
                     </button>
                 )}
                 {allAnswered && totalCorrect < requiredCorrect && (
                     <div className="guided-feedback wrong">
                         <i className="fas fa-redo"></i>
-                        <span>Not enough correct answers. Review and try the ones you missed!</span>
-                        <button onClick={() => { setSubmittedAnswers({}); setSelectedAnswers({}); setCurrentPuzzleIdx(0); setShowExplanation(false); }}>Try again</button>
+                        <span>{isThai ? 'ยังตอบถูกไม่พอ ลองทบทวนข้อที่พลาดแล้วตอบใหม่' : 'Not enough correct answers. Review and try the ones you missed!'}</span>
+                        <button onClick={() => { setSubmittedAnswers({}); setSelectedAnswers({}); setCurrentPuzzleIdx(0); setShowExplanation(false); }}>{isThai ? 'ลองอีกครั้ง' : 'Try again'}</button>
                     </div>
                 )}
             </div>

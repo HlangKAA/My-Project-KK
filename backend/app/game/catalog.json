@@ -366,213 +366,2183 @@
       }
     },
     {
+      "chapter": 1,
+      "level_name": "The Sleeping Garden",
+      "description": "Mix red and green light to restore a golden flower.",
+      "objective": "Walk beside the Golden Flower at (5, 2) and restore its yellow light with hero.cast_color(255, 255, 0).",
+      "starter_code": "# The flower needs yellow light (red + green).\n# Walk beside the flower at (5, 2), then cast its color.\n\n",
+      "difficulty": "Medium",
+      "map_data": {
+        "catalog": "spectrum_stages_v1",
+        "stage_key": "1-5",
+        "stage_type": "challenge",
+        "xp_reward": 375,
+        "arena": {
+          "cols": 8,
+          "rows": 5,
+          "theme": "forest",
+          "spawn": {
+            "x": 1,
+            "y": 2
+          },
+          "colorTargets": [
+            {
+              "id": "golden-flower",
+              "name": "Golden Flower",
+              "icon": "fas fa-seedling",
+              "x": 5,
+              "y": 2,
+              "targetRgb": [
+                255,
+                255,
+                0
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "chapter": 1,
+      "level_name": "The Swapped Canvas",
+      "description": "Fix swapped RGB channels to color two enchanted frames.",
+      "objective": "Fix the two color spells. The frame at (3, 2) needs red (255, 0, 0); the frame at (7, 2) needs blue (0, 0, 255).",
+      "starter_code": "# The painter swapped red and blue. Fix both calls!\nhero.move_right(2)\nhero.cast_color(0, 0, 255)  # Red Frame\nhero.move_right(4)\nhero.cast_color(255, 0, 0)  # Blue Frame\n",
+      "difficulty": "Medium",
+      "map_data": {
+        "catalog": "spectrum_stages_v1",
+        "stage_key": "1-6",
+        "stage_type": "challenge",
+        "xp_reward": 400,
+        "arena": {
+          "cols": 9,
+          "rows": 5,
+          "theme": "forest",
+          "spawn": {
+            "x": 1,
+            "y": 2
+          },
+          "colorTargets": [
+            {
+              "id": "red-frame",
+              "name": "Red Frame",
+              "icon": "fas fa-image",
+              "x": 3,
+              "y": 2,
+              "targetRgb": [
+                255,
+                0,
+                0
+              ]
+            },
+            {
+              "id": "blue-frame",
+              "name": "Blue Frame",
+              "icon": "fas fa-image",
+              "x": 7,
+              "y": 2,
+              "targetRgb": [
+                0,
+                0,
+                255
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "chapter": 1,
+      "level_name": "The Three Seasons",
+      "description": "Use variables and movement to color three seasonal relics.",
+      "objective": "Color the relics at (2, 2), (5, 2), and (8, 2): yellow (255, 255, 0), cyan (0, 255, 255), and magenta (255, 0, 255).",
+      "starter_code": "# Use variables to keep track of each RGB channel.\nred = 255\ngreen = 255\nblue = 0\n\nhero.move_right(1)\nhero.cast_color(red, green, blue)  # Summer: yellow\n\n# Move to Spring and cast cyan, then Autumn and cast magenta.\n",
+      "difficulty": "Medium",
+      "map_data": {
+        "catalog": "spectrum_stages_v1",
+        "stage_key": "1-7",
+        "stage_type": "challenge",
+        "xp_reward": 450,
+        "arena": {
+          "cols": 10,
+          "rows": 5,
+          "theme": "forest",
+          "spawn": {
+            "x": 1,
+            "y": 2
+          },
+          "colorTargets": [
+            {
+              "id": "summer",
+              "name": "Summer Relic",
+              "icon": "fas fa-sun",
+              "x": 2,
+              "y": 2,
+              "targetRgb": [
+                255,
+                255,
+                0
+              ]
+            },
+            {
+              "id": "spring",
+              "name": "Spring Relic",
+              "icon": "fas fa-leaf",
+              "x": 5,
+              "y": 2,
+              "targetRgb": [
+                0,
+                255,
+                255
+              ]
+            },
+            {
+              "id": "autumn",
+              "name": "Autumn Relic",
+              "icon": "fas fa-gem",
+              "x": 8,
+              "y": 2,
+              "targetRgb": [
+                255,
+                0,
+                255
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
       "chapter": 2,
-      "level_name": "The Essence of Values",
-      "description": "Learn how to declare variables and understand data types.",
-      "objective": "Declare a variable named <span class='highlight'>magic_number</span> and assign it the integer value <span class='highlight'>42</span>. Then print it.",
-      "starter_code": "# Declare your variable below\n\n\n# Print the value to verify\n",
+      "level_name": "The Faded Manuscript",
+      "description": "Brighten a faded manuscript with RGB arithmetic.",
+      "objective": "Brighten the manuscript ink from <span class=\"highlight\">(80, 55, 30)</span> by 40 per channel. Move beside it and cast the calculated RGB color.",
+      "starter_code": "# Brighten each channel by 40, then move beside the manuscript.\nr, g, b = 80, 55, 30\n\n",
       "difficulty": "Medium",
       "map_data": {
         "catalog": "spectrum_stages_v1",
         "stage_key": "2-1",
         "stage_type": "lesson",
         "xp_reward": 200,
-        "arena": null
+        "arena": {
+          "theme": "archive",
+          "blockMovement": true,
+          "cols": 8,
+          "rows": 5,
+          "spawn": {
+            "x": 1,
+            "y": 2
+          },
+          "murals": [
+            {
+              "id": "manuscript",
+              "name": "Faded Manuscript"
+            }
+          ],
+          "colorTargets": [
+            {
+              "id": "manuscript-ink",
+              "muralId": "manuscript",
+              "name": "Golden Ink",
+              "icon": "fas fa-scroll",
+              "x": 5,
+              "y": 2,
+              "sourceRgb": [
+                80,
+                55,
+                30
+              ],
+              "targetRgb": [
+                120,
+                95,
+                70
+              ]
+            }
+          ],
+          "obstacles": [
+            {
+              "x": 3,
+              "y": 0
+            },
+            {
+              "x": 4,
+              "y": 0
+            }
+          ]
+        }
       }
     },
     {
       "chapter": 2,
-      "level_name": "The Type Checker",
-      "description": "Use type() to inspect variables and verify their nature.",
-      "objective": "Fill in the blanks to use <span class='highlight'>type()</span> and reveal the type of each variable.",
-      "starter_code": "number = 42\nword = \"Hello\"\n\n# Reveal the type of each variable\nprint(___BLANK_1___)\nprint(___BLANK_2___)",
+      "level_name": "The Tinted Lenses",
+      "description": "Tint two lenses by changing one color channel at a time.",
+      "objective": "Warm the first lens by adding <span class=\"highlight\">50 red</span>. Cool the second by adding <span class=\"highlight\">80 blue</span>. Restore both with code.",
+      "starter_code": "# Warm the first lens and cool the second.\nwarm_r, warm_g, warm_b = 45, 90, 170\ncool_r, cool_g, cool_b = 160, 90, 40\n\n",
       "difficulty": "Medium",
       "map_data": {
         "catalog": "spectrum_stages_v1",
         "stage_key": "2-2",
-        "stage_type": "guided",
+        "stage_type": "challenge",
         "xp_reward": 200,
-        "arena": null
+        "arena": {
+          "theme": "archive",
+          "blockMovement": true,
+          "cols": 10,
+          "rows": 5,
+          "spawn": {
+            "x": 1,
+            "y": 2
+          },
+          "colorTargets": [
+            {
+              "id": "warm-lens",
+              "name": "Warm Lens",
+              "icon": "fas fa-sun",
+              "x": 3,
+              "y": 2,
+              "sourceRgb": [
+                45,
+                90,
+                170
+              ],
+              "targetRgb": [
+                95,
+                90,
+                170
+              ]
+            },
+            {
+              "id": "cool-lens",
+              "name": "Cool Lens",
+              "icon": "fas fa-eye",
+              "x": 7,
+              "y": 2,
+              "sourceRgb": [
+                160,
+                90,
+                40
+              ],
+              "targetRgb": [
+                160,
+                90,
+                120
+              ]
+            }
+          ],
+          "obstacles": [
+            {
+              "x": 5,
+              "y": 0
+            },
+            {
+              "x": 5,
+              "y": 4
+            }
+          ]
+        }
+      }
+    },
+    {
+      "chapter": 2,
+      "level_name": "The Mirror Gallery",
+      "description": "Invert the colors of two enchanted reflections.",
+      "objective": "Invert both mirror images. For each RGB channel, calculate <span class=\"highlight\">255 - channel</span>, then cast the result beside its mirror.",
+      "starter_code": "# Invert each mirror by subtracting its channels from 255.\nfirst_r, first_g, first_b = 40, 90, 150\nsecond_r, second_g, second_b = 200, 80, 20\n\n",
+      "difficulty": "Medium",
+      "map_data": {
+        "catalog": "spectrum_stages_v1",
+        "stage_key": "2-3",
+        "stage_type": "challenge",
+        "xp_reward": 250,
+        "arena": {
+          "theme": "archive",
+          "blockMovement": true,
+          "cols": 10,
+          "rows": 5,
+          "spawn": {
+            "x": 1,
+            "y": 2
+          },
+          "murals": [
+            {
+              "id": "mirrors",
+              "name": "Mirror Gallery"
+            }
+          ],
+          "colorTargets": [
+            {
+              "id": "mirror-a",
+              "muralId": "mirrors",
+              "name": "First Reflection",
+              "icon": "fas fa-image",
+              "x": 3,
+              "y": 2,
+              "sourceRgb": [
+                40,
+                90,
+                150
+              ],
+              "targetRgb": [
+                215,
+                165,
+                105
+              ]
+            },
+            {
+              "id": "mirror-b",
+              "muralId": "mirrors",
+              "name": "Second Reflection",
+              "icon": "fas fa-image",
+              "x": 7,
+              "y": 2,
+              "sourceRgb": [
+                200,
+                80,
+                20
+              ],
+              "targetRgb": [
+                55,
+                175,
+                235
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "chapter": 2,
+      "level_name": "Gray Memory",
+      "description": "Restore a three-panel image in grayscale.",
+      "objective": "Restore the three memory panels in grayscale. Compute <span class=\"highlight\">(r + g + b) // 3</span> for each panel and cast that value into all channels.",
+      "starter_code": "# Calculate a grayscale shade for each panel.\nfirst_r, first_g, first_b = 30, 90, 150\nmiddle_r, middle_g, middle_b = 180, 60, 30\nfinal_r, final_g, final_b = 15, 135, 210\n\n",
+      "difficulty": "Medium",
+      "map_data": {
+        "catalog": "spectrum_stages_v1",
+        "stage_key": "2-4",
+        "stage_type": "challenge",
+        "xp_reward": 300,
+        "arena": {
+          "theme": "archive",
+          "blockMovement": true,
+          "cols": 10,
+          "rows": 6,
+          "spawn": {
+            "x": 1,
+            "y": 3
+          },
+          "murals": [
+            {
+              "id": "memory",
+              "name": "Memory Triptych"
+            }
+          ],
+          "colorTargets": [
+            {
+              "id": "memory-a",
+              "muralId": "memory",
+              "name": "First Panel",
+              "icon": "fas fa-image",
+              "x": 2,
+              "y": 1,
+              "sourceRgb": [
+                30,
+                90,
+                150
+              ],
+              "targetRgb": [
+                90,
+                90,
+                90
+              ]
+            },
+            {
+              "id": "memory-b",
+              "muralId": "memory",
+              "name": "Middle Panel",
+              "icon": "fas fa-image",
+              "x": 5,
+              "y": 1,
+              "sourceRgb": [
+                180,
+                60,
+                30
+              ],
+              "targetRgb": [
+                90,
+                90,
+                90
+              ]
+            },
+            {
+              "id": "memory-c",
+              "muralId": "memory",
+              "name": "Final Panel",
+              "icon": "fas fa-image",
+              "x": 8,
+              "y": 1,
+              "sourceRgb": [
+                15,
+                135,
+                210
+              ],
+              "targetRgb": [
+                120,
+                120,
+                120
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "chapter": 2,
+      "level_name": "The Palette Lock",
+      "description": "Combine color transformations to open the prism vault.",
+      "objective": "Open three locks using the right transformation: <span class=\"highlight\">+40 brightness</span>, <span class=\"highlight\">inversion</span>, then <span class=\"highlight\">grayscale</span>.",
+      "starter_code": "# Restore the three locks in order.\nbright_r, bright_g, bright_b = 110, 60, 30\ninverse_r, inverse_g, inverse_b = 20, 100, 160\ngray_r, gray_g, gray_b = 20, 80, 140\n\n",
+      "difficulty": "Medium",
+      "map_data": {
+        "catalog": "spectrum_stages_v1",
+        "stage_key": "2-5",
+        "stage_type": "challenge",
+        "xp_reward": 200,
+        "arena": {
+          "theme": "archive",
+          "blockMovement": true,
+          "cols": 10,
+          "rows": 6,
+          "spawn": {
+            "x": 1,
+            "y": 3
+          },
+          "colorTargets": [
+            {
+              "id": "bright-lock",
+              "name": "Radiance Lock",
+              "icon": "fas fa-lock",
+              "x": 2,
+              "y": 1,
+              "sourceRgb": [
+                110,
+                60,
+                30
+              ],
+              "targetRgb": [
+                150,
+                100,
+                70
+              ]
+            },
+            {
+              "id": "inverse-lock",
+              "name": "Mirror Lock",
+              "icon": "fas fa-lock",
+              "x": 5,
+              "y": 1,
+              "sourceRgb": [
+                20,
+                100,
+                160
+              ],
+              "targetRgb": [
+                235,
+                155,
+                95
+              ]
+            },
+            {
+              "id": "gray-lock",
+              "name": "Silver Lock",
+              "icon": "fas fa-lock",
+              "x": 8,
+              "y": 1,
+              "sourceRgb": [
+                20,
+                80,
+                140
+              ],
+              "targetRgb": [
+                80,
+                80,
+                80
+              ]
+            }
+          ],
+          "obstacles": [
+            {
+              "x": 3,
+              "y": 3
+            },
+            {
+              "x": 6,
+              "y": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "chapter": 2,
+      "level_name": "The Living Atlas",
+      "description": "Restore three Atlas pages and open the final gate.",
+      "objective": "Restore the Atlas pages with <span class=\"highlight\">+50 brightness</span>, <span class=\"highlight\">inversion</span>, and <span class=\"highlight\">grayscale</span>. Then move beside the Atlas Gate.",
+      "starter_code": "# Restore all three pages, then reach the gate at (9, 4).\nlight_r, light_g, light_b = 40, 60, 90\nmirror_r, mirror_g, mirror_b = 20, 100, 180\nsilver_r, silver_g, silver_b = 120, 60, 30\n\n",
+      "difficulty": "Medium",
+      "map_data": {
+        "catalog": "spectrum_stages_v1",
+        "stage_key": "2-6",
+        "stage_type": "boss",
+        "xp_reward": 500,
+        "arena": {
+          "theme": "archive",
+          "blockMovement": true,
+          "cols": 10,
+          "rows": 6,
+          "spawn": {
+            "x": 1,
+            "y": 4
+          },
+          "murals": [
+            {
+              "id": "atlas",
+              "name": "Living Atlas"
+            }
+          ],
+          "colorTargets": [
+            {
+              "id": "atlas-light",
+              "muralId": "atlas",
+              "name": "Sunlit Page",
+              "icon": "fas fa-scroll",
+              "x": 2,
+              "y": 1,
+              "sourceRgb": [
+                40,
+                60,
+                90
+              ],
+              "targetRgb": [
+                90,
+                110,
+                140
+              ]
+            },
+            {
+              "id": "atlas-mirror",
+              "muralId": "atlas",
+              "name": "Mirror Page",
+              "icon": "fas fa-scroll",
+              "x": 5,
+              "y": 1,
+              "sourceRgb": [
+                20,
+                100,
+                180
+              ],
+              "targetRgb": [
+                235,
+                155,
+                75
+              ]
+            },
+            {
+              "id": "atlas-gray",
+              "muralId": "atlas",
+              "name": "Silver Page",
+              "icon": "fas fa-scroll",
+              "x": 8,
+              "y": 1,
+              "sourceRgb": [
+                120,
+                60,
+                30
+              ],
+              "targetRgb": [
+                70,
+                70,
+                70
+              ]
+            }
+          ],
+          "gate": {
+            "x": 9,
+            "y": 4,
+            "name": "Atlas Gate"
+          },
+          "obstacles": [
+            {
+              "x": 4,
+              "y": 4
+            },
+            {
+              "x": 7,
+              "y": 4
+            }
+          ]
+        }
       }
     },
     {
       "chapter": 3,
       "level_name": "The Inscription Wall",
       "description": "Learn about lists and how to create them.",
-      "objective": "Create a list named <span class='highlight'>elements</span> with values <span class='highlight'>[\"Fire\", \"Water\", \"Earth\"]</span> and print it.",
-      "starter_code": "# Create a list of three elements\n\n\n# Print the list\n",
+      "objective": "Return a new list containing the three pixels in their original order. <span class=\"highlight\">A digital image is a list of RGB pixels; each rune is one pixel.</span>",
+      "starter_code": "def transform(pixels):\n    pass  # Write the pixel filter here\n\npixels = [[220,40,35],[40,200,90],[35,90,220]]\ncolors = transform(pixels)\nfor color in colors:\n    hero.cast_color(color[0], color[1], color[2])\n    hero.move_right(3)",
       "difficulty": "Medium",
       "map_data": {
         "catalog": "spectrum_stages_v1",
         "stage_key": "3-1",
         "stage_type": "lesson",
-        "xp_reward": 200,
-        "arena": null
+        "xp_reward": 220,
+        "arena": {
+          "theme": "peaks",
+          "blockMovement": true,
+          "cols": 10,
+          "rows": 5,
+          "spawn": {
+            "x": 1,
+            "y": 2
+          },
+          "murals": [
+            {
+              "id": "3-1-image",
+              "name": "The Inscription Wall image"
+            }
+          ],
+          "colorTargets": [
+            {
+              "id": "3-1-pixel-0",
+              "name": "Pixel 1",
+              "icon": "fas fa-th-list",
+              "x": 2,
+              "y": 2,
+              "sourceRgb": [
+                220,
+                40,
+                35
+              ],
+              "targetRgb": [
+                220,
+                40,
+                35
+              ],
+              "muralId": "3-1-image"
+            },
+            {
+              "id": "3-1-pixel-1",
+              "name": "Pixel 2",
+              "icon": "fas fa-th-list",
+              "x": 5,
+              "y": 2,
+              "sourceRgb": [
+                40,
+                200,
+                90
+              ],
+              "targetRgb": [
+                40,
+                200,
+                90
+              ],
+              "muralId": "3-1-image"
+            },
+            {
+              "id": "3-1-pixel-2",
+              "name": "Pixel 3",
+              "icon": "fas fa-th-list",
+              "x": 8,
+              "y": 2,
+              "sourceRgb": [
+                35,
+                90,
+                220
+              ],
+              "targetRgb": [
+                35,
+                90,
+                220
+              ],
+              "muralId": "3-1-image"
+            }
+          ],
+          "obstacles": [
+            {
+              "x": 3,
+              "y": 0
+            },
+            {
+              "x": 6,
+              "y": 4
+            }
+          ]
+        }
       }
     },
     {
       "chapter": 3,
       "level_name": "Rune Positions",
-      "description": "Practice indexing with guided exercises.",
-      "objective": "Fill in the blanks to access specific elements from the list by their index.",
-      "starter_code": "runes = [\"Alpha\", \"Beta\", \"Gamma\", \"Delta\"]\n\n# Print the first element (index 0)\nprint(runes[___BLANK_1___])\n\n# Print the third element (index 2)\nprint(runes[___BLANK_2___])\n\n# Print the last element (index -1 or 3)\nprint(runes[___BLANK_3___])",
+      "description": "Use pixel positions to repair a scrambled image.",
+      "objective": "The first and last pixels were swapped. Return them in the correct order. <span class=\"highlight\">Pixel indexing locates an exact position in an image row.</span>",
+      "starter_code": "def transform(pixels):\n    pass  # Write the pixel filter here\n\npixels = [[35,90,220],[40,200,90],[220,40,35]]\ncolors = transform(pixels)\nfor color in colors:\n    hero.cast_color(color[0], color[1], color[2])\n    hero.move_right(3)",
       "difficulty": "Medium",
       "map_data": {
         "catalog": "spectrum_stages_v1",
         "stage_key": "3-2",
-        "stage_type": "guided",
-        "xp_reward": 200,
-        "arena": null
+        "stage_type": "challenge",
+        "xp_reward": 240,
+        "arena": {
+          "theme": "peaks",
+          "blockMovement": true,
+          "cols": 10,
+          "rows": 5,
+          "spawn": {
+            "x": 1,
+            "y": 2
+          },
+          "murals": [
+            {
+              "id": "3-2-image",
+              "name": "Rune Positions image"
+            }
+          ],
+          "colorTargets": [
+            {
+              "id": "3-2-pixel-0",
+              "name": "Pixel 1",
+              "icon": "fas fa-hand-pointer",
+              "x": 2,
+              "y": 2,
+              "sourceRgb": [
+                35,
+                90,
+                220
+              ],
+              "targetRgb": [
+                220,
+                40,
+                35
+              ],
+              "muralId": "3-2-image"
+            },
+            {
+              "id": "3-2-pixel-1",
+              "name": "Pixel 2",
+              "icon": "fas fa-hand-pointer",
+              "x": 5,
+              "y": 2,
+              "sourceRgb": [
+                40,
+                200,
+                90
+              ],
+              "targetRgb": [
+                40,
+                200,
+                90
+              ],
+              "muralId": "3-2-image"
+            },
+            {
+              "id": "3-2-pixel-2",
+              "name": "Pixel 3",
+              "icon": "fas fa-hand-pointer",
+              "x": 8,
+              "y": 2,
+              "sourceRgb": [
+                220,
+                40,
+                35
+              ],
+              "targetRgb": [
+                35,
+                90,
+                220
+              ],
+              "muralId": "3-2-image"
+            }
+          ],
+          "obstacles": [
+            {
+              "x": 3,
+              "y": 0
+            },
+            {
+              "x": 6,
+              "y": 4
+            }
+          ]
+        }
       }
     },
     {
       "chapter": 3,
       "level_name": "The Matrix Search",
       "description": "Find values in lists using .index().",
-      "objective": "Find value <span class='highlight'>46</span> in the ancient list and move to its index position.",
-      "starter_code": "# The values inscribed on the Matrix wall\nvalues = [10, 25, 46, 80]\n\n# Find the position (index) of 46\n# Use .index() method\n\n# Print the result and move to that position\n",
+      "objective": "Find the pixel with the most red using .index() and max(). Turn that pixel gold. <span class=\"highlight\">Searching a pixel row finds the brightest red sample, a simple feature detector.</span>",
+      "starter_code": "def transform(pixels):\n    pass  # Write the pixel filter here\n\npixels = [[20,50,90],[180,30,50],[70,70,70]]\ncolors = transform(pixels)\nfor color in colors:\n    hero.cast_color(color[0], color[1], color[2])\n    hero.move_right(3)",
       "difficulty": "Medium",
       "map_data": {
         "catalog": "spectrum_stages_v1",
         "stage_key": "3-3",
         "stage_type": "challenge",
-        "xp_reward": 300,
-        "arena": null
+        "xp_reward": 280,
+        "arena": {
+          "theme": "peaks",
+          "blockMovement": true,
+          "cols": 10,
+          "rows": 5,
+          "spawn": {
+            "x": 1,
+            "y": 2
+          },
+          "murals": [
+            {
+              "id": "3-3-image",
+              "name": "The Matrix Search image"
+            }
+          ],
+          "colorTargets": [
+            {
+              "id": "3-3-pixel-0",
+              "name": "Pixel 1",
+              "icon": "fas fa-search",
+              "x": 2,
+              "y": 2,
+              "sourceRgb": [
+                20,
+                50,
+                90
+              ],
+              "targetRgb": [
+                20,
+                50,
+                90
+              ],
+              "muralId": "3-3-image"
+            },
+            {
+              "id": "3-3-pixel-1",
+              "name": "Pixel 2",
+              "icon": "fas fa-search",
+              "x": 5,
+              "y": 2,
+              "sourceRgb": [
+                180,
+                30,
+                50
+              ],
+              "targetRgb": [
+                255,
+                200,
+                40
+              ],
+              "muralId": "3-3-image"
+            },
+            {
+              "id": "3-3-pixel-2",
+              "name": "Pixel 3",
+              "icon": "fas fa-search",
+              "x": 8,
+              "y": 2,
+              "sourceRgb": [
+                70,
+                70,
+                70
+              ],
+              "targetRgb": [
+                70,
+                70,
+                70
+              ],
+              "muralId": "3-3-image"
+            }
+          ],
+          "obstacles": [
+            {
+              "x": 3,
+              "y": 0
+            },
+            {
+              "x": 6,
+              "y": 4
+            }
+          ]
+        }
       }
     },
     {
       "chapter": 3,
       "level_name": "The Echo Loop",
       "description": "Learn for loops to iterate over lists.",
-      "objective": "Use a <span class='highlight'>for loop</span> to print each element from the list <span class='highlight'>[10, 20, 30, 40]</span> on its own line.",
-      "starter_code": "# The values on the canyon wall\nvalues = [10, 20, 30, 40]\n\n# Use a for loop to print each value\n",
+      "objective": "Brighten every channel by 30, stopping at 255. <span class=\"highlight\">A for loop applies the same image filter to every pixel.</span>",
+      "starter_code": "def transform(pixels):\n    pass  # Write the pixel filter here\n\npixels = [[50,70,90],[140,40,70],[240,220,200]]\ncolors = transform(pixels)\nfor color in colors:\n    hero.cast_color(color[0], color[1], color[2])\n    hero.move_right(3)",
       "difficulty": "Medium",
       "map_data": {
         "catalog": "spectrum_stages_v1",
         "stage_key": "3-4",
         "stage_type": "lesson",
-        "xp_reward": 250,
-        "arena": null
+        "xp_reward": 290,
+        "arena": {
+          "theme": "peaks",
+          "blockMovement": true,
+          "cols": 10,
+          "rows": 5,
+          "spawn": {
+            "x": 1,
+            "y": 2
+          },
+          "murals": [
+            {
+              "id": "3-4-image",
+              "name": "The Echo Loop image"
+            }
+          ],
+          "colorTargets": [
+            {
+              "id": "3-4-pixel-0",
+              "name": "Pixel 1",
+              "icon": "fas fa-sync-alt",
+              "x": 2,
+              "y": 2,
+              "sourceRgb": [
+                50,
+                70,
+                90
+              ],
+              "targetRgb": [
+                80,
+                100,
+                120
+              ],
+              "muralId": "3-4-image"
+            },
+            {
+              "id": "3-4-pixel-1",
+              "name": "Pixel 2",
+              "icon": "fas fa-sync-alt",
+              "x": 5,
+              "y": 2,
+              "sourceRgb": [
+                140,
+                40,
+                70
+              ],
+              "targetRgb": [
+                170,
+                70,
+                100
+              ],
+              "muralId": "3-4-image"
+            },
+            {
+              "id": "3-4-pixel-2",
+              "name": "Pixel 3",
+              "icon": "fas fa-sync-alt",
+              "x": 8,
+              "y": 2,
+              "sourceRgb": [
+                240,
+                220,
+                200
+              ],
+              "targetRgb": [
+                255,
+                250,
+                230
+              ],
+              "muralId": "3-4-image"
+            }
+          ],
+          "obstacles": [
+            {
+              "x": 3,
+              "y": 0
+            },
+            {
+              "x": 6,
+              "y": 4
+            }
+          ]
+        }
       }
     },
     {
       "chapter": 3,
       "level_name": "Broken Arrays",
-      "description": "Fix errors in list operations.",
-      "objective": "Fix the <span class='highlight'>2 bugs</span> so the code correctly prints each item and then the total count.",
-      "starter_code": "items = [\"sword\", \"shield\", \"potion\"]\n\nfor item in items\n    print(item)\n\nprint(f\"Total items: {len(item)}\")",
+      "description": "Repair a broken pixel processing loop.",
+      "objective": "Fix the loop so it adds 20 to red only, capped at 255; keep green and blue. <span class=\"highlight\">A faulty loop shifts pixel channels and corrupts an image.</span>",
+      "starter_code": "def transform(pixels):\n    result = []\n    for pixel in pixels:\n        result.append([min(255, pixel[1] + 20), pixel[0], pixel[2]])\n    return result\n\npixels = [[20,40,90],[80,140,30],[250,20,50]]\ncolors = transform(pixels)\nfor color in colors:\n    hero.cast_color(color[0], color[1], color[2])\n    hero.move_right(3)",
       "difficulty": "Medium",
       "map_data": {
         "catalog": "spectrum_stages_v1",
         "stage_key": "3-5",
-        "stage_type": "debug",
-        "xp_reward": 300,
-        "arena": null
+        "stage_type": "challenge",
+        "xp_reward": 310,
+        "arena": {
+          "theme": "peaks",
+          "blockMovement": true,
+          "cols": 10,
+          "rows": 5,
+          "spawn": {
+            "x": 1,
+            "y": 2
+          },
+          "murals": [
+            {
+              "id": "3-5-image",
+              "name": "Broken Arrays image"
+            }
+          ],
+          "colorTargets": [
+            {
+              "id": "3-5-pixel-0",
+              "name": "Pixel 1",
+              "icon": "fas fa-bug",
+              "x": 2,
+              "y": 2,
+              "sourceRgb": [
+                20,
+                40,
+                90
+              ],
+              "targetRgb": [
+                40,
+                40,
+                90
+              ],
+              "muralId": "3-5-image"
+            },
+            {
+              "id": "3-5-pixel-1",
+              "name": "Pixel 2",
+              "icon": "fas fa-bug",
+              "x": 5,
+              "y": 2,
+              "sourceRgb": [
+                80,
+                140,
+                30
+              ],
+              "targetRgb": [
+                100,
+                140,
+                30
+              ],
+              "muralId": "3-5-image"
+            },
+            {
+              "id": "3-5-pixel-2",
+              "name": "Pixel 3",
+              "icon": "fas fa-bug",
+              "x": 8,
+              "y": 2,
+              "sourceRgb": [
+                250,
+                20,
+                50
+              ],
+              "targetRgb": [
+                255,
+                20,
+                50
+              ],
+              "muralId": "3-5-image"
+            }
+          ],
+          "obstacles": [
+            {
+              "x": 3,
+              "y": 0
+            },
+            {
+              "x": 6,
+              "y": 4
+            }
+          ]
+        }
+      }
+    },
+    {
+      "chapter": 3,
+      "level_name": "Pixel Trail",
+      "description": "Walk through a row of pixels and restore each color.",
+      "objective": "Reverse the row with a loop and append(), so the rune trail reads from right to left. <span class=\"highlight\">Traversing a pixel row restores an image one sample at a time.</span>",
+      "starter_code": "def transform(pixels):\n    pass  # Write the pixel filter here\n\npixels = [[35,90,220],[40,200,90],[220,40,35]]\ncolors = transform(pixels)\nfor color in colors:\n    hero.cast_color(color[0], color[1], color[2])\n    hero.move_right(3)",
+      "difficulty": "Medium",
+      "map_data": {
+        "catalog": "spectrum_stages_v1",
+        "stage_key": "3-7",
+        "stage_type": "challenge",
+        "xp_reward": 330,
+        "arena": {
+          "theme": "peaks",
+          "blockMovement": true,
+          "cols": 10,
+          "rows": 5,
+          "spawn": {
+            "x": 1,
+            "y": 2
+          },
+          "murals": [
+            {
+              "id": "3-7-image",
+              "name": "Pixel Trail image"
+            }
+          ],
+          "colorTargets": [
+            {
+              "id": "3-7-pixel-0",
+              "name": "Pixel 1",
+              "icon": "fas fa-route",
+              "x": 2,
+              "y": 2,
+              "sourceRgb": [
+                35,
+                90,
+                220
+              ],
+              "targetRgb": [
+                220,
+                40,
+                35
+              ],
+              "muralId": "3-7-image"
+            },
+            {
+              "id": "3-7-pixel-1",
+              "name": "Pixel 2",
+              "icon": "fas fa-route",
+              "x": 5,
+              "y": 2,
+              "sourceRgb": [
+                40,
+                200,
+                90
+              ],
+              "targetRgb": [
+                40,
+                200,
+                90
+              ],
+              "muralId": "3-7-image"
+            },
+            {
+              "id": "3-7-pixel-2",
+              "name": "Pixel 3",
+              "icon": "fas fa-route",
+              "x": 8,
+              "y": 2,
+              "sourceRgb": [
+                220,
+                40,
+                35
+              ],
+              "targetRgb": [
+                35,
+                90,
+                220
+              ],
+              "muralId": "3-7-image"
+            }
+          ],
+          "obstacles": [
+            {
+              "x": 3,
+              "y": 0
+            },
+            {
+              "x": 6,
+              "y": 4
+            }
+          ]
+        }
+      }
+    },
+    {
+      "chapter": 3,
+      "level_name": "The Hidden Pattern",
+      "description": "Find a repeated color pattern in the rune image.",
+      "objective": "If the outer pixels match, make the center gold; otherwise leave the row unchanged. <span class=\"highlight\">A repeated pixel pattern can reveal a feature hidden in an image.</span>",
+      "starter_code": "def transform(pixels):\n    pass  # Write the pixel filter here\n\npixels = [[220,40,35],[30,30,30],[220,40,35]]\ncolors = transform(pixels)\nfor color in colors:\n    hero.cast_color(color[0], color[1], color[2])\n    hero.move_right(3)",
+      "difficulty": "Medium",
+      "map_data": {
+        "catalog": "spectrum_stages_v1",
+        "stage_key": "3-8",
+        "stage_type": "challenge",
+        "xp_reward": 350,
+        "arena": {
+          "theme": "peaks",
+          "blockMovement": true,
+          "cols": 10,
+          "rows": 5,
+          "spawn": {
+            "x": 1,
+            "y": 2
+          },
+          "murals": [
+            {
+              "id": "3-8-image",
+              "name": "The Hidden Pattern image"
+            }
+          ],
+          "colorTargets": [
+            {
+              "id": "3-8-pixel-0",
+              "name": "Pixel 1",
+              "icon": "fas fa-chess-board",
+              "x": 2,
+              "y": 2,
+              "sourceRgb": [
+                220,
+                40,
+                35
+              ],
+              "targetRgb": [
+                220,
+                40,
+                35
+              ],
+              "muralId": "3-8-image"
+            },
+            {
+              "id": "3-8-pixel-1",
+              "name": "Pixel 2",
+              "icon": "fas fa-chess-board",
+              "x": 5,
+              "y": 2,
+              "sourceRgb": [
+                30,
+                30,
+                30
+              ],
+              "targetRgb": [
+                255,
+                200,
+                40
+              ],
+              "muralId": "3-8-image"
+            },
+            {
+              "id": "3-8-pixel-2",
+              "name": "Pixel 3",
+              "icon": "fas fa-chess-board",
+              "x": 8,
+              "y": 2,
+              "sourceRgb": [
+                220,
+                40,
+                35
+              ],
+              "targetRgb": [
+                220,
+                40,
+                35
+              ],
+              "muralId": "3-8-image"
+            }
+          ],
+          "obstacles": [
+            {
+              "x": 3,
+              "y": 0
+            },
+            {
+              "x": 6,
+              "y": 4
+            }
+          ]
+        }
       }
     },
     {
       "chapter": 3,
       "level_name": "The Peak Trial",
-      "description": "Navigate the matrix using all your list skills.",
-      "objective": "Create a list <span class='highlight'>[10, 25, 46, 80, 99]</span>, find the index of <span class='highlight'>46</span>, print each value using a for loop, then move to the index of 46.",
-      "starter_code": "# The Peak Trial\n# 1. Create the list\n\n# 2. Find the index of 46\n\n# 3. Print each value with a for loop\n\n# 4. Move to the index of 46\n",
+      "description": "Use lists, indexing, and loops to restore the summit image.",
+      "objective": "Brighten every pixel by 20, then mark the brightest original red pixel gold. <span class=\"highlight\">Indexing, searching, and loops combine to locate and restore image features.</span>",
+      "starter_code": "def transform(pixels):\n    pass  # Write the pixel filter here\n\npixels = [[30,40,50],[200,30,20],[70,80,90]]\ncolors = transform(pixels)\nfor color in colors:\n    hero.cast_color(color[0], color[1], color[2])\n    hero.move_right(3)\nhero.move_down(2)",
       "difficulty": "Hard",
       "map_data": {
         "catalog": "spectrum_stages_v1",
         "stage_key": "3-6",
         "stage_type": "boss",
-        "xp_reward": 500,
-        "arena": null
+        "xp_reward": 450,
+        "arena": {
+          "theme": "peaks",
+          "blockMovement": true,
+          "cols": 10,
+          "rows": 5,
+          "spawn": {
+            "x": 1,
+            "y": 2
+          },
+          "murals": [
+            {
+              "id": "3-6-image",
+              "name": "The Peak Trial image"
+            }
+          ],
+          "colorTargets": [
+            {
+              "id": "3-6-pixel-0",
+              "name": "Pixel 1",
+              "icon": "fas fa-crown",
+              "x": 2,
+              "y": 2,
+              "sourceRgb": [
+                30,
+                40,
+                50
+              ],
+              "targetRgb": [
+                50,
+                60,
+                70
+              ],
+              "muralId": "3-6-image"
+            },
+            {
+              "id": "3-6-pixel-1",
+              "name": "Pixel 2",
+              "icon": "fas fa-crown",
+              "x": 5,
+              "y": 2,
+              "sourceRgb": [
+                200,
+                30,
+                20
+              ],
+              "targetRgb": [
+                255,
+                200,
+                40
+              ],
+              "muralId": "3-6-image"
+            },
+            {
+              "id": "3-6-pixel-2",
+              "name": "Pixel 3",
+              "icon": "fas fa-crown",
+              "x": 8,
+              "y": 2,
+              "sourceRgb": [
+                70,
+                80,
+                90
+              ],
+              "targetRgb": [
+                90,
+                100,
+                110
+              ],
+              "muralId": "3-6-image"
+            }
+          ],
+          "obstacles": [
+            {
+              "x": 3,
+              "y": 0
+            },
+            {
+              "x": 6,
+              "y": 4
+            }
+          ],
+          "gate": {
+            "x": 9,
+            "y": 4,
+            "name": "Summit Gate"
+          }
+        }
       }
     },
     {
       "chapter": 4,
       "level_name": "The Crossroads",
       "description": "Learn if/elif/else conditional logic.",
-      "objective": "Write an if/else: if <span class='highlight'>power</span> is greater than 100, print <span class='highlight'>Powerful</span>. Otherwise, print <span class='highlight'>Weak</span>. (power = 150)",
-      "starter_code": "# The power level to test\npower = 150\n\n# Write an if/else statement\n",
+      "objective": "For every pixel, average its RGB values. Use white when the average is at least 128, otherwise black. <span class=\"highlight\">Thresholding turns image brightness into a black or white mask.</span>",
+      "starter_code": "def transform(pixels):\n    pass  # Write the pixel filter here\n\npixels = [[30,30,30],[180,180,180],[90,150,120]]\ncolors = transform(pixels)\nfor color in colors:\n    hero.cast_color(color[0], color[1], color[2])\n    hero.move_right(3)",
       "difficulty": "Medium",
       "map_data": {
         "catalog": "spectrum_stages_v1",
         "stage_key": "4-1",
         "stage_type": "lesson",
-        "xp_reward": 250,
-        "arena": null
+        "xp_reward": 300,
+        "arena": {
+          "theme": "cavern",
+          "blockMovement": true,
+          "cols": 10,
+          "rows": 5,
+          "spawn": {
+            "x": 1,
+            "y": 2
+          },
+          "murals": [
+            {
+              "id": "4-1-image",
+              "name": "The Crossroads image"
+            }
+          ],
+          "colorTargets": [
+            {
+              "id": "4-1-pixel-0",
+              "name": "Pixel 1",
+              "icon": "fas fa-code-branch",
+              "x": 2,
+              "y": 2,
+              "sourceRgb": [
+                30,
+                30,
+                30
+              ],
+              "targetRgb": [
+                0,
+                0,
+                0
+              ],
+              "muralId": "4-1-image"
+            },
+            {
+              "id": "4-1-pixel-1",
+              "name": "Pixel 2",
+              "icon": "fas fa-code-branch",
+              "x": 5,
+              "y": 2,
+              "sourceRgb": [
+                180,
+                180,
+                180
+              ],
+              "targetRgb": [
+                255,
+                255,
+                255
+              ],
+              "muralId": "4-1-image"
+            },
+            {
+              "id": "4-1-pixel-2",
+              "name": "Pixel 3",
+              "icon": "fas fa-code-branch",
+              "x": 8,
+              "y": 2,
+              "sourceRgb": [
+                90,
+                150,
+                120
+              ],
+              "targetRgb": [
+                0,
+                0,
+                0
+              ],
+              "muralId": "4-1-image"
+            }
+          ],
+          "obstacles": [
+            {
+              "x": 3,
+              "y": 0
+            },
+            {
+              "x": 6,
+              "y": 4
+            }
+          ]
+        }
       }
     },
     {
       "chapter": 4,
       "level_name": "Path Selection",
-      "description": "Practice writing conditionals with guidance.",
-      "objective": "Fill in the blanks to complete the if/elif/else chain.",
-      "starter_code": "temp = 35\n\nif temp ___BLANK_1___ 30:\n    print(\"Hot!\")\n___BLANK_2___ temp >= 20:\n    print(\"Warm\")\n___BLANK_3___:\n    print(\"Cold\")",
+      "description": "Choose an image filter with if, elif, and else.",
+      "objective": "Classify average brightness: below 85 blue, below 170 gold, otherwise white. <span class=\"highlight\">if/elif/else selects a different filter for each brightness range.</span>",
+      "starter_code": "def transform(pixels):\n    pass  # Write the pixel filter here\n\npixels = [[30,30,30],[120,120,120],[220,220,220]]\ncolors = transform(pixels)\nfor color in colors:\n    hero.cast_color(color[0], color[1], color[2])\n    hero.move_right(3)",
       "difficulty": "Medium",
       "map_data": {
         "catalog": "spectrum_stages_v1",
         "stage_key": "4-2",
-        "stage_type": "guided",
-        "xp_reward": 250,
-        "arena": null
+        "stage_type": "challenge",
+        "xp_reward": 320,
+        "arena": {
+          "theme": "cavern",
+          "blockMovement": true,
+          "cols": 10,
+          "rows": 5,
+          "spawn": {
+            "x": 1,
+            "y": 2
+          },
+          "murals": [
+            {
+              "id": "4-2-image",
+              "name": "Path Selection image"
+            }
+          ],
+          "colorTargets": [
+            {
+              "id": "4-2-pixel-0",
+              "name": "Pixel 1",
+              "icon": "fas fa-directions",
+              "x": 2,
+              "y": 2,
+              "sourceRgb": [
+                30,
+                30,
+                30
+              ],
+              "targetRgb": [
+                35,
+                90,
+                220
+              ],
+              "muralId": "4-2-image"
+            },
+            {
+              "id": "4-2-pixel-1",
+              "name": "Pixel 2",
+              "icon": "fas fa-directions",
+              "x": 5,
+              "y": 2,
+              "sourceRgb": [
+                120,
+                120,
+                120
+              ],
+              "targetRgb": [
+                255,
+                200,
+                40
+              ],
+              "muralId": "4-2-image"
+            },
+            {
+              "id": "4-2-pixel-2",
+              "name": "Pixel 3",
+              "icon": "fas fa-directions",
+              "x": 8,
+              "y": 2,
+              "sourceRgb": [
+                220,
+                220,
+                220
+              ],
+              "targetRgb": [
+                240,
+                240,
+                240
+              ],
+              "muralId": "4-2-image"
+            }
+          ],
+          "obstacles": [
+            {
+              "x": 3,
+              "y": 0
+            },
+            {
+              "x": 6,
+              "y": 4
+            }
+          ]
+        }
       }
     },
     {
       "chapter": 4,
       "level_name": "Truth and Lies",
-      "description": "Test your boolean logic understanding.",
-      "objective": "Answer the boolean logic puzzles correctly.",
-      "starter_code": "",
+      "description": "Combine boolean masks to reveal hidden pixels.",
+      "objective": "Keep a pixel only if red is above 100 AND blue is below 100; make all others black. <span class=\"highlight\">Boolean masks select pixels by combining channel conditions.</span>",
+      "starter_code": "def transform(pixels):\n    pass  # Write the pixel filter here\n\npixels = [[180,30,40],[40,200,40],[180,30,180]]\ncolors = transform(pixels)\nfor color in colors:\n    hero.cast_color(color[0], color[1], color[2])\n    hero.move_right(3)",
       "difficulty": "Medium",
       "map_data": {
         "catalog": "spectrum_stages_v1",
         "stage_key": "4-3",
-        "stage_type": "puzzle",
-        "xp_reward": 250,
-        "arena": null
+        "stage_type": "challenge",
+        "xp_reward": 340,
+        "arena": {
+          "theme": "cavern",
+          "blockMovement": true,
+          "cols": 10,
+          "rows": 5,
+          "spawn": {
+            "x": 1,
+            "y": 2
+          },
+          "murals": [
+            {
+              "id": "4-3-image",
+              "name": "Truth and Lies image"
+            }
+          ],
+          "colorTargets": [
+            {
+              "id": "4-3-pixel-0",
+              "name": "Pixel 1",
+              "icon": "fas fa-toggle-on",
+              "x": 2,
+              "y": 2,
+              "sourceRgb": [
+                180,
+                30,
+                40
+              ],
+              "targetRgb": [
+                180,
+                30,
+                40
+              ],
+              "muralId": "4-3-image"
+            },
+            {
+              "id": "4-3-pixel-1",
+              "name": "Pixel 2",
+              "icon": "fas fa-toggle-on",
+              "x": 5,
+              "y": 2,
+              "sourceRgb": [
+                40,
+                200,
+                40
+              ],
+              "targetRgb": [
+                0,
+                0,
+                0
+              ],
+              "muralId": "4-3-image"
+            },
+            {
+              "id": "4-3-pixel-2",
+              "name": "Pixel 3",
+              "icon": "fas fa-toggle-on",
+              "x": 8,
+              "y": 2,
+              "sourceRgb": [
+                180,
+                30,
+                180
+              ],
+              "targetRgb": [
+                0,
+                0,
+                0
+              ],
+              "muralId": "4-3-image"
+            }
+          ],
+          "obstacles": [
+            {
+              "x": 3,
+              "y": 0
+            },
+            {
+              "x": 6,
+              "y": 4
+            }
+          ]
+        }
       }
     },
     {
       "chapter": 4,
       "level_name": "Broken Bridges",
-      "description": "Fix broken conditional logic.",
-      "objective": "Fix the <span class='highlight'>2 bugs</span> in the conditional logic so it correctly prints <span class='highlight'>Bridge is safe!</span>",
-      "starter_code": "weight = 50\nmax_weight = 100\n\nif weight < max_weight\n    print(\"Bridge is safe!\")\nelse\n    print(\"Too heavy!\")",
+      "description": "Repair conditional logic in a broken image mask.",
+      "objective": "Fix the comparison: keep pixels whose average brightness is at least 100; black out the rest. <span class=\"highlight\">A reversed comparison breaks a threshold mask and hides the wrong pixels.</span>",
+      "starter_code": "def transform(pixels):\n    result = []\n    for pixel in pixels:\n        if sum(pixel) / 3 < 100:\n            result.append(pixel)\n        else:\n            result.append([0, 0, 0])\n    return result\n\npixels = [[30,30,30],[100,100,100],[200,150,100]]\ncolors = transform(pixels)\nfor color in colors:\n    hero.cast_color(color[0], color[1], color[2])\n    hero.move_right(3)",
       "difficulty": "Medium",
       "map_data": {
         "catalog": "spectrum_stages_v1",
         "stage_key": "4-4",
-        "stage_type": "debug",
-        "xp_reward": 300,
-        "arena": null
+        "stage_type": "challenge",
+        "xp_reward": 360,
+        "arena": {
+          "theme": "cavern",
+          "blockMovement": true,
+          "cols": 10,
+          "rows": 5,
+          "spawn": {
+            "x": 1,
+            "y": 2
+          },
+          "murals": [
+            {
+              "id": "4-4-image",
+              "name": "Broken Bridges image"
+            }
+          ],
+          "colorTargets": [
+            {
+              "id": "4-4-pixel-0",
+              "name": "Pixel 1",
+              "icon": "fas fa-bug",
+              "x": 2,
+              "y": 2,
+              "sourceRgb": [
+                30,
+                30,
+                30
+              ],
+              "targetRgb": [
+                0,
+                0,
+                0
+              ],
+              "muralId": "4-4-image"
+            },
+            {
+              "id": "4-4-pixel-1",
+              "name": "Pixel 2",
+              "icon": "fas fa-bug",
+              "x": 5,
+              "y": 2,
+              "sourceRgb": [
+                100,
+                100,
+                100
+              ],
+              "targetRgb": [
+                100,
+                100,
+                100
+              ],
+              "muralId": "4-4-image"
+            },
+            {
+              "id": "4-4-pixel-2",
+              "name": "Pixel 3",
+              "icon": "fas fa-bug",
+              "x": 8,
+              "y": 2,
+              "sourceRgb": [
+                200,
+                150,
+                100
+              ],
+              "targetRgb": [
+                200,
+                150,
+                100
+              ],
+              "muralId": "4-4-image"
+            }
+          ],
+          "obstacles": [
+            {
+              "x": 3,
+              "y": 0
+            },
+            {
+              "x": 6,
+              "y": 4
+            }
+          ]
+        }
       }
     },
     {
       "chapter": 4,
       "level_name": "The Color Mixer",
       "description": "Use conditionals to mix colors dynamically.",
-      "objective": "Use an if/elif/else to cast the correct color based on the <span class='highlight'>command</span> variable. If command is \"red\" → cast (255,0,0). If \"green\" → (0,255,0). If \"blue\" → (0,0,255). Else → cast (255,255,255).",
-      "starter_code": "# The command to execute\ncommand = \"green\"\n\n# Use if/elif/else to cast the correct color\n",
-      "difficulty": "Hard",
+      "objective": "If red is strongest, add 40 green; otherwise add 40 blue. Cap the changed channel at 255. <span class=\"highlight\">Conditional color mixing changes RGB channels based on the source pixel.</span>",
+      "starter_code": "def transform(pixels):\n    pass  # Write the pixel filter here\n\npixels = [[190,30,20],[20,180,40],[10,20,210]]\ncolors = transform(pixels)\nfor color in colors:\n    hero.cast_color(color[0], color[1], color[2])\n    hero.move_right(3)",
+      "difficulty": "Medium",
       "map_data": {
         "catalog": "spectrum_stages_v1",
         "stage_key": "4-5",
         "stage_type": "challenge",
-        "xp_reward": 350,
-        "arena": null
+        "xp_reward": 380,
+        "arena": {
+          "theme": "cavern",
+          "blockMovement": true,
+          "cols": 10,
+          "rows": 5,
+          "spawn": {
+            "x": 1,
+            "y": 2
+          },
+          "murals": [
+            {
+              "id": "4-5-image",
+              "name": "The Color Mixer image"
+            }
+          ],
+          "colorTargets": [
+            {
+              "id": "4-5-pixel-0",
+              "name": "Pixel 1",
+              "icon": "fas fa-tint",
+              "x": 2,
+              "y": 2,
+              "sourceRgb": [
+                190,
+                30,
+                20
+              ],
+              "targetRgb": [
+                190,
+                70,
+                20
+              ],
+              "muralId": "4-5-image"
+            },
+            {
+              "id": "4-5-pixel-1",
+              "name": "Pixel 2",
+              "icon": "fas fa-tint",
+              "x": 5,
+              "y": 2,
+              "sourceRgb": [
+                20,
+                180,
+                40
+              ],
+              "targetRgb": [
+                20,
+                180,
+                80
+              ],
+              "muralId": "4-5-image"
+            },
+            {
+              "id": "4-5-pixel-2",
+              "name": "Pixel 3",
+              "icon": "fas fa-tint",
+              "x": 8,
+              "y": 2,
+              "sourceRgb": [
+                10,
+                20,
+                210
+              ],
+              "targetRgb": [
+                10,
+                20,
+                250
+              ],
+              "muralId": "4-5-image"
+            }
+          ],
+          "obstacles": [
+            {
+              "x": 3,
+              "y": 0
+            },
+            {
+              "x": 6,
+              "y": 4
+            }
+          ]
+        }
+      }
+    },
+    {
+      "chapter": 4,
+      "level_name": "Shadow Boundaries",
+      "description": "Detect light and shadow boundaries between pixels.",
+      "objective": "Make a pixel gold if its average brightness differs from the previous pixel by at least 80; keep other pixels. <span class=\"highlight\">Edge detection compares neighboring pixels to find a light to shadow boundary.</span>",
+      "starter_code": "def transform(pixels):\n    pass  # Write the pixel filter here\n\npixels = [[30,30,30],[200,200,200],[210,210,210]]\ncolors = transform(pixels)\nfor color in colors:\n    hero.cast_color(color[0], color[1], color[2])\n    hero.move_right(3)",
+      "difficulty": "Medium",
+      "map_data": {
+        "catalog": "spectrum_stages_v1",
+        "stage_key": "4-7",
+        "stage_type": "challenge",
+        "xp_reward": 400,
+        "arena": {
+          "theme": "cavern",
+          "blockMovement": true,
+          "cols": 10,
+          "rows": 5,
+          "spawn": {
+            "x": 1,
+            "y": 2
+          },
+          "murals": [
+            {
+              "id": "4-7-image",
+              "name": "Shadow Boundaries image"
+            }
+          ],
+          "colorTargets": [
+            {
+              "id": "4-7-pixel-0",
+              "name": "Pixel 1",
+              "icon": "fas fa-adjust",
+              "x": 2,
+              "y": 2,
+              "sourceRgb": [
+                30,
+                30,
+                30
+              ],
+              "targetRgb": [
+                30,
+                30,
+                30
+              ],
+              "muralId": "4-7-image"
+            },
+            {
+              "id": "4-7-pixel-1",
+              "name": "Pixel 2",
+              "icon": "fas fa-adjust",
+              "x": 5,
+              "y": 2,
+              "sourceRgb": [
+                200,
+                200,
+                200
+              ],
+              "targetRgb": [
+                255,
+                200,
+                40
+              ],
+              "muralId": "4-7-image"
+            },
+            {
+              "id": "4-7-pixel-2",
+              "name": "Pixel 3",
+              "icon": "fas fa-adjust",
+              "x": 8,
+              "y": 2,
+              "sourceRgb": [
+                210,
+                210,
+                210
+              ],
+              "targetRgb": [
+                210,
+                210,
+                210
+              ],
+              "muralId": "4-7-image"
+            }
+          ],
+          "obstacles": [
+            {
+              "x": 3,
+              "y": 0
+            },
+            {
+              "x": 6,
+              "y": 4
+            }
+          ]
+        }
+      }
+    },
+    {
+      "chapter": 4,
+      "level_name": "The Color Seal",
+      "description": "Combine masks and color mixing to open the seal.",
+      "objective": "Turn pixels with every channel below 100 into gold. For all others, brighten blue by 20. <span class=\"highlight\">A color mask identifies dark pixels before applying an RGB transformation.</span>",
+      "starter_code": "def transform(pixels):\n    pass  # Write the pixel filter here\n\npixels = [[20,30,40],[180,60,40],[40,150,240]]\ncolors = transform(pixels)\nfor color in colors:\n    hero.cast_color(color[0], color[1], color[2])\n    hero.move_right(3)",
+      "difficulty": "Medium",
+      "map_data": {
+        "catalog": "spectrum_stages_v1",
+        "stage_key": "4-8",
+        "stage_type": "challenge",
+        "xp_reward": 420,
+        "arena": {
+          "theme": "cavern",
+          "blockMovement": true,
+          "cols": 10,
+          "rows": 5,
+          "spawn": {
+            "x": 1,
+            "y": 2
+          },
+          "murals": [
+            {
+              "id": "4-8-image",
+              "name": "The Color Seal image"
+            }
+          ],
+          "colorTargets": [
+            {
+              "id": "4-8-pixel-0",
+              "name": "Pixel 1",
+              "icon": "fas fa-shield-alt",
+              "x": 2,
+              "y": 2,
+              "sourceRgb": [
+                20,
+                30,
+                40
+              ],
+              "targetRgb": [
+                255,
+                200,
+                40
+              ],
+              "muralId": "4-8-image"
+            },
+            {
+              "id": "4-8-pixel-1",
+              "name": "Pixel 2",
+              "icon": "fas fa-shield-alt",
+              "x": 5,
+              "y": 2,
+              "sourceRgb": [
+                180,
+                60,
+                40
+              ],
+              "targetRgb": [
+                180,
+                60,
+                60
+              ],
+              "muralId": "4-8-image"
+            },
+            {
+              "id": "4-8-pixel-2",
+              "name": "Pixel 3",
+              "icon": "fas fa-shield-alt",
+              "x": 8,
+              "y": 2,
+              "sourceRgb": [
+                40,
+                150,
+                240
+              ],
+              "targetRgb": [
+                40,
+                150,
+                255
+              ],
+              "muralId": "4-8-image"
+            }
+          ],
+          "obstacles": [
+            {
+              "x": 3,
+              "y": 0
+            },
+            {
+              "x": 6,
+              "y": 4
+            }
+          ]
+        }
       }
     },
     {
       "chapter": 4,
       "level_name": "The Light Convergence",
-      "description": "Cast White light to restore the Lost Spectrum!",
-      "objective": "Set <span class='highlight'>red, green, blue</span> all to 255. Use an <span class='highlight'>if</span> to verify all are 255, then cast White light and print: <span class='highlight'>The Lost Spectrum is restored!</span>",
-      "starter_code": "# The Final Challenge\n# Set all three channels\nred = 255\ngreen = 255\nblue = 255\n\n# Verify all channels are at maximum\n# If all are 255, cast white light and print the message\n",
+      "description": "Restore the final image with a conditional RGB filter.",
+      "objective": "If average brightness is below 85, make white. If red is strongest, add 50 blue. Otherwise keep the pixel. Avoid the marked shadow tiles, restore all three seals, and reach the gate. <span class=\"highlight\">Two minutes of active execution time.</span>",
+      "starter_code": "def transform(pixels):\n    pass  # Write the pixel filter here\n\npixels = [[20,30,40],[200,40,30],[40,180,90]]\ncolors = transform(pixels)\nfor index, color in enumerate(colors):\n    hero.cast_color(color[0], color[1], color[2])\n    if index < 2:\n        hero.move_up(1)\n        hero.move_right(3)\n        hero.move_down(1)\nhero.move_right(2)\nhero.move_down(2)",
       "difficulty": "Hard",
       "map_data": {
         "catalog": "spectrum_stages_v1",
         "stage_key": "4-6",
         "stage_type": "boss",
         "xp_reward": 600,
-        "arena": null
+        "arena": {
+          "theme": "cavern",
+          "blockMovement": true,
+          "cols": 10,
+          "rows": 5,
+          "spawn": {
+            "x": 1,
+            "y": 2
+          },
+          "murals": [
+            {
+              "id": "4-6-image",
+              "name": "The Light Convergence image"
+            }
+          ],
+          "colorTargets": [
+            {
+              "id": "4-6-pixel-0",
+              "name": "Color Seal 1",
+              "icon": "fas fa-sun",
+              "x": 2,
+              "y": 2,
+              "sourceRgb": [
+                20,
+                30,
+                40
+              ],
+              "targetRgb": [
+                255,
+                255,
+                255
+              ],
+              "muralId": "4-6-image"
+            },
+            {
+              "id": "4-6-pixel-1",
+              "name": "Color Seal 2",
+              "icon": "fas fa-sun",
+              "x": 5,
+              "y": 2,
+              "sourceRgb": [
+                200,
+                40,
+                30
+              ],
+              "targetRgb": [
+                200,
+                40,
+                80
+              ],
+              "muralId": "4-6-image"
+            },
+            {
+              "id": "4-6-pixel-2",
+              "name": "Color Seal 3",
+              "icon": "fas fa-sun",
+              "x": 8,
+              "y": 2,
+              "sourceRgb": [
+                40,
+                180,
+                90
+              ],
+              "targetRgb": [
+                40,
+                180,
+                90
+              ],
+              "muralId": "4-6-image"
+            }
+          ],
+          "obstacles": [
+            {
+              "x": 3,
+              "y": 0
+            },
+            {
+              "x": 6,
+              "y": 4
+            }
+          ],
+          "gate": {
+            "x": 9,
+            "y": 4,
+            "name": "Spectrum Gate"
+          },
+          "boss": {
+            "name": "Krakk, Summus Magus Monotoniae",
+            "x": 9,
+            "y": 0
+          },
+          "hazards": [
+            {
+              "x": 3,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 2
+            }
+          ]
+        }
       }
     }
   ],
@@ -588,7 +2558,7 @@
       "unlock_condition": "spectrum_stages_v1:region:1"
     },
     {
-      "title": "Value & Type Master",
+      "title": "The Chromatic Archive Master",
       "description": "Complete every stage in THE SCHOLAR'S ARCHIVE.",
       "unlock_condition": "spectrum_stages_v1:region:2"
     },
@@ -604,7 +2574,7 @@
     },
     {
       "title": "Lost Spectrum Restored",
-      "description": "Complete all 18 stages of the current adventure.",
+      "description": "Complete all 29 stages of the current adventure.",
       "unlock_condition": "spectrum_stages_v1:all"
     }
   ]

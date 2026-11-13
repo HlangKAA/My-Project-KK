@@ -5,7 +5,7 @@ import { CHARACTER_LEVELS, calculateXP, calculateLevel, getLevelProgress, SPELLS
 
 /**
  * useCharacterProgression — hook สำหรับจัดการ XP, Level, Spells, Outfits
- * เก็บข้อมูลใน localStorage เพื่อ persist ข้ามเซสชัน (จนกว่าจะมี backend API)
+ * เก็บเครื่องแต่งกายและสถานะหน้าจอใน localStorage; XP และด่านที่ผ่านมาจากบัญชี
  */
 
 const STORAGE_KEY = 'lost_spectrum_character';
@@ -46,10 +46,15 @@ const useCharacterProgression = () => {
     const { user } = useGame();
     const storageKey = `${STORAGE_KEY}:${user?.player_id || 'guest'}`;
     const [localCharacter, setCharacter] = useState(() => loadCharacter(storageKey));
-    // Stage ownership comes from the database; cosmetic/XP preferences stay local.
+    // Stage completion and XP come from the account; cosmetic choices stay local.
     const completedStages = user?.completedStages || localCharacter.completedStages;
+    const totalXP = user ? (user.highScore ?? 0) : localCharacter.xp;
+    const currentLevel = calculateLevel(totalXP);
     const character = {
         ...localCharacter,
+        xp: totalXP,
+        wizardLevel: currentLevel.level,
+        wizardTitle: currentLevel.title,
         completedStages,
         unlockedSpells: Object.entries(SPELLS).filter(([, spell]) => completedStages[spell.unlockStage]).map(([key]) => key),
         conceptsMastered: [...new Set(Object.keys(completedStages).flatMap(key => STAGE_DATA[key]?.teachingConcepts || []))],
@@ -65,8 +70,8 @@ const useCharacterProgression = () => {
     }, [storageKey]);
 
     // ─── Award XP and handle level ups ───
-    const awardXP = useCallback((stageKey, baseXP, modifiers = {}) => {
-        const { earnedXP, appliedBonuses } = calculateXP(baseXP, modifiers);
+    const awardXP = useCallback((stageKey, baseXP, modifiers = {}, serverAward = null) => {
+        const { earnedXP, appliedBonuses } = serverAward || calculateXP(baseXP, modifiers);
 
         let levelUpInfo = null;
         let newSpellUnlock = null;
@@ -74,8 +79,8 @@ const useCharacterProgression = () => {
         let newTitleUnlock = null;
 
         updateCharacter(prev => {
-            const newXP = prev.xp + earnedXP;
-            const oldLevel = calculateLevel(prev.xp);
+            const newXP = serverAward ? serverAward.totalXP : prev.xp + earnedXP;
+            const oldLevel = calculateLevel(serverAward ? newXP - earnedXP : prev.xp);
             const newLevel = calculateLevel(newXP);
             const leveledUp = newLevel.level > oldLevel.level;
 
@@ -101,7 +106,10 @@ const useCharacterProgression = () => {
             }
 
             // Check outfit unlocks
-            const completedRegions = getCompletedRegions({ ...prev.completedStages, [stageKey]: true });
+            const completedRegions = [...new Set([
+                ...getCompletedRegions({ ...completedStages, [stageKey]: true }),
+                ...(user?.completedRegions || []),
+            ])];
             const updatedOutfits = [...prev.unlockedOutfits];
             Object.entries(OUTFITS).forEach(([key, outfit]) => {
                 if (!updatedOutfits.includes(key)) {
@@ -139,14 +147,14 @@ const useCharacterProgression = () => {
 
         return {
             earnedXP,
-            baseXP,
+            baseXP: serverAward && earnedXP === 0 ? 0 : baseXP,
             appliedBonuses,
             levelUpInfo,
             newSpellUnlock,
             newOutfitUnlock,
             newTitleUnlock,
         };
-    }, [updateCharacter]);
+    }, [updateCharacter, completedStages, user?.completedRegions]);
 
     // ─── Master a concept ───
     const masterConcept = useCallback((conceptKey) => {

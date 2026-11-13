@@ -26,7 +26,7 @@
     height: 48px;
     border-radius: 50%;
     background: rgba(40, 20, 15, 0.9);
-    border: 2px solid rgba(220, 38, 38, 0.3);
+    border: 2px solid rgba(184, 137, 73, 0.3);
     color: #f1e8e0;
     font-size: 1.2rem;
     cursor: pointer;
@@ -40,8 +40,8 @@
 }
 
 .grimoire-close:hover {
-    background: rgba(220, 38, 38, 0.3);
-    border-color: #dc2626;
+    background: rgba(184, 137, 73, 0.3);
+    border-color: #b88949;
 }
 
 .grimoire-close-label {

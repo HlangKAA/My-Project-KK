@@ -1,15 +1,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap');
+
+html:lang(th) body, html:lang(th) button, html:lang(th) input, html:lang(th) textarea {
+  font-family: 'Sarabun', 'Tahoma', sans-serif;
+}
 
 :root {
-  --primary-bg: #1a0a0a;
-  --secondary-bg: #0d0505;
-  --glass-border: rgba(220, 38, 38, 0.35);
-  --primary-red: #dc2626;
-  --accent-maroon: #7f1d1d;
-  --accent-gold: #d4a373;
-  --text-main: #f1e8e0;
-  --text-muted: #a89080;
-  --font-main: 'Inter', sans-serif;
+  --primary-bg: #171a17;
+  --secondary-bg: #101411;
+  --glass-border: rgba(191, 157, 96, .4);
+  --primary-red: #b88949;
+  --accent-maroon: #51432e;
+  --accent-gold: #d6bb7a;
+  --text-main: #e9e0ca;
+  --text-muted: #b7ab8d;
+  --font-main: 'Georgia', 'Times New Roman', serif;
   --font-heading: 'Cinzel', serif;
   --font-code: "Consolas", "Monaco", monospace;
 }
@@ -33,7 +38,7 @@ button {
 
 /* Utilities */
 .glass-panel {
-  background: rgba(30, 10, 10, 0.8);
+  background: rgba(30, 29, 24, 0.8);
   backdrop-filter: blur(12px);
   border: 1px solid var(--glass-border);
   border-radius: 12px;
@@ -53,12 +58,12 @@ button {
   font-weight: bold;
   font-family: var(--font-heading);
   letter-spacing: 2px;
-  box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
+  box-shadow: 0 4px 15px rgba(184, 137, 73, 0.28);
 }
 
 .btn-neon:hover {
-  background: #ef4444;
-  box-shadow: 0 6px 25px rgba(220, 38, 38, 0.5);
+  background: #c49a5a;
+  box-shadow: 0 6px 25px rgba(184, 137, 73, 0.42);
   transform: translateY(-2px);
 }
 

@@ -2,9 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useGame } from '../context/GameContext';
 import useCharacterProgression from '../hooks/useCharacterProgression';
-import { STAGE_DATA } from '../data/stageData';
+import { REGIONS as PLAYABLE_REGIONS, STAGE_DATA } from '../data/stageData';
+import { CONCEPT_MAP } from '../data/conceptMap';
 import api from '../api/axios';
+import { useLanguage } from '../i18n/useLanguage';
+import { localRegion, localStage } from '../i18n/th';
 import WizardProfile from '../components/WizardProfile';
+import StoryScene from '../components/StoryScene';
 import worldMap from '../assets/images/the-lost-spectrum-world-map.png';
 import regionRedForest from '../assets/images/region-red-forest.png';
 import regionAshPeaks from '../assets/images/region-ash-peaks.png';
@@ -17,15 +21,15 @@ const REGIONS = [
         id: 1,
         name: 'THE RED FOREST',
         image: regionRedForest,
-        top: '31%',
-        left: '14%',
+        top: 'calc(22% + 38px)',
+        left: '19%',
     },
     {
         id: 2,
         name: "THE SCHOLAR'S ARCHIVE",
         image: thescholarsarchive,
-        top: '45%',
-        left: '65%',
+        top: 'calc(39% + 38px)',
+        left: '56%',
     },
     {
         id: 3,
@@ -43,39 +47,60 @@ const REGIONS = [
     }
 ];
 
+const conceptLabel = key => CONCEPT_MAP[key]?.name
+    || key.replace(/-/g, ' ').replace(/^./, first => first.toUpperCase());
+
 const Dashboard = () => {
+    const { language, setLanguage, isThai } = useLanguage();
     const { user, logout } = useGame();
     const navigate = useNavigate();
     const { character, levelProgress } = useCharacterProgression();
     const userLevel = user?.level || 1;
-    const [activePanel, setActivePanel] = useState(null);
+    const [showLegends, setShowLegends] = useState(false);
+    const [storyScene, setStoryScene] = useState(null);
+    const [dismissedPrologueFor, setDismissedPrologueFor] = useState(null);
     const [mapZoom, setMapZoom] = useState(1);
-    const [reduceMotion, setReduceMotion] = useState(() => localStorage.getItem('lost-spectrum-reduce-motion') === 'true');
-    const [journal, setJournal] = useState({ loading: true, error: '', entries: [] });
+    const [leaderboard, setLeaderboard] = useState({ loading: true, error: '', entries: [], me: null });
+
+    const autoPrologue = user?.player_id && !user?.completedStages?.['1-1']
+        && dismissedPrologueFor !== user.player_id
+        && !localStorage.getItem(`lost-spectrum-prologue:${user.player_id}`)
+        ? 'prologue' : null;
+    const activeStoryScene = storyScene || autoPrologue;
+
+    const closeStoryScene = () => {
+        if (activeStoryScene === 'prologue' && user?.player_id) {
+            localStorage.setItem(`lost-spectrum-prologue:${user.player_id}`, 'seen');
+            setDismissedPrologueFor(user.player_id);
+        }
+        setStoryScene(null);
+    };
 
     useEffect(() => {
-        api.get('/api/profile/history').then(response => {
-            setJournal({ loading: false, error: '', entries: response.data.history });
+        let active = true;
+        api.get('/api/leaderboard').then(response => {
+            if (active) setLeaderboard({
+                loading: false, error: '',
+                entries: response.data.entries,
+                me: response.data.me,
+            });
         }).catch(error => {
-            setJournal({ loading: false, error: error.response?.data?.message || 'Could not load your journal.', entries: [] });
+            if (active) setLeaderboard({
+                loading: false,
+                error: error.response?.data?.message || 'Could not load the leaderboard.',
+                entries: [],
+                me: null,
+            });
         });
+        return () => { active = false; };
     }, []);
 
-    const recentJournalEntries = [...journal.entries]
-        .sort((a, b) => new Date(b.last_attempt_at || 0) - new Date(a.last_attempt_at || 0))
-        .slice(0, 8);
-
     useEffect(() => {
-        if (!activePanel) return undefined;
-        const closeOnEscape = event => { if (event.key === 'Escape') setActivePanel(null); };
+        if (!showLegends) return undefined;
+        const closeOnEscape = event => { if (event.key === 'Escape') setShowLegends(false); };
         window.addEventListener('keydown', closeOnEscape);
         return () => window.removeEventListener('keydown', closeOnEscape);
-    }, [activePanel]);
-
-    const changeMotionPreference = enabled => {
-        setReduceMotion(enabled);
-        localStorage.setItem('lost-spectrum-reduce-motion', String(enabled));
-    };
+    }, [showLegends]);
 
     const getRegionStatus = (regionId) => {
         if (regionId < userLevel) return 'complete';
@@ -84,29 +109,29 @@ const Dashboard = () => {
     };
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#1a0a0a', color: '#f1e8e0' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#171a17', color: '#e9e0ca' }}>
             {/* ─── Top Navbar ─── */}
             <nav className="dash-navbar">
                 <div className="dash-brand">
                     <div className="dash-brand-icon">
                         <i className="fas fa-chess-rook"></i>
                     </div>
-                    <span className="dash-brand-text">The Lost Spectrum</span>
+                    <span className="dash-brand-text">{'The Lost Spectrum'}</span>
                 </div>
 
                 <div className="dash-nav-links">
-                    <button className={`dash-nav-link ${!activePanel ? 'active' : ''}`} onClick={() => setActivePanel(null)}>
-                        <i className="fas fa-map"></i> MAP
-                    </button>
-                    <button className={`dash-nav-link ${activePanel === 'settings' ? 'active' : ''}`} onClick={() => setActivePanel('settings')}>
-                        <i className="fas fa-cog"></i> SETTINGS
+                    <button className="dash-nav-link active" onClick={() => setShowLegends(false)}>
+                        <i className="fas fa-map"></i> {isThai ? 'แผนที่' : 'MAP'}
                     </button>
                 </div>
 
                 <div className="dash-user">
+                    <button type="button" className="dash-nav-link dash-language-toggle" onClick={() => setLanguage(language === 'th' ? 'en' : 'th')} aria-label={isThai ? 'Switch to English' : 'เปลี่ยนเป็นภาษาไทย'} title={isThai ? 'Switch to English' : 'เปลี่ยนเป็นภาษาไทย'}>
+                        <i className="fas fa-language" /> {isThai ? 'EN' : 'ไทย'}
+                    </button>
                     <div className="dash-user-info">
-                        <div className="dash-user-role">SCHOLAR</div>
-                        <div className="dash-user-name">{user?.username || 'Explorer'}</div>
+                        <span className="dash-user-role">{isThai ? 'นักปราชญ์' : 'SCHOLAR'}</span>
+                        <span className="dash-user-name" title={user?.username || 'Explorer'}>{user?.username || 'Explorer'}</span>
                     </div>
                     <WizardProfile character={character} levelProgress={levelProgress} compact />
                     <button className="dash-logout" onClick={() => navigate('/profile')} title="Open profile" aria-label="Open profile">
@@ -125,23 +150,24 @@ const Dashboard = () => {
                     <div className="dash-header">
                         <div className="dash-header-actions">
                             <div>
-                                <h1 className="dash-title">Mission Select</h1>
-                                <p className="dash-quote">"The path is illuminated only by what you know."</p>
+                                <h1 className="dash-title">{isThai ? 'เลือกภารกิจ' : 'Mission Select'}</h1>
+                                <p className="dash-quote">{isThai ? '“ความรู้จะช่วยส่องทางให้เรา”' : '"The path is illuminated only by what you know."'}</p>
                             </div>
-                            <button className="dash-view-btn" onClick={() => setActivePanel('legends')}>
-                                <i className="fas fa-scroll"></i> VIEW LEGENDS
+                            <button className="dash-view-btn" onClick={() => setShowLegends(true)}>
+                                <i className="fas fa-scroll"></i> {isThai ? 'ดูเรื่องราวโลก' : 'VIEW LEGENDS'}
                             </button>
                         </div>
                     </div>
 
                     <div className="dash-map">
                         <div className="dash-map-search">
-                            <input type="text" placeholder="Search regions..." />
+                            <input type="text" placeholder={isThai ? 'ค้นหาดินแดน...' : 'Search regions...'} />
                         </div>
 
-                        <div className={`dash-map-world ${reduceMotion ? 'reduce-motion' : ''}`} style={{ backgroundImage: `url(${worldMap})`, transform: `scale(${mapZoom})` }}>
+                        <div className="dash-map-world" style={{ backgroundImage: `url(${worldMap})`, transform: `scale(${mapZoom})` }}>
                         {/* Region Nodes */}
-                        {REGIONS.map((region) => {
+                        {REGIONS.map((rawRegion) => {
+                            const region = localRegion(rawRegion, isThai);
                             const status = getRegionStatus(region.id);
                             return (
                                 <Link
@@ -175,71 +201,101 @@ const Dashboard = () => {
                     </div>
                 </div>
 
-                {/* ─── Sidebar: Essence Inventory ─── */}
-                <aside className="dash-sidebar">
-                    <h2 className="dash-sidebar-title">
-                        <i className="fas fa-book-open"></i> Journal
+                {/* Leaderboard */}
+                <aside className="dash-sidebar" aria-labelledby="leaderboard-title">
+                    <h2 className="dash-sidebar-title" id="leaderboard-title">
+                        <i className="fas fa-trophy" aria-hidden="true"></i> {isThai ? 'ตารางอันดับ' : 'Leaderboard'}
                     </h2>
-                    <p className="dash-journal-intro">Recent stage attempts and progress.</p>
-                    {journal.loading && <p role="status">Loading journal…</p>}
-                    {journal.error && <p role="alert">{journal.error}</p>}
-                    {!journal.loading && !journal.error && recentJournalEntries.length === 0 && (
-                        <p className="dash-journal-empty">No attempts yet. Your stage activity will appear here.</p>
+                    {leaderboard.loading && <p role="status">Loading leaderboard…</p>}
+                    {leaderboard.error && <p role="alert">{leaderboard.error}</p>}
+                    {!leaderboard.loading && !leaderboard.error && leaderboard.entries.length === 0 && (
+                        <p className="dash-leaderboard-empty">No ranked explorers yet. Complete a stage to join.</p>
                     )}
-                    {!journal.error && recentJournalEntries.map(entry => (
-                        <Link className="dash-journal-entry" key={entry.stage_key}
-                            to={`/region/${entry.stage_key.split('-')[0]}/stage/${entry.stage_key.split('-')[1]}`}>
-                            <span className="dash-journal-entry-copy">
-                                <strong>{entry.stage_name}</strong>
-                                <small>Stage {entry.stage_key} · {entry.attempts} attempt{entry.attempts === 1 ? '' : 's'}</small>
+                    {!leaderboard.error && leaderboard.entries.map(entry => (
+                        <div className={`dash-leaderboard-entry ${entry.rank <= 7 ? `rainbow-rank-${entry.rank}` : ''} ${entry.player_id === user?.player_id ? 'is-me' : ''}`}
+                            key={entry.player_id} aria-label={`Rank ${entry.rank}, ${entry.username}, ${entry.score} XP, ${entry.completed_stages} stages completed`}>
+                            <span className="dash-leaderboard-rank" aria-hidden="true">#{entry.rank}</span>
+                            <span className="dash-leaderboard-player">
+                                <strong title={entry.username}>{entry.username}</strong>
+                                <small><b>{entry.score.toLocaleString()} XP</b> · {entry.completed_stages} stage{entry.completed_stages === 1 ? '' : 's'}</small>
                             </span>
-                            <span className={entry.completed_at ? 'dash-journal-status complete' : 'dash-journal-status'}>
-                                {entry.completed_at ? 'Passed' : 'In progress'}
-                            </span>
-                        </Link>
+                            {entry.player_id === user?.player_id && <span className="dash-leaderboard-you">You</span>}
+                        </div>
                     ))}
-                    <Link className="dash-journal-all" to="/profile">View full history <i className="fas fa-arrow-right" /></Link>
+                    {!leaderboard.loading && !leaderboard.error && leaderboard.me && leaderboard.me.rank > 20 && (
+                        <div className="dash-leaderboard-own">
+                            <p>Your rank</p>
+                            <div className="dash-leaderboard-entry is-me" aria-label={`Your rank ${leaderboard.me.rank}, ${leaderboard.me.score} XP, ${leaderboard.me.completed_stages} stages completed`}>
+                                <span className="dash-leaderboard-rank">#{leaderboard.me.rank}</span>
+                                <span className="dash-leaderboard-player">
+                                    <strong title={leaderboard.me.username}>{leaderboard.me.username}</strong>
+                                    <small><b>{leaderboard.me.score.toLocaleString()} XP</b> · {leaderboard.me.completed_stages} stages</small>
+                                </span>
+                                <span className="dash-leaderboard-you">You</span>
+                            </div>
+                        </div>
+                    )}
+                    {!leaderboard.loading && !leaderboard.error && !leaderboard.me && (
+                        <p className="dash-leaderboard-unranked">Complete a stage to earn your rank.</p>
+                    )}
                 </aside>
             </div>
-            {activePanel && (
-                <div className="dash-panel-backdrop" onMouseDown={event => { if (event.target === event.currentTarget) setActivePanel(null); }}>
+            {showLegends && (
+                <div className="dash-panel-backdrop" onMouseDown={event => { if (event.target === event.currentTarget) setShowLegends(false); }}>
                     <section className="dash-panel" role="dialog" aria-modal="true"
                         aria-labelledby="dash-panel-title" onMouseDown={event => event.stopPropagation()}>
                         <header className="dash-panel-header">
-                            <h2 id="dash-panel-title">{{ settings: 'Map Settings', legends: 'World Legends' }[activePanel]}</h2>
-                            <button type="button" className="dash-panel-close" aria-label="Close panel" onClick={() => setActivePanel(null)}>×</button>
+                            <h2 id="dash-panel-title">{isThai ? 'เรื่องราวของโลก' : 'World Legends'}</h2>
+                            <button type="button" className="dash-panel-close" aria-label="Close panel" onClick={() => setShowLegends(false)}>×</button>
                         </header>
-                        {activePanel === 'settings' && (
-                            <div className="dash-panel-content">
-                                <label className="dash-setting-row">
-                                    <span><strong>Reduce map animation</strong><small>Turn off movement effects on the world map.</small></span>
-                                    <input type="checkbox" checked={reduceMotion} onChange={event => changeMotionPreference(event.target.checked)} />
-                                </label>
-                                <div className="dash-setting-row">
-                                    <span><strong>Map zoom</strong><small>Current zoom: {Math.round(mapZoom * 100)}%</small></span>
-                                    <button type="button" className="dash-panel-link" onClick={() => setMapZoom(1)}>Reset</button>
+                        <div className="dash-panel-content dash-legends-content">
+                                <p className="dash-legends-intro">{isThai ? 'สำรวจด่านและเรื่องที่ได้เรียนรู้ในแต่ละดินแดน' : 'Explore the playable stages and the ideas they teach.'}</p>
+                                <div className="dash-story-replays">
+                                    <button type="button" onClick={() => { setShowLegends(false); setStoryScene('prologue'); }}>
+                                        <i className="fas fa-book-open" /> {isThai ? 'ดูตอนเปิดเรื่อง' : 'Replay Opening'}
+                                    </button>
+                                    {user?.completedStages?.['4-6'] && <button type="button" onClick={() => { setShowLegends(false); setStoryScene('epilogue'); }}>
+                                        <i className="fas fa-sun" /> {isThai ? 'ดูตอนจบ' : 'Replay Ending'}
+                                    </button>}
                                 </div>
-                            </div>
-                        )}
-                        {activePanel === 'legends' && (
-                            <div className="dash-panel-content">
-                                <p>Regions, stages, and concepts in the current game world.</p>
-                                {REGIONS.map(region => (
+                                {Object.values(PLAYABLE_REGIONS).map(rawRegion => {
+                                    const region = localRegion(rawRegion, isThai);
+                                    return (
                                     <article className="dash-legend-region" key={region.id}>
                                         <h3>{region.name}</h3>
-                                        {Object.entries(STAGE_DATA).filter(([key]) => key.startsWith(`${region.id}-`)).map(([key, stage]) => (
-                                            <div className="dash-legend-stage" key={key}>
-                                                <strong>{key} · {stage.title}</strong>
-                                                <span>{stage.teachingConcepts?.length ? stage.teachingConcepts.join(' · ') : stage.objective}</span>
-                                            </div>
-                                        ))}
+                                        <div className="dash-legend-stages">
+                                            {region.stages.map(rawStage => {
+                                                const stage = localStage(rawStage, region.id, isThai);
+                                                const key = `${region.id}-${stage.id}`;
+                                                const concepts = STAGE_DATA[key]?.teachingConcepts || [];
+                                                return (
+                                                    <div className="dash-legend-stage" key={key}>
+                                                        <div className="dash-legend-stage-heading">
+                                                            <span className="dash-legend-stage-icon" aria-hidden="true"><i className={stage.icon} /></span>
+                                                            <div>
+                                                                <small>{isThai ? 'ด่าน' : 'Stage'} {key}</small>
+                                                                <strong>{stage.name}</strong>
+                                                            </div>
+                                                        </div>
+                                                        <p>{stage.description}</p>
+                                                        {concepts.length > 0 && (
+                                                            <div className="dash-legend-concepts" aria-label="Concepts">
+                                                                {concepts.map(concept => (
+                                                                    <span className="dash-legend-concept" key={concept}>{isThai && concept === 'indexing' ? 'ตำแหน่ง' : isThai && concept === 'boolean-logic' ? 'boolean' : conceptLabel(concept)}</span>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
                                     </article>
-                                ))}
-                            </div>
-                        )}
+                                );})}
+                        </div>
                     </section>
                 </div>
             )}
+            {activeStoryScene && <StoryScene scene={activeStoryScene} playerName={user?.username} isThai={isThai} onClose={closeStoryScene} />}
         </div>
     );
 };

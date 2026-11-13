@@ -17,6 +17,9 @@
  *   boss      — ด่านรวม concept ทั้ง region
  */
 
+import { CHAPTER_TWO_STAGES } from './chapterTwoStages.js';
+import { CHAPTER_THREE_FOUR_STAGES } from './chapterThreeFourStages.js';
+
 export const REGIONS = {
     1: {
         id: 1,
@@ -27,45 +30,56 @@ export const REGIONS = {
             { id: 1, name: 'The Awakening Altar',    type: 'lesson',    icon: 'fas fa-shoe-prints',      description: 'Master grid movement and learn the first incantation: print().' },
             { id: 2, name: "The Alchemist's Flasks", type: 'challenge', icon: 'fas fa-flask',            description: 'Sort variables into Flasks (str, int, float, bool) with real type validation.' },
             { id: 3, name: 'The Prism Crystals',     type: 'challenge', icon: 'fas fa-gem',              description: 'Navigate the crystal cavern and cast RGB colored light into ancient braziers.' },
-            { id: 4, name: 'The Prism Gate',         type: 'boss',      icon: 'fas fa-crown',            description: 'The grand trial: navigate obstacles, cast RGB light, and chant the opening phrase.' }
+            { id: 4, name: 'The Prism Gate',         type: 'boss',      icon: 'fas fa-crown',            description: 'The grand trial: navigate obstacles, cast RGB light, and chant the opening phrase.' },
+            { id: 5, name: 'The Sleeping Garden',    type: 'challenge', icon: 'fas fa-seedling',         description: 'Mix red and green light to restore a golden flower.' },
+            { id: 6, name: 'The Swapped Canvas',     type: 'challenge', icon: 'fas fa-image',            description: 'Fix swapped RGB channels to color two enchanted frames.' },
+            { id: 7, name: 'The Three Seasons',      type: 'challenge', icon: 'fas fa-palette',          description: 'Use variables and movement to color three seasonal relics.' }
         ]
     },
     2: {
         id: 2,
         name: "THE SCHOLAR'S ARCHIVE",
-        subtitle: 'Value & Type',
-        description: 'Discover the essence of magic. Learn data types and type checking.',
+        subtitle: 'The Chromatic Archive',
+        description: 'Restore faded images and magical mechanisms with brightness, tint, inversion, and grayscale.',
         stages: [
-            { id: 1, name: 'The Essence of Values',  type: 'lesson',    icon: 'fas fa-scroll',          description: 'Learn how to declare variables and understand data types.' },
-            { id: 2, name: 'The Type Checker',        type: 'guided',    icon: 'fas fa-microscope',      description: 'Use type() to inspect variables and verify their nature.' }
+            { id: 1, name: 'The Faded Manuscript', type: 'lesson', icon: 'fas fa-scroll', description: 'Brighten a faded manuscript with RGB arithmetic.' },
+            { id: 2, name: 'The Tinted Lenses', type: 'challenge', icon: 'fas fa-eye', description: 'Tint two lenses by changing one color channel at a time.' },
+            { id: 3, name: 'The Mirror Gallery', type: 'challenge', icon: 'fas fa-images', description: 'Invert the colors of two enchanted reflections.' },
+            { id: 4, name: 'Gray Memory', type: 'challenge', icon: 'fas fa-image', description: 'Restore a three-panel image in grayscale.' },
+            { id: 5, name: 'The Palette Lock', type: 'challenge', icon: 'fas fa-lock', description: 'Combine color transformations to open the prism vault.' },
+            { id: 6, name: 'The Living Atlas', type: 'boss', icon: 'fas fa-book-open', description: 'Restore three Atlas pages and open the final gate.' }
         ]
     },
     3: {
         id: 3,
         name: 'ASH PEAKS',
         subtitle: 'The Matrix',
-        description: 'Navigate the ancient arrays inscribed upon the mountain walls. Master lists, indexing, and loops.',
+        description: 'Decode image pixels on rune walls with lists, indexing, loops, and pattern searches.',
         stages: [
             { id: 1, name: 'The Inscription Wall',   type: 'lesson',    icon: 'fas fa-th-list',         description: 'Learn about lists and how to create them.' },
-            { id: 2, name: 'Rune Positions',          type: 'guided',    icon: 'fas fa-hand-pointer',    description: 'Practice indexing with guided exercises.' },
+            { id: 2, name: 'Rune Positions',          type: 'challenge', icon: 'fas fa-hand-pointer',    description: 'Use pixel positions to repair a scrambled image.' },
             { id: 3, name: 'The Matrix Search',       type: 'challenge', icon: 'fas fa-search',          description: 'Find values in lists using .index().' },
             { id: 4, name: 'The Echo Loop',           type: 'lesson',    icon: 'fas fa-sync-alt',        description: 'Learn for loops to iterate over lists.' },
-            { id: 5, name: 'Broken Arrays',           type: 'debug',     icon: 'fas fa-bug',             description: 'Fix errors in list operations.' },
-            { id: 6, name: 'The Peak Trial',          type: 'boss',      icon: 'fas fa-crown',           description: 'Navigate the matrix using all your list skills.' }
+            { id: 5, name: 'Broken Arrays',           type: 'challenge', icon: 'fas fa-bug',             description: 'Repair a broken pixel processing loop.' },
+            { id: 7, name: 'Pixel Trail',             type: 'challenge', icon: 'fas fa-route',           description: 'Walk through a row of pixels and restore each color.' },
+            { id: 8, name: 'The Hidden Pattern',      type: 'challenge', icon: 'fas fa-chess-board',     description: 'Find a repeated color pattern in the rune image.' },
+            { id: 6, name: 'The Peak Trial',          type: 'boss',      icon: 'fas fa-crown',           description: 'Use lists, indexing, and loops to restore the summit image.' }
         ]
     },
     4: {
         id: 4,
         name: 'WHISPERING CAVERNS',
         subtitle: 'The Light',
-        description: 'Master conditionals, boolean logic, and color mixing to restore the Lost Spectrum.',
+        description: 'Use image thresholds, masks, edges, and RGB conditions to restore the Lost Spectrum.',
         stages: [
             { id: 1, name: 'The Crossroads',         type: 'lesson',    icon: 'fas fa-code-branch',     description: 'Learn if/elif/else conditional logic.' },
-            { id: 2, name: 'Path Selection',          type: 'guided',    icon: 'fas fa-directions',      description: 'Practice writing conditionals with guidance.' },
-            { id: 3, name: 'Truth and Lies',          type: 'puzzle',    icon: 'fas fa-toggle-on',       description: 'Test your boolean logic understanding.' },
-            { id: 4, name: 'Broken Bridges',          type: 'debug',     icon: 'fas fa-bug',             description: 'Fix broken conditional logic.' },
+            { id: 2, name: 'Path Selection',          type: 'challenge', icon: 'fas fa-directions',      description: 'Choose an image filter with if, elif, and else.' },
+            { id: 3, name: 'Truth and Lies',          type: 'challenge', icon: 'fas fa-toggle-on',       description: 'Combine boolean masks to reveal hidden pixels.' },
+            { id: 4, name: 'Broken Bridges',          type: 'challenge', icon: 'fas fa-bug',             description: 'Repair conditional logic in a broken image mask.' },
             { id: 5, name: 'The Color Mixer',         type: 'challenge', icon: 'fas fa-tint',            description: 'Use conditionals to mix colors dynamically.' },
-            { id: 6, name: 'The Light Convergence',   type: 'boss',      icon: 'fas fa-sun',             description: 'Cast White light to restore the Lost Spectrum!' }
+            { id: 7, name: 'Shadow Boundaries',       type: 'challenge', icon: 'fas fa-adjust',          description: 'Detect light and shadow boundaries between pixels.' },
+            { id: 8, name: 'The Color Seal',          type: 'challenge', icon: 'fas fa-shield-alt',      description: 'Combine masks and color mixing to open the seal.' },
+            { id: 6, name: 'The Light Convergence',   type: 'boss',      icon: 'fas fa-sun',             description: 'Restore the final image with a conditional RGB filter.' }
         ]
     }
 };
@@ -107,7 +121,7 @@ export const STAGE_DATA = {
             dialogues: [
                 {
                     speaker: "Eldrin",
-                    text: "Traveler... welcome to the Red Forest. In this realm, wizards do not walk by thought alone — we command our steps through CODE.",
+                    text: "The grimoire chose you when Krakk stole the kingdom's colors. I am Eldrin. Here in the Red Forest, your first spells will teach the world to move and shine again.",
                     emotion: "mysterious"
                 },
                 {
@@ -407,7 +421,159 @@ hero.cast_color(255, 0, 0)
         }
     },
 
-    // ─── Stage 1-4: Boss Trial — The Prism Gate ───
+    // Stages 1-5 to 1-7: RGB practice before the boss
+    '1-5': {
+        title: 'The Sleeping Garden',
+        chapter: 'Chapter 1: The Sleeping Garden',
+        location: 'The Red Forest - Faded Garden',
+        stageType: 'challenge',
+        difficulty: 2,
+        xpReward: 375,
+        teachingConcepts: ['rgb'],
+        prerequisiteConcepts: ['rgb', 'movement'],
+        hasStoryIntro: true,
+        arena: {
+            cols: 8, rows: 5, theme: 'forest', spawn: { x: 1, y: 2 },
+            colorTargets: [
+                { id: 'golden-flower', name: 'Golden Flower', icon: 'fas fa-seedling', x: 5, y: 2, targetRgb: [255, 255, 0] }
+            ]
+        },
+        storyIntro: {
+            sceneName: 'The Faded Garden',
+            npcName: 'Prisma',
+            npcTitle: 'Color Sage',
+            npcIcon: 'fas fa-palette',
+            dialogues: [
+                { speaker: 'Prisma', text: 'The flower has lost its golden glow. Mix red and green light to bring it back.', emotion: 'teaching' }
+            ],
+            enterButtonText: 'Restore the Garden',
+            enterButtonIcon: 'fas fa-seedling'
+        },
+        objective: 'Walk beside the Golden Flower at (5, 2) and restore its yellow light with hero.cast_color(255, 255, 0).',
+        initialCode: '# The flower needs yellow light (red + green).\n# Walk beside the flower at (5, 2), then cast its color.\n\n',
+        completeMessage: 'Golden light returns to the Sleeping Garden!',
+        hints: [
+            { level: 1, text: 'Yellow light combines full red and full green, with no blue.' },
+            { level: 2, text: 'Move right 4 tiles from (1, 2) to reach the flower.' },
+            { level: 3, text: 'hero.move_right(4)\nhero.cast_color(255, 255, 0)' }
+        ],
+        grimoire: [{
+            leftTitle: 'Mixing Yellow Light', leftIcon: 'fas fa-palette',
+            leftContent: 'RGB channels each range from 0 to 255. Red plus green light makes yellow.',
+            leftCode: 'hero.cast_color(255, 255, 0)',
+            leftNote: 'Stand on or next to a faded object before casting.',
+            leftIncantations: [{ code: 'hero.cast_color(r, g, b)', desc: 'Restore an object with RGB light' }],
+            rightTitle: 'The Golden Flower', rightIcon: 'fas fa-seedling',
+            rightContent: 'Its glow returns only when all three RGB channels match the target.',
+            rightColors: ['#ff0000', '#00ff00', '#ffff00']
+        }],
+        skills: [{ name: 'Yellow Light', type: 'SPECTRUM', icon: 'fas fa-palette', desc: 'Mixed red and green light.', pct: 100 }],
+        rewards: { spellUnlock: null, titleUnlock: 'Garden Restorer', outfitPart: null }
+    },
+
+    '1-6': {
+        title: 'The Swapped Canvas',
+        chapter: 'Chapter 1: The Swapped Canvas',
+        location: 'The Red Forest - Gallery Clearing',
+        stageType: 'challenge',
+        difficulty: 2,
+        xpReward: 400,
+        teachingConcepts: ['rgb'],
+        prerequisiteConcepts: ['rgb', 'movement'],
+        hasStoryIntro: true,
+        arena: {
+            cols: 9, rows: 5, theme: 'forest', spawn: { x: 1, y: 2 },
+            colorTargets: [
+                { id: 'red-frame', name: 'Red Frame', icon: 'fas fa-image', x: 3, y: 2, targetRgb: [255, 0, 0] },
+                { id: 'blue-frame', name: 'Blue Frame', icon: 'fas fa-image', x: 7, y: 2, targetRgb: [0, 0, 255] }
+            ]
+        },
+        storyIntro: {
+            sceneName: 'The Gallery Clearing',
+            npcName: 'Prisma',
+            npcTitle: 'Color Sage',
+            npcIcon: 'fas fa-palette',
+            dialogues: [
+                { speaker: 'Prisma', text: 'The painter swapped red and blue. Correct the two spells to restore both frames.', emotion: 'pointing' }
+            ],
+            enterButtonText: 'Repair the Frames',
+            enterButtonIcon: 'fas fa-image'
+        },
+        objective: 'Fix the two color spells. The frame at (3, 2) needs red (255, 0, 0); the frame at (7, 2) needs blue (0, 0, 255).',
+        initialCode: '# The painter swapped red and blue. Fix both calls!\nhero.move_right(2)\nhero.cast_color(0, 0, 255)  # Red Frame\nhero.move_right(4)\nhero.cast_color(255, 0, 0)  # Blue Frame\n',
+        completeMessage: 'Both frames shine with their proper colors!',
+        hints: [
+            { level: 1, text: 'The argument order is red, green, blue.' },
+            { level: 2, text: 'The first frame needs full red; the second needs full blue.' },
+            { level: 3, text: 'Use (255, 0, 0) at the first frame and (0, 0, 255) at the second.' }
+        ],
+        grimoire: [{
+            leftTitle: 'RGB Channel Order', leftIcon: 'fas fa-code',
+            leftContent: 'hero.cast_color always takes red first, green second, and blue third.',
+            leftCode: 'hero.cast_color(255, 0, 0)  # Red\nhero.cast_color(0, 0, 255)  # Blue',
+            leftNote: 'A spell can run without an error and still produce the wrong color.',
+            leftIncantations: [{ code: 'hero.cast_color(r, g, b)', desc: 'Cast channels in RGB order' }],
+            rightTitle: 'Repair Both Frames', rightIcon: 'fas fa-image',
+            rightContent: 'Each frame is checked independently. A wrong color can be painted over.',
+            rightColors: ['#ff0000', '#0000ff']
+        }],
+        skills: [{ name: 'RGB Debugging', type: 'LOGIC', icon: 'fas fa-bug', desc: 'Corrected swapped color channels.', pct: 100 }],
+        rewards: { spellUnlock: null, titleUnlock: 'Canvas Keeper', outfitPart: null }
+    },
+
+    '1-7': {
+        title: 'The Three Seasons',
+        chapter: 'Chapter 1: The Three Seasons',
+        location: 'The Red Forest - Seasonal Grove',
+        stageType: 'challenge',
+        difficulty: 3,
+        xpReward: 450,
+        teachingConcepts: ['rgb', 'variables', 'movement'],
+        prerequisiteConcepts: ['rgb', 'variables', 'movement'],
+        hasStoryIntro: true,
+        arena: {
+            cols: 10, rows: 5, theme: 'forest', spawn: { x: 1, y: 2 },
+            colorTargets: [
+                { id: 'summer', name: 'Summer Relic', icon: 'fas fa-sun', x: 2, y: 2, targetRgb: [255, 255, 0] },
+                { id: 'spring', name: 'Spring Relic', icon: 'fas fa-leaf', x: 5, y: 2, targetRgb: [0, 255, 255] },
+                { id: 'autumn', name: 'Autumn Relic', icon: 'fas fa-gem', x: 8, y: 2, targetRgb: [255, 0, 255] }
+            ]
+        },
+        storyIntro: {
+            sceneName: 'The Seasonal Grove',
+            npcName: 'Prisma',
+            npcTitle: 'Color Sage',
+            npcIcon: 'fas fa-palette',
+            dialogues: [
+                { speaker: 'Prisma', text: 'Three relics await yellow, cyan, and magenta light. Restore them, and the path to the Scholar\'s Archive will finally open.', emotion: 'encouraging' },
+                { speaker: 'Prisma', text: 'Krakk took more than colors. He tried to erase every story they carried. Vane may know where the stolen light went.', emotion: 'mysterious' }
+            ],
+            enterButtonText: 'Restore the Relics',
+            enterButtonIcon: 'fas fa-magic'
+        },
+        objective: 'Color the relics at (2, 2), (5, 2), and (8, 2): yellow (255, 255, 0), cyan (0, 255, 255), and magenta (255, 0, 255).',
+        initialCode: '# Use variables to keep track of each RGB channel.\nred = 255\ngreen = 255\nblue = 0\n\nhero.move_right(1)\nhero.cast_color(red, green, blue)  # Summer: yellow\n\n# Move to Spring and cast cyan, then Autumn and cast magenta.\n',
+        completeMessage: 'All three seasons return to the grove. The path to the Scholar\'s Archive opens!',
+        hints: [
+            { level: 1, text: 'Cyan is green plus blue. Magenta is red plus blue.' },
+            { level: 2, text: 'The relics stand 3 tiles apart along row 2.' },
+            { level: 3, text: 'After yellow: move_right(3), cast (0, 255, 255), move_right(3), cast (255, 0, 255).' }
+        ],
+        grimoire: [{
+            leftTitle: 'Secondary Colors', leftIcon: 'fas fa-palette',
+            leftContent: 'Pair two full-strength RGB channels to make yellow, cyan, or magenta.',
+            leftCode: 'red = 255\ngreen = 255\nblue = 0\nhero.cast_color(red, green, blue)',
+            leftNote: 'You can store channel values in variables and reuse them.',
+            leftIncantations: [{ code: 'hero.cast_color(r, g, b)', desc: 'Restore the nearby relic' }],
+            rightTitle: 'Three Relics', rightIcon: 'fas fa-gem',
+            rightContent: 'Visit each relic and match its exact RGB channels.',
+            rightColors: ['#ffff00', '#00ffff', '#ff00ff']
+        }],
+        skills: [{ name: 'Seasonal Spectrum', type: 'SPECTRUM', icon: 'fas fa-palette', desc: 'Restored three secondary colors.', pct: 100 }],
+        rewards: { spellUnlock: null, titleUnlock: 'Season Weaver', outfitPart: null }
+    },
+
+    // Stage 1-4: Boss Trial - The Prism Gate
     '1-4': {
         title: "The Prism Gate",
         chapter: "Chapter 1: The Grand Trial",
@@ -448,7 +614,7 @@ hero.cast_color(255, 0, 0)
             dialogues: [
                 {
                     speaker: "Eldrin",
-                    text: "You have arrived at the Great Prism Gate, apprentice! Beyond this barrier lies the Scholar's Archive.",
+                    text: "You have reached the inner Prism Gate. Beyond it lie the last faded groves of the Red Forest; restore them before taking the road to the Archive.",
                     emotion: "impressed"
                 },
                 {
@@ -485,7 +651,7 @@ hero.move_right(5)
 print(f"Open, {spell}!")
 `,
 
-        completeMessage: "THE PRISM GATE SHATTERS! The Red Forest is restored, and the way to the Scholar's Archive is unlocked. You have proven yourself a true Adept!",
+        completeMessage: "The inner Prism Gate opens! The final groves still wait for your light.",
 
         hints: [
             { level: 1, text: "Break the challenge into steps: (1) Key to flask, (2) Walk to Brazier and cast (255, 0, 0), (3) Walk to gate and print." },
@@ -531,1203 +697,8 @@ print(f"Open, {spell}!")
     },
 
 
-    /* ═══════════════════════════════════════
-       REGION 2 — THE SCHOLAR'S ARCHIVE
-       ═══════════════════════════════════════ */
+    /* Chapter 2: animated color stages in chapterTwoStages.js */
+    ...CHAPTER_TWO_STAGES,
 
-    // ─── Stage 2-1: Lesson — Data Types ───
-    '2-1': {
-        title: "The Essence of Values",
-        chapter: "Chapter 2: The Foundation",
-        location: "The Scholar's Archive — Main Hall",
-        stageType: 'lesson',
-        difficulty: 2,
-        xpReward: 200,
-        teachingConcepts: ['int-float'],
-        prerequisiteConcepts: ['variables'],
-        hasStoryIntro: true,
-
-        storyIntro: {
-            sceneName: "The Scholar's Archive",
-            npcName: "Loremaster Vane",
-            npcTitle: "Keeper of Types",
-            npcIcon: "fas fa-book-reader",
-            dialogues: [
-                {
-                    speaker: "Loremaster Vane",
-                    text: "Ah, a new apprentice. Welcome to the Archive. Here, we study the fundamental nature of magical energy.",
-                    emotion: "calm"
-                },
-                {
-                    speaker: "Loremaster Vane",
-                    text: "You have learned to store magic in Variables. But do you know what kind of magic you are storing?",
-                    emotion: "questioning"
-                },
-                {
-                    speaker: "Loremaster Vane",
-                    text: "Magic comes in different forms, or 'Types'. An Integer is a solid number. A String is woven text. A Boolean is the ultimate truth or falsehood.",
-                    emotion: "serious"
-                },
-                {
-                    speaker: "Loremaster Vane",
-                    text: "For your first task here, declare a simple Integer. Prove you understand the essence of a value.",
-                    emotion: "encouraging"
-                }
-            ],
-            enterButtonText: "Enter the Archive",
-            enterButtonIcon: "fas fa-scroll"
-        },
-
-        objective: "Declare a variable named <span class='highlight'>magic_number</span> and assign it the integer value <span class='highlight'>42</span>. Then print it.",
-        initialCode: "# Declare your variable below\n\n\n# Print the value to verify\n",
-        completeMessage: "A solid Integer! The Archive accepts your offering.",
-
-        hints: [
-            { level: 1, text: "An integer is a whole number, written without quotes: 42" },
-            { level: 2, text: "Declare: magic_number = 42, then print it." },
-            { level: 3, text: "magic_number = 42\nprint(magic_number)" }
-        ],
-
-        validateOutput: (outputLines) => {
-            return outputLines.some(line => line.includes('42'));
-        },
-
-        grimoire: [
-            {
-                leftTitle: "Data Types: Integers & Strings",
-                leftIcon: "fas fa-shapes",
-                leftContent: `Every piece of data has a <em style="color:#dc2626">Type</em>. Integers are whole numbers. Strings are text.`,
-                leftCode: "age = 25       # Integer\nname = 'Mage'  # String\npi = 3.14      # Float",
-                leftNote: "Strings must be wrapped in quotes. Integers and floats are written plainly.",
-                leftIncantations: [
-                    { code: "x = 10", desc: "Integer" },
-                    { code: "s = 'Hello'", desc: "String" },
-                    { code: "f = 3.14", desc: "Float" },
-                    { code: "b = True", desc: "Boolean" }
-                ],
-                rightTitle: "The Importance of Form",
-                rightIcon: "fas fa-balance-scale",
-                rightContent: `Each type has its own rules. You cannot add a String and an Integer without conversion.`,
-                rightColors: [],
-                rightQuote: `"Know the nature of your magic before you cast it. A misunderstood spell is a dangerous one."`
-            }
-        ],
-
-        skills: [
-            { name: "Data Types", type: "KNOWLEDGE", icon: "fas fa-shapes", desc: "Understood fundamental data types.", pct: 80 }
-        ],
-
-        rewards: {
-            spellUnlock: 'type',
-            titleUnlock: null,
-            outfitPart: null
-        }
-    },
-
-    // ─── Stage 2-2: Guided — type() ───
-    '2-2': {
-        title: "The Type Checker",
-        chapter: "Chapter 2: Inspection",
-        location: "The Scholar's Archive — Inspectory",
-        stageType: 'guided',
-        difficulty: 2,
-        xpReward: 200,
-        teachingConcepts: ['type-checking'],
-        prerequisiteConcepts: ['int-float', 'strings'],
-        hasStoryIntro: false,
-
-        objective: "Fill in the blanks to use <span class='highlight'>type()</span> and reveal the type of each variable.",
-        guidedInstruction: "Complete the code by filling in the type() calls.",
-
-        codeTemplate: 'number = 42\nword = "Hello"\n\n# Reveal the type of each variable\nprint(___BLANK_1___)\nprint(___BLANK_2___)',
-        blanks: [
-            { id: 'BLANK_1', answer: 'type(number)', acceptableAnswers: ['type(number)'], hint: 'Use type() with the variable name inside.' },
-            { id: 'BLANK_2', answer: 'type(word)', acceptableAnswers: ['type(word)'], hint: 'Use type() with the variable name inside.' }
-        ],
-        expectedOutput: "<class 'int'>\n<class 'str'>",
-
-        hints: [
-            { level: 1, text: "type() takes a variable and returns its type. Put the variable name inside the parentheses." },
-            { level: 2, text: "print(type(variable_name)) shows the type in the console." },
-            { level: 3, text: "Blanks: type(number) and type(word)" }
-        ],
-
-        completeMessage: "The nature of the values has been revealed!",
-
-        validateOutput: (outputLines) => {
-            const hasInt = outputLines.some(line => line.includes("<class 'int'>"));
-            const hasStr = outputLines.some(line => line.includes("<class 'str'>"));
-            return hasInt && hasStr;
-        },
-
-        grimoire: [
-            {
-                leftTitle: "The Type() Spell",
-                leftIcon: "fas fa-search",
-                leftContent: `The <em style="color:#dc2626">type()</em> spell reveals the underlying class of any value.`,
-                leftCode: "x = 10\nprint(type(x))  # <class 'int'>",
-                leftNote: "Useful for debugging when your spells misbehave.",
-                leftIncantations: [
-                    { code: "type(10)", desc: "Returns int" },
-                    { code: "type('hi')", desc: "Returns str" },
-                    { code: "type(3.14)", desc: "Returns float" },
-                    { code: "type(True)", desc: "Returns bool" }
-                ],
-                rightTitle: "Inspection",
-                rightIcon: "fas fa-eye",
-                rightContent: `A wise wizard always inspects foreign artifacts before using them.`,
-                rightColors: [],
-                rightQuote: `"The eye of the beholder sees the surface. The type() spell sees the soul."`
-            }
-        ],
-
-        skills: [
-            { name: "type()", type: "INSPECTION", icon: "fas fa-microscope", desc: "Mastered type inspection.", pct: 100 }
-        ],
-
-        rewards: {
-            spellUnlock: null,
-            titleUnlock: null,
-            outfitPart: null
-        }
-    },
-
-    // ─── Stage 2-3: Debug — Type Errors ───
-    '2-3': {
-        title: "Mixed Potions",
-        chapter: "Chapter 2: Mixed Potions",
-        location: "The Scholar's Archive — Potion Lab",
-        stageType: 'debug',
-        difficulty: 2,
-        xpReward: 250,
-        teachingConcepts: ['type-checking'],
-        prerequisiteConcepts: ['type-checking', 'int-float', 'strings'],
-        hasStoryIntro: false,
-
-        objective: "Fix the <span class='highlight'>2 bugs</span> in this potion recipe so it correctly calculates and prints: <span class='highlight'>Total: 75</span>",
-
-        buggyCode: '# Potion recipe calculator\nbase_power = "50"\nboost = 25\n\ntotal = base_power + boost\nprint("Total: " + total)',
-        bugCount: 2,
-        bugDescriptions: [
-            'Line 2: base_power is a string "50", not an integer — it should be converted',
-            'Line 6: Cannot concatenate string and integer — convert total to string'
-        ],
-
-        initialCode: '# Potion recipe calculator\nbase_power = "50"\nboost = 25\n\ntotal = base_power + boost\nprint("Total: " + total)',
-
-        hints: [
-            { level: 1, text: "Look at line 2: \"50\" with quotes is a string, not a number!" },
-            { level: 2, text: "Use int() to convert a string to integer: int(\"50\") → 50" },
-            { level: 3, text: "Fix 1: base_power = int(\"50\") or base_power = 50. Fix 2: print(\"Total: \" + str(total))" }
-        ],
-
-        completeMessage: "The potion is brewed correctly! Type awareness is crucial for a wizard.",
-
-        validateOutput: (outputLines) => {
-            return outputLines.some(line => line.includes('Total: 75'));
-        },
-
-        grimoire: [
-            {
-                leftTitle: "Type Errors",
-                leftIcon: "fas fa-exclamation-triangle",
-                leftContent: `Mixing types without conversion causes <em style="color:#dc2626">TypeError</em>. Always convert first!`,
-                leftCode: '# Wrong:\n"50" + 25  # TypeError!\n\n# Right:\nint("50") + 25  # 75\n"Total: " + str(75)  # "Total: 75"',
-                leftNote: "Python doesn't auto-convert types. You must explicitly use int(), str(), float().",
-                leftIncantations: [
-                    { code: "int('50')", desc: "String → Integer" },
-                    { code: "str(75)", desc: "Integer → String" },
-                    { code: "float('3.14')", desc: "String → Float" }
-                ],
-                rightTitle: "Conversion Spells",
-                rightIcon: "fas fa-exchange-alt",
-                rightContent: `Type conversion is the art of transforming one form of magic into another.`,
-                rightColors: [],
-                rightQuote: `"You cannot mix oil and water without a catalyst. Use int(), str(), float() as your catalysts."`
-            }
-        ],
-
-        skills: [
-            { name: "Type Debugging", type: "MASTERY", icon: "fas fa-bug", desc: "Fixed type-related bugs.", pct: 85 }
-        ],
-
-        rewards: { spellUnlock: null, titleUnlock: null, outfitPart: null }
-    },
-
-    // ─── Stage 2-4: Challenge — Type Conversion ───
-    '2-4': {
-        title: "The Transmuter",
-        chapter: "Chapter 2: Transmutation",
-        location: "The Scholar's Archive — Transmutation Room",
-        stageType: 'challenge',
-        difficulty: 3,
-        xpReward: 300,
-        teachingConcepts: ['type-conversion'],
-        prerequisiteConcepts: ['type-checking'],
-        hasStoryIntro: false,
-
-        objective: "Convert the string <span class='highlight'>\"255\"</span> to an integer, multiply it by <span class='highlight'>2</span>, and print the result: <span class='highlight'>510</span>",
-        initialCode: '# The input arrives as a string\nvalue_str = "255"\n\n# Convert to integer, multiply by 2, and print the result\n',
-        completeMessage: "Transmutation complete! You can now convert between types freely.",
-
-        hints: [
-            { level: 1, text: "Use int() to convert a string to a number." },
-            { level: 2, text: "value_int = int(value_str) then result = value_int * 2" },
-            { level: 3, text: "value_int = int(value_str)\nresult = value_int * 2\nprint(result)" }
-        ],
-
-        validateOutput: (outputLines) => {
-            return outputLines.some(line => line.includes('510'));
-        },
-
-        grimoire: [
-            {
-                leftTitle: "Type Conversion",
-                leftIcon: "fas fa-exchange-alt",
-                leftContent: `Convert between types: <em style="color:#dc2626">int()</em>, <em style="color:#dc2626">str()</em>, <em style="color:#dc2626">float()</em>.`,
-                leftCode: 'x = int("255")    # 255\ny = float("3.14") # 3.14\nz = str(510)      # "510"',
-                leftNote: "Conversion is essential when dealing with user input (always strings).",
-                leftIncantations: [
-                    { code: 'int("42")', desc: "String → Integer" },
-                    { code: "str(42)", desc: "Integer → String" },
-                    { code: 'float("3.14")', desc: "String → Float" }
-                ],
-                rightTitle: "Math Operations",
-                rightIcon: "fas fa-calculator",
-                rightContent: `Once you have numbers, you can perform arithmetic: +, -, *, /, //, %, **`,
-                rightColors: [],
-                rightQuote: `"Transmutation is the bridge between forms. Master it, and no type shall stop you."`
-            }
-        ],
-
-        skills: [
-            { name: "Type Conversion", type: "CONVERSION", icon: "fas fa-exchange-alt", desc: "Mastered converting between types.", pct: 90 }
-        ],
-
-        rewards: { spellUnlock: 'type_convert', titleUnlock: null, outfitPart: null }
-    },
-
-    // ─── Stage 2-5: Puzzle — Arithmetic ───
-    '2-5': {
-        title: "Rune Arithmetic",
-        chapter: "Chapter 2: Rune Arithmetic",
-        location: "The Scholar's Archive — Calculation Chamber",
-        stageType: 'puzzle',
-        difficulty: 2,
-        xpReward: 200,
-        teachingConcepts: ['arithmetic'],
-        prerequisiteConcepts: ['int-float'],
-        hasStoryIntro: false,
-
-        objective: "Answer the arithmetic puzzles correctly to unlock the chamber.",
-        puzzleInstruction: "Select the correct answer for each question.",
-        puzzles: [
-            {
-                question: "What is the result of: 10 + 5 * 2?",
-                choices: ["30", "20", "25", "15"],
-                correctIndex: 1,
-                explanation: "Python follows math order of operations (PEMDAS). 5 * 2 = 10, then 10 + 10 = 20."
-            },
-            {
-                question: "What is the result of: 17 // 5?",
-                choices: ["3", "3.4", "2", "4"],
-                correctIndex: 0,
-                explanation: "// is integer division (floor). 17 ÷ 5 = 3.4, floor = 3."
-            },
-            {
-                question: "What is the result of: 17 % 5?",
-                choices: ["3", "2", "3.4", "12"],
-                correctIndex: 1,
-                explanation: "% is modulo (remainder). 17 ÷ 5 = 3 remainder 2."
-            },
-            {
-                question: "What is the result of: 2 ** 3?",
-                choices: ["6", "5", "8", "9"],
-                correctIndex: 2,
-                explanation: "** is exponentiation. 2^3 = 2 × 2 × 2 = 8."
-            }
-        ],
-        requiredCorrect: 3,
-
-        hints: [
-            { level: 1, text: "Remember Python's math operators: +, -, *, /, //, %, **" },
-            { level: 2, text: "// is floor division (rounds down). % gives the remainder." },
-            { level: 3, text: "** is power/exponent. 2**3 means 2 to the power of 3 = 8" }
-        ],
-
-        completeMessage: "Your arithmetic skills are sharp! The chamber unlocks.",
-
-        validateOutput: null,
-
-        grimoire: [
-            {
-                leftTitle: "Python Arithmetic",
-                leftIcon: "fas fa-calculator",
-                leftContent: `Python supports all standard math operations plus some special ones.`,
-                leftCode: "10 + 5    # 15 (addition)\n10 - 5    # 5  (subtraction)\n10 * 5    # 50 (multiplication)\n10 / 3    # 3.33 (division)\n10 // 3   # 3  (floor division)\n10 % 3    # 1  (modulo/remainder)\n2 ** 3    # 8  (power)",
-                leftNote: "Remember: * (multiply), ** (power), // (floor divide), % (remainder)",
-                leftIncantations: [
-                    { code: "+, -", desc: "Add, Subtract" },
-                    { code: "*, /", desc: "Multiply, Divide" },
-                    { code: "//", desc: "Floor Division" },
-                    { code: "%", desc: "Modulo (remainder)" },
-                    { code: "**", desc: "Power" }
-                ],
-                rightTitle: "Order of Operations",
-                rightIcon: "fas fa-sort-amount-down",
-                rightContent: `Python follows PEMDAS: Parentheses, Exponents, Multiply/Divide, Add/Subtract.`,
-                rightColors: [],
-                rightQuote: `"The order of operations is the law of the land. Break it, and your calculations crumble."`
-            }
-        ],
-
-        skills: [
-            { name: "Arithmetic", type: "CALCULATION", icon: "fas fa-calculator", desc: "Mastered Python arithmetic operators.", pct: 90 }
-        ],
-
-        rewards: { spellUnlock: null, titleUnlock: null, outfitPart: null }
-    },
-
-    // ─── Stage 2-6: Boss — Archive Exam ───
-    '2-6': {
-        title: "The Archive Exam",
-        chapter: "Chapter 2: The Archive Exam",
-        location: "The Scholar's Archive — Grand Hall",
-        stageType: 'boss',
-        difficulty: 3,
-        xpReward: 500,
-        teachingConcepts: [],
-        prerequisiteConcepts: ['int-float', 'type-checking', 'type-conversion', 'arithmetic'],
-        hasStoryIntro: true,
-
-        storyIntro: {
-            sceneName: "The Grand Hall",
-            npcName: "Loremaster Vane",
-            npcTitle: "Keeper of Types",
-            npcIcon: "fas fa-book-reader",
-            dialogues: [
-                {
-                    speaker: "Loremaster Vane",
-                    text: "Impressive progress, apprentice. But knowledge must be proven through examination.",
-                    emotion: "serious"
-                },
-                {
-                    speaker: "Loremaster Vane",
-                    text: "For this final exam: take the string input, convert it, perform arithmetic, and present the result. Show me you understand types!",
-                    emotion: "encouraging"
-                }
-            ],
-            enterButtonText: "Begin the Exam",
-            enterButtonIcon: "fas fa-scroll"
-        },
-
-        objective: "Convert <span class='highlight'>\"100\"</span> and <span class='highlight'>\"50\"</span> to integers, add them, and print: <span class='highlight'>The sum is 150 (type: &lt;class 'int'&gt;)</span>",
-        initialCode: '# The Archive Exam\na_str = "100"\nb_str = "50"\n\n# Convert both to integers\n\n# Calculate the sum\n\n# Print the result with its type\n# Expected: The sum is 150 (type: <class \'int\'>)\n',
-        completeMessage: "You have passed the Archive Exam! Loremaster Vane nods with approval.",
-
-        hints: [
-            { level: 1, text: "Convert strings to integers with int(). Then add them together." },
-            { level: 2, text: "a = int(a_str), b = int(b_str), total = a + b" },
-            { level: 3, text: 'a = int(a_str)\nb = int(b_str)\ntotal = a + b\nprint(f"The sum is {total} (type: {type(total)})")' }
-        ],
-
-        validateOutput: (outputLines) => {
-            return outputLines.some(line => line.includes('150') && line.includes("type:") && line.includes("int"));
-        },
-
-        grimoire: [],
-
-        skills: [
-            { name: "Boss Clear", type: "MASTERY", icon: "fas fa-crown", desc: "Passed the Archive Exam!", pct: 100 }
-        ],
-
-        rewards: { spellUnlock: null, titleUnlock: 'Mage', outfitPart: 'blue_robe' }
-    },
-
-
-    /* ═══════════════════════════════════════
-       REGION 3 — ASH PEAKS
-       ═══════════════════════════════════════ */
-
-    // ─── Stage 3-1: Lesson — Lists ───
-    '3-1': {
-        title: "The Inscription Wall",
-        chapter: "Chapter 3: The Inscription",
-        location: "Ash Peaks — Entrance",
-        stageType: 'lesson',
-        difficulty: 2,
-        xpReward: 200,
-        teachingConcepts: ['lists'],
-        prerequisiteConcepts: ['variables'],
-        hasStoryIntro: true,
-
-        storyIntro: {
-            sceneName: "The Ash Peaks",
-            npcName: "Sentinel Kael",
-            npcTitle: "Warden of Arrays",
-            npcIcon: "fas fa-mountain",
-            dialogues: [
-                {
-                    speaker: "Sentinel Kael",
-                    text: "Welcome to the Ash Peaks, wizard. The mountain walls are inscribed with ancient arrays — ordered collections of values.",
-                    emotion: "calm"
-                },
-                {
-                    speaker: "Sentinel Kael",
-                    text: "A List in Python is like a shelf of labeled potions. Each has a position, starting from 0. You can add, remove, and search within them.",
-                    emotion: "serious"
-                },
-                {
-                    speaker: "Sentinel Kael",
-                    text: "Your first task: create a list of three magic elements and print it. Let's see if you can handle arrays.",
-                    emotion: "encouraging"
-                }
-            ],
-            enterButtonText: "Scale the Peaks",
-            enterButtonIcon: "fas fa-mountain"
-        },
-
-        objective: "Create a list named <span class='highlight'>elements</span> with values <span class='highlight'>[\"Fire\", \"Water\", \"Earth\"]</span> and print it.",
-        initialCode: '# Create a list of three elements\n\n\n# Print the list\n',
-        completeMessage: "The inscriptions glow! You've created your first list.",
-
-        hints: [
-            { level: 1, text: "Lists use square brackets: [item1, item2, item3]" },
-            { level: 2, text: "String items need quotes: [\"Fire\", \"Water\", \"Earth\"]" },
-            { level: 3, text: 'elements = ["Fire", "Water", "Earth"]\nprint(elements)' }
-        ],
-
-        validateOutput: (outputLines) => {
-            return outputLines.some(line => line.includes('Fire') && line.includes('Water') && line.includes('Earth'));
-        },
-
-        grimoire: [
-            {
-                leftTitle: "Scriptures of Lists",
-                leftIcon: "fas fa-book-open",
-                leftContent: `A <em style="color:#dc2626">List</em> is a collection of values, ordered and changeable.`,
-                leftCode: "inventory = ['sword', 'shield', 'potion']\nnumbers = [10, 25, 46, 80]",
-                leftNote: "The first item is always at index 0, not 1!",
-                leftIncantations: [
-                    { code: "[a, b, c]", desc: "Create a list" },
-                    { code: "list[0]", desc: "First element" },
-                    { code: "len(list)", desc: "Count items" }
-                ],
-                rightTitle: "List Operations",
-                rightIcon: "fas fa-tools",
-                rightContent: `Lists can be modified: add, remove, find, and sort items.`,
-                rightColors: [],
-                rightQuote: `"A list is a wizard's inventory — ordered, accessible, and always ready."`
-            }
-        ],
-
-        skills: [
-            { name: "Lists", type: "STRUCTURE", icon: "fas fa-list-ol", desc: "Created your first list.", pct: 70 }
-        ],
-
-        rewards: { spellUnlock: 'lists', titleUnlock: null, outfitPart: null }
-    },
-
-    // ─── Stage 3-2: Guided — Indexing ───
-    '3-2': {
-        title: "Rune Positions",
-        chapter: "Chapter 3: Rune Positions",
-        location: "Ash Peaks — Rune Gallery",
-        stageType: 'guided',
-        difficulty: 2,
-        xpReward: 200,
-        teachingConcepts: ['indexing'],
-        prerequisiteConcepts: ['lists'],
-        hasStoryIntro: false,
-
-        objective: "Fill in the blanks to access specific elements from the list by their index.",
-        guidedInstruction: "Use square bracket notation to access list elements by index.",
-
-        codeTemplate: 'runes = ["Alpha", "Beta", "Gamma", "Delta"]\n\n# Print the first element (index 0)\nprint(runes[___BLANK_1___])\n\n# Print the third element (index 2)\nprint(runes[___BLANK_2___])\n\n# Print the last element (index -1 or 3)\nprint(runes[___BLANK_3___])',
-        blanks: [
-            { id: 'BLANK_1', answer: '0', acceptableAnswers: ['0'], hint: 'The first element is at index 0' },
-            { id: 'BLANK_2', answer: '2', acceptableAnswers: ['2'], hint: 'The third element is at index 2 (0, 1, 2)' },
-            { id: 'BLANK_3', answer: '-1', acceptableAnswers: ['-1', '3'], hint: 'Use -1 for the last element, or 3 (the last index)' }
-        ],
-        expectedOutput: 'Alpha\nGamma\nDelta',
-
-        hints: [
-            { level: 1, text: "Python lists are zero-indexed: first item = index 0, second = index 1, etc." },
-            { level: 2, text: "You can also use negative indexing: -1 is the last item, -2 is second to last." },
-            { level: 3, text: "Blanks: 0, 2, -1 (or 3)" }
-        ],
-
-        completeMessage: "You can navigate arrays like a true Sentinel!",
-
-        validateOutput: (outputLines) => {
-            return outputLines.some(l => l.includes('Alpha')) &&
-                   outputLines.some(l => l.includes('Gamma')) &&
-                   outputLines.some(l => l.includes('Delta'));
-        },
-
-        grimoire: [
-            {
-                leftTitle: "Indexing",
-                leftIcon: "fas fa-hand-pointer",
-                leftContent: `Access any element by its position: <em style="color:#dc2626">list[index]</em>`,
-                leftCode: 'runes = ["Alpha", "Beta", "Gamma"]\nprint(runes[0])  # Alpha\nprint(runes[-1]) # Gamma',
-                leftNote: "Index starts at 0. Negative indices count from the end.",
-                leftIncantations: [
-                    { code: "list[0]", desc: "First element" },
-                    { code: "list[-1]", desc: "Last element" },
-                    { code: "list[1:3]", desc: "Slice (items 1-2)" }
-                ],
-                rightTitle: "Zero-Based Counting",
-                rightIcon: "fas fa-sort-numeric-down",
-                rightContent: `In Python, counting starts at 0. This is a universal rule in programming.`,
-                rightColors: [],
-                rightQuote: `"The index is the key to the door. 0 opens the first chamber, 1 the second..."`
-            }
-        ],
-
-        skills: [
-            { name: "Indexing", type: "ACCESS", icon: "fas fa-hand-pointer", desc: "Mastered accessing elements by index.", pct: 85 }
-        ],
-
-        rewards: { spellUnlock: null, titleUnlock: null, outfitPart: null }
-    },
-
-    // ─── Stage 3-3: Challenge — .index() search ───
-    '3-3': {
-        title: "The Matrix Search",
-        chapter: "Chapter 3: The Matrix",
-        location: "Ash Peaks — Matrix Wall",
-        stageType: 'challenge',
-        difficulty: 3,
-        xpReward: 300,
-        teachingConcepts: ['list-methods'],
-        prerequisiteConcepts: ['lists', 'indexing'],
-        hasStoryIntro: false,
-
-        objective: "Find value <span class='highlight'>46</span> in the ancient list and move to its index position.",
-        initialCode: "# The values inscribed on the Matrix wall\nvalues = [10, 25, 46, 80]\n\n# Find the position (index) of 46\n# Use .index() method\n\n# Print the result and move to that position\n",
-        completeMessage: "You've navigated the Matrix! The path through the Ash Peaks reveals itself.",
-
-        hints: [
-            { level: 1, text: "The .index(value) method returns the position of a value in a list." },
-            { level: 2, text: "target_index = values.index(46) — this gives you 2." },
-            { level: 3, text: "target_index = values.index(46)\nprint(f'Found 46 at index {target_index}')\nhero.move_to_x(target_index)" }
-        ],
-
-        validateOutput: null,
-
-        grimoire: [
-            {
-                leftTitle: "List Methods",
-                leftIcon: "fas fa-search",
-                leftContent: `Lists have built-in methods for searching, adding, and removing items.`,
-                leftCode: "values = [10, 25, 46, 80]\npos = values.index(46)  # returns 2",
-                leftNote: ".index() returns the position. But beware — if the element is not found, it raises ValueError!",
-                leftIncantations: [
-                    { code: ".index(x)", desc: "Find position of x" },
-                    { code: ".append(x)", desc: "Add to end" },
-                    { code: ".pop()", desc: "Remove last" },
-                    { code: "len(list)", desc: "Count items" }
-                ],
-                rightTitle: "Matrix Navigation",
-                rightIcon: "fas fa-compass",
-                rightContent: `In the Matrix realm, every value has a hidden position. Map values to indices to navigate.`,
-                rightColors: [],
-                rightQuote: `"Use .index(value) to reveal where any element hides within the list."`
-            }
-        ],
-
-        skills: [
-            { name: "Searching", type: "LOGIC", icon: "fas fa-search", desc: "Learned to search lists.", pct: 85 }
-        ],
-
-        rewards: { spellUnlock: null, titleUnlock: null, outfitPart: null }
-    },
-
-    // ─── Stage 3-4: Lesson — for loops ───
-    '3-4': {
-        title: "The Echo Loop",
-        chapter: "Chapter 3: The Echo Loop",
-        location: "Ash Peaks — Echo Canyon",
-        stageType: 'lesson',
-        difficulty: 3,
-        xpReward: 250,
-        teachingConcepts: ['for-loops'],
-        prerequisiteConcepts: ['lists'],
-        hasStoryIntro: true,
-
-        storyIntro: {
-            sceneName: "Echo Canyon",
-            npcName: "Sentinel Kael",
-            npcTitle: "Warden of Arrays",
-            npcIcon: "fas fa-mountain",
-            dialogues: [
-                {
-                    speaker: "Sentinel Kael",
-                    text: "Well done with lists, wizard. But what if you need to examine every element? One by one?",
-                    emotion: "questioning"
-                },
-                {
-                    speaker: "Sentinel Kael",
-                    text: "The 'for loop' is the wizard's torch. It walks through every item in a collection, illuminating each one.",
-                    emotion: "serious"
-                },
-                {
-                    speaker: "Sentinel Kael",
-                    text: "The syntax is: for item in list: — then indented code runs for each item. Try it!",
-                    emotion: "encouraging"
-                }
-            ],
-            enterButtonText: "Enter the Canyon",
-            enterButtonIcon: "fas fa-sync-alt"
-        },
-
-        objective: "Use a <span class='highlight'>for loop</span> to print each element from the list <span class='highlight'>[10, 20, 30, 40]</span> on its own line.",
-        initialCode: '# The values on the canyon wall\nvalues = [10, 20, 30, 40]\n\n# Use a for loop to print each value\n',
-        completeMessage: "The canyon echoes with each value! You've mastered the for loop.",
-
-        hints: [
-            { level: 1, text: "A for loop iterates over each item: for item in list:" },
-            { level: 2, text: "Remember to indent the code inside the loop with spaces." },
-            { level: 3, text: "for val in values:\n    print(val)" }
-        ],
-
-        validateOutput: (outputLines) => {
-            const has10 = outputLines.some(l => l.trim() === '10');
-            const has20 = outputLines.some(l => l.trim() === '20');
-            const has30 = outputLines.some(l => l.trim() === '30');
-            const has40 = outputLines.some(l => l.trim() === '40');
-            return has10 && has20 && has30 && has40;
-        },
-
-        grimoire: [
-            {
-                leftTitle: "For Loops",
-                leftIcon: "fas fa-sync-alt",
-                leftContent: `The <em style="color:#dc2626">for</em> loop walks through every element in a collection.`,
-                leftCode: "items = [10, 20, 30]\nfor item in items:\n    print(item)",
-                leftNote: "The indented block runs once for each element. 'item' takes on each value in turn.",
-                leftIncantations: [
-                    { code: "for x in list:", desc: "Iterate over list" },
-                    { code: "for i in range(5):", desc: "Loop 0 to 4" },
-                    { code: "for char in 'hello':", desc: "Iterate over string" }
-                ],
-                rightTitle: "Indentation",
-                rightIcon: "fas fa-indent",
-                rightContent: `In Python, indentation (4 spaces) defines what's inside the loop. No curly braces needed!`,
-                rightColors: [],
-                rightQuote: `"for item in collection: — this incantation walks through every element, giving you the power to examine, transform, or collect."`
-            }
-        ],
-
-        skills: [
-            { name: "for Loops", type: "ITERATION", icon: "fas fa-sync-alt", desc: "Learned to iterate over collections.", pct: 80 }
-        ],
-
-        rewards: { spellUnlock: 'for_loop', titleUnlock: null, outfitPart: null }
-    },
-
-    // ─── Stage 3-5: Debug — List errors ───
-    '3-5': {
-        title: "Broken Arrays",
-        chapter: "Chapter 3: Broken Arrays",
-        location: "Ash Peaks — Damaged Wall",
-        stageType: 'debug',
-        difficulty: 3,
-        xpReward: 300,
-        teachingConcepts: ['lists', 'for-loops'],
-        prerequisiteConcepts: ['lists', 'indexing', 'for-loops'],
-        hasStoryIntro: false,
-
-        objective: "Fix the <span class='highlight'>2 bugs</span> so the code correctly prints each item and then the total count.",
-
-        buggyCode: 'items = ["sword", "shield", "potion"]\n\nfor item in items\n    print(item)\n\nprint(f"Total items: {len(item)}")',
-        bugCount: 2,
-        bugDescriptions: [
-            "Line 3: Missing colon at the end of the for statement",
-            "Line 6: Should be len(items) not len(item) — 'items' is the list, 'item' is the loop variable"
-        ],
-
-        initialCode: 'items = ["sword", "shield", "potion"]\n\nfor item in items\n    print(item)\n\nprint(f"Total items: {len(item)}")',
-
-        hints: [
-            { level: 1, text: "for loops need a colon at the end: for item in items:" },
-            { level: 2, text: "Check the variable name in len() — are you measuring the list or the last item?" },
-            { level: 3, text: "Fix 1: Add ':' → for item in items:\nFix 2: len(items) instead of len(item)" }
-        ],
-
-        completeMessage: "Array restored! Your debugging skills are mountain-strong.",
-
-        validateOutput: (outputLines) => {
-            return outputLines.some(l => l.includes('sword')) &&
-                   outputLines.some(l => l.includes('Total items: 3'));
-        },
-
-        grimoire: [],
-
-        skills: [
-            { name: "List Debugging", type: "MASTERY", icon: "fas fa-bug", desc: "Fixed list and loop bugs.", pct: 85 }
-        ],
-
-        rewards: { spellUnlock: null, titleUnlock: null, outfitPart: null }
-    },
-
-    // ─── Stage 3-6: Boss — Peak Trial ───
-    '3-6': {
-        title: "The Peak Trial",
-        chapter: "Chapter 3: The Peak Trial",
-        location: "Ash Peaks — Summit",
-        stageType: 'boss',
-        difficulty: 4,
-        xpReward: 500,
-        teachingConcepts: [],
-        prerequisiteConcepts: ['lists', 'indexing', 'list-methods', 'for-loops'],
-        hasStoryIntro: true,
-
-        storyIntro: {
-            sceneName: "The Summit",
-            npcName: "Sentinel Kael",
-            npcTitle: "Warden of Arrays",
-            npcIcon: "fas fa-mountain",
-            dialogues: [
-                {
-                    speaker: "Sentinel Kael",
-                    text: "The summit is near. But the final trial of the Ash Peaks demands mastery of lists, loops, and searching.",
-                    emotion: "serious"
-                },
-                {
-                    speaker: "Sentinel Kael",
-                    text: "Create a list, find a specific value, loop through it, and navigate to the correct position. Show me everything!",
-                    emotion: "encouraging"
-                }
-            ],
-            enterButtonText: "Reach the Summit",
-            enterButtonIcon: "fas fa-mountain"
-        },
-
-        objective: "Create a list <span class='highlight'>[10, 25, 46, 80, 99]</span>, find the index of <span class='highlight'>46</span>, print each value using a for loop, then move to the index of 46.",
-        initialCode: "# The Peak Trial\n# 1. Create the list\n\n# 2. Find the index of 46\n\n# 3. Print each value with a for loop\n\n# 4. Move to the index of 46\n",
-        completeMessage: "You've conquered the Ash Peaks! The Whispering Caverns await.",
-
-        hints: [
-            { level: 1, text: "Start by creating: values = [10, 25, 46, 80, 99]" },
-            { level: 2, text: "Use .index(46) to find position, then a for loop to print all values." },
-            { level: 3, text: "values = [10, 25, 46, 80, 99]\nidx = values.index(46)\nfor v in values:\n    print(v)\nhero.move_to_x(idx)" }
-        ],
-
-        validateOutput: null,
-
-        grimoire: [],
-
-        skills: [
-            { name: "Boss Clear", type: "MASTERY", icon: "fas fa-crown", desc: "Conquered the Ash Peaks!", pct: 100 }
-        ],
-
-        rewards: { spellUnlock: null, titleUnlock: 'Sorcerer', outfitPart: 'green_robe' }
-    },
-
-
-    /* ═══════════════════════════════════════
-       REGION 4 — WHISPERING CAVERNS
-       ═══════════════════════════════════════ */
-
-    // ─── Stage 4-1: Lesson — Conditionals ───
-    '4-1': {
-        title: "The Crossroads",
-        chapter: "Chapter 4: The Crossroads",
-        location: "Whispering Caverns — Entrance",
-        stageType: 'lesson',
-        difficulty: 3,
-        xpReward: 250,
-        teachingConcepts: ['conditionals'],
-        prerequisiteConcepts: ['variables'],
-        hasStoryIntro: true,
-
-        storyIntro: {
-            sceneName: "The Whispering Caverns",
-            npcName: "Oracle Seren",
-            npcTitle: "Voice of the Spectrum",
-            npcIcon: "fas fa-eye",
-            dialogues: [
-                {
-                    speaker: "Oracle Seren",
-                    text: "Welcome, wizard. You have come far. But the caverns test not just your skill — they test your judgment.",
-                    emotion: "mysterious"
-                },
-                {
-                    speaker: "Oracle Seren",
-                    text: "The 'if' statement is the wizard's crossroads. It tests a condition and chooses a path. If true — one way. If false — another.",
-                    emotion: "serious"
-                },
-                {
-                    speaker: "Oracle Seren",
-                    text: "Write an if/else that checks a number. If it's greater than 100, print 'Powerful'. Otherwise, print 'Weak'.",
-                    emotion: "encouraging"
-                }
-            ],
-            enterButtonText: "Enter the Caverns",
-            enterButtonIcon: "fas fa-eye"
-        },
-
-        objective: "Write an if/else: if <span class='highlight'>power</span> is greater than 100, print <span class='highlight'>Powerful</span>. Otherwise, print <span class='highlight'>Weak</span>. (power = 150)",
-        initialCode: '# The power level to test\npower = 150\n\n# Write an if/else statement\n',
-        completeMessage: "Wise choice! You understand the power of conditional logic.",
-
-        hints: [
-            { level: 1, text: "if condition: runs code when condition is True. else: runs when False." },
-            { level: 2, text: "if power > 100:\n    print(\"Powerful\")\nelse:\n    print(\"Weak\")" },
-            { level: 3, text: "Make sure to indent with 4 spaces inside the if and else blocks." }
-        ],
-
-        validateOutput: (outputLines) => {
-            return outputLines.some(line => line.includes('Powerful'));
-        },
-
-        grimoire: [
-            {
-                leftTitle: "Conditional Logic",
-                leftIcon: "fas fa-code-branch",
-                leftContent: `The <em style="color:#dc2626">if</em> statement tests a condition and chooses a path.`,
-                leftCode: "if brightness > 200:\n    print('Blinding!')\nelse:\n    print('Too dim...')",
-                leftNote: "Use elif for additional paths. else catches everything that didn't match.",
-                leftIncantations: [
-                    { code: "if x > y:", desc: "Compare values" },
-                    { code: "elif:", desc: "Another condition" },
-                    { code: "else:", desc: "Default fallback" },
-                    { code: "and / or", desc: "Combine conditions" }
-                ],
-                rightTitle: "Comparison Operators",
-                rightIcon: "fas fa-balance-scale",
-                rightContent: `== (equal), != (not equal), < (less), > (greater), <= (less or equal), >= (greater or equal)`,
-                rightColors: [],
-                rightQuote: `"At every crossroads, the wizard must choose. The 'if' statement is your compass."`
-            }
-        ],
-
-        skills: [
-            { name: "Conditionals", type: "LOGIC", icon: "fas fa-code-branch", desc: "Learned if/else conditional logic.", pct: 70 }
-        ],
-
-        rewards: { spellUnlock: 'conditionals', titleUnlock: null, outfitPart: null }
-    },
-
-    // ─── Stage 4-2: Guided — Conditionals practice ───
-    '4-2': {
-        title: "Path Selection",
-        chapter: "Chapter 4: Path Selection",
-        location: "Whispering Caverns — Forked Path",
-        stageType: 'guided',
-        difficulty: 3,
-        xpReward: 250,
-        teachingConcepts: ['conditionals', 'comparison'],
-        prerequisiteConcepts: ['conditionals'],
-        hasStoryIntro: false,
-
-        objective: "Fill in the blanks to complete the if/elif/else chain.",
-        guidedInstruction: "Complete the conditional logic to classify a temperature value.",
-
-        codeTemplate: 'temp = 35\n\nif temp ___BLANK_1___ 30:\n    print("Hot!")\n___BLANK_2___ temp >= 20:\n    print("Warm")\n___BLANK_3___:\n    print("Cold")',
-        blanks: [
-            { id: 'BLANK_1', answer: '>', acceptableAnswers: ['>', '>='], hint: 'Use a comparison operator: > means greater than' },
-            { id: 'BLANK_2', answer: 'elif', acceptableAnswers: ['elif'], hint: 'elif is used for additional conditions after if' },
-            { id: 'BLANK_3', answer: 'else', acceptableAnswers: ['else'], hint: 'else handles all remaining cases' }
-        ],
-        expectedOutput: 'Hot!',
-
-        hints: [
-            { level: 1, text: "if checks the first condition. elif adds more conditions. else is the default." },
-            { level: 2, text: "Comparison operators: > (greater), >= (greater or equal), < (less), == (equal)" },
-            { level: 3, text: "Blanks: >, elif, else" }
-        ],
-
-        completeMessage: "Perfect path selection! Your conditional logic is strong.",
-
-        validateOutput: (outputLines) => {
-            return outputLines.some(line => line.includes('Hot!'));
-        },
-
-        grimoire: [
-            {
-                leftTitle: "if / elif / else",
-                leftIcon: "fas fa-directions",
-                leftContent: `Chain multiple conditions with <em style="color:#dc2626">elif</em>. Only the first matching block executes.`,
-                leftCode: "if temp > 30:\n    print('Hot')\nelif temp >= 20:\n    print('Warm')\nelse:\n    print('Cold')",
-                leftNote: "Python checks conditions top-to-bottom. The first True condition wins.",
-                leftIncantations: [
-                    { code: "if:", desc: "First condition" },
-                    { code: "elif:", desc: "Additional condition" },
-                    { code: "else:", desc: "Default (no condition)" }
-                ],
-                rightTitle: "When to Use What",
-                rightIcon: "fas fa-lightbulb",
-                rightContent: `Use if alone for simple checks. Add elif for multiple options. else is optional but recommended.`,
-                rightColors: [],
-                rightQuote: `"A wise wizard considers all paths before choosing. elif is your second sight."`
-            }
-        ],
-
-        skills: [
-            { name: "elif/else", type: "LOGIC", icon: "fas fa-directions", desc: "Mastered multi-path conditionals.", pct: 85 }
-        ],
-
-        rewards: { spellUnlock: null, titleUnlock: null, outfitPart: null }
-    },
-
-    // ─── Stage 4-3: Puzzle — Boolean logic ───
-    '4-3': {
-        title: "Truth and Lies",
-        chapter: "Chapter 4: Truth and Lies",
-        location: "Whispering Caverns — Truth Chamber",
-        stageType: 'puzzle',
-        difficulty: 3,
-        xpReward: 250,
-        teachingConcepts: ['boolean-logic'],
-        prerequisiteConcepts: ['conditionals'],
-        hasStoryIntro: false,
-
-        objective: "Answer the boolean logic puzzles correctly.",
-        puzzleInstruction: "Select the correct result for each expression.",
-        puzzles: [
-            {
-                question: "What is: True and False?",
-                choices: ["True", "False", "None", "Error"],
-                correctIndex: 1,
-                explanation: "'and' requires BOTH to be True. Since one is False, the result is False."
-            },
-            {
-                question: "What is: True or False?",
-                choices: ["True", "False", "None", "Error"],
-                correctIndex: 0,
-                explanation: "'or' requires at least ONE to be True. Since one is True, the result is True."
-            },
-            {
-                question: "What is: not True?",
-                choices: ["True", "False", "None", "Error"],
-                correctIndex: 1,
-                explanation: "'not' inverts the value. not True = False."
-            },
-            {
-                question: "What is: (5 > 3) and (10 < 20)?",
-                choices: ["True", "False", "None", "5"],
-                correctIndex: 0,
-                explanation: "5 > 3 is True. 10 < 20 is True. True and True = True."
-            }
-        ],
-        requiredCorrect: 3,
-
-        hints: [
-            { level: 1, text: "'and' = both must be True. 'or' = at least one True. 'not' = invert." },
-            { level: 2, text: "True and True = True. True and False = False. True or False = True." },
-            { level: 3, text: "Answers: False, True, False, True" }
-        ],
-
-        completeMessage: "The truth has been spoken! Boolean logic mastered.",
-
-        validateOutput: null,
-
-        grimoire: [
-            {
-                leftTitle: "Boolean Logic",
-                leftIcon: "fas fa-toggle-on",
-                leftContent: `Boolean values are either <em style="color:#dc2626">True</em> or <em style="color:#dc2626">False</em>. Combine them with and, or, not.`,
-                leftCode: "print(True and False)  # False\nprint(True or False)   # True\nprint(not True)        # False",
-                leftNote: "'and' needs both True. 'or' needs one True. 'not' flips the value.",
-                leftIncantations: [
-                    { code: "and", desc: "Both must be True" },
-                    { code: "or", desc: "At least one True" },
-                    { code: "not", desc: "Invert the value" }
-                ],
-                rightTitle: "Truth Tables",
-                rightIcon: "fas fa-table",
-                rightContent: `Think of 'and' as strict, 'or' as lenient, and 'not' as the rebel.`,
-                rightColors: [],
-                rightQuote: `"In the caverns, truth and lies are the same — it depends on the logic you apply."`
-            }
-        ],
-
-        skills: [
-            { name: "Boolean Logic", type: "LOGIC", icon: "fas fa-toggle-on", desc: "Mastered and, or, not.", pct: 90 }
-        ],
-
-        rewards: { spellUnlock: 'boolean', titleUnlock: null, outfitPart: null }
-    },
-
-    // ─── Stage 4-4: Debug — Conditional bugs ───
-    '4-4': {
-        title: "Broken Bridges",
-        chapter: "Chapter 4: Broken Bridges",
-        location: "Whispering Caverns — Bridge Room",
-        stageType: 'debug',
-        difficulty: 3,
-        xpReward: 300,
-        teachingConcepts: ['conditionals'],
-        prerequisiteConcepts: ['conditionals', 'comparison'],
-        hasStoryIntro: false,
-
-        objective: "Fix the <span class='highlight'>2 bugs</span> in the conditional logic so it correctly prints <span class='highlight'>Bridge is safe!</span>",
-
-        buggyCode: 'weight = 50\nmax_weight = 100\n\nif weight < max_weight\n    print("Bridge is safe!")\nelse\n    print("Too heavy!")',
-        bugCount: 2,
-        bugDescriptions: [
-            "Line 4: Missing colon after the if condition",
-            "Line 6: Missing colon after else"
-        ],
-
-        initialCode: 'weight = 50\nmax_weight = 100\n\nif weight < max_weight\n    print("Bridge is safe!")\nelse\n    print("Too heavy!")',
-
-        hints: [
-            { level: 1, text: "Both if and else statements need a colon (:) at the end." },
-            { level: 2, text: "if condition: ← colon here. else: ← colon here too." },
-            { level: 3, text: "Fix: if weight < max_weight: and else:" }
-        ],
-
-        completeMessage: "Bridge repaired! Colons are small but mighty.",
-
-        validateOutput: (outputLines) => {
-            return outputLines.some(line => line.includes('Bridge is safe!'));
-        },
-
-        grimoire: [],
-
-        skills: [
-            { name: "Syntax Debugging", type: "MASTERY", icon: "fas fa-bug", desc: "Fixed conditional syntax errors.", pct: 85 }
-        ],
-
-        rewards: { spellUnlock: null, titleUnlock: null, outfitPart: null }
-    },
-
-    // ─── Stage 4-5: Challenge — Color mixing with conditionals ───
-    '4-5': {
-        title: "The Color Mixer",
-        chapter: "Chapter 4: The Color Mixer",
-        location: "Whispering Caverns — Color Chamber",
-        stageType: 'challenge',
-        difficulty: 4,
-        xpReward: 350,
-        teachingConcepts: ['color-mixing'],
-        prerequisiteConcepts: ['conditionals', 'rgb'],
-        hasStoryIntro: false,
-
-        objective: "Use an if/elif/else to cast the correct color based on the <span class='highlight'>command</span> variable. If command is \"red\" → cast (255,0,0). If \"green\" → (0,255,0). If \"blue\" → (0,0,255). Else → cast (255,255,255).",
-        initialCode: '# The command to execute\ncommand = "green"\n\n# Use if/elif/else to cast the correct color\n',
-        completeMessage: "The chamber glows with the correct color! Conditional color magic mastered.",
-
-        hints: [
-            { level: 1, text: "Use if to check command == \"red\", elif for \"green\", elif for \"blue\", else for default." },
-            { level: 2, text: "if command == \"red\":\n    hero.cast_color(255, 0, 0)\nelif command == \"green\":\n    hero.cast_color(0, 255, 0)" },
-            { level: 3, text: "if command == \"red\":\n    hero.cast_color(255, 0, 0)\nelif command == \"green\":\n    hero.cast_color(0, 255, 0)\nelif command == \"blue\":\n    hero.cast_color(0, 0, 255)\nelse:\n    hero.cast_color(255, 255, 255)" }
-        ],
-
-        validateOutput: null,
-
-        grimoire: [
-            {
-                leftTitle: "Conditionals + Functions",
-                leftIcon: "fas fa-tint",
-                leftContent: `Combining conditionals with function calls lets you create dynamic, responsive spells.`,
-                leftCode: 'if color == "red":\n    hero.cast_color(255, 0, 0)\nelif color == "blue":\n    hero.cast_color(0, 0, 255)',
-                leftNote: "Use == to compare strings. = is assignment, == is comparison!",
-                leftIncantations: [
-                    { code: '== "text"', desc: "Compare strings" },
-                    { code: "if/elif/else", desc: "Multi-path logic" }
-                ],
-                rightTitle: "Dynamic Spells",
-                rightIcon: "fas fa-bolt",
-                rightContent: `By combining conditionals with hero commands, your spells can adapt to any situation.`,
-                rightColors: ["red", "green", "blue"],
-                rightQuote: `"A wizard who adapts is a wizard who survives. Let conditions guide your magic."`
-            }
-        ],
-
-        skills: [
-            { name: "Dynamic Logic", type: "LOGIC", icon: "fas fa-bolt", desc: "Combined conditionals with actions.", pct: 90 }
-        ],
-
-        rewards: { spellUnlock: null, titleUnlock: null, outfitPart: null }
-    },
-
-    // ─── Stage 4-6: Boss — The Light Convergence ───
-    '4-6': {
-        title: "The Light Convergence",
-        chapter: "Chapter 4: The Light Convergence",
-        location: "Whispering Caverns — Heart",
-        stageType: 'boss',
-        difficulty: 5,
-        xpReward: 600,
-        teachingConcepts: [],
-        prerequisiteConcepts: ['conditionals', 'boolean-logic', 'rgb', 'color-mixing'],
-        hasStoryIntro: true,
-
-        storyIntro: {
-            sceneName: "The Heart of the Caverns",
-            npcName: "Oracle Seren",
-            npcTitle: "Voice of the Spectrum",
-            npcIcon: "fas fa-eye",
-            dialogues: [
-                {
-                    speaker: "Oracle Seren",
-                    text: "This is it, wizard. The final trial. The Lost Spectrum can only be restored by casting White light — all three channels at maximum.",
-                    emotion: "serious"
-                },
-                {
-                    speaker: "Oracle Seren",
-                    text: "But first, you must prove your understanding. Set all three channels to 255, verify they are correct, then cast the light. The spectrum depends on you!",
-                    emotion: "encouraging"
-                },
-                {
-                    speaker: "Oracle Seren",
-                    text: "Remember: White = Red + Green + Blue, all at 255. Use variables, conditionals, and cast_color to complete the ritual.",
-                    emotion: "mysterious"
-                }
-            ],
-            enterButtonText: "Restore the Spectrum",
-            enterButtonIcon: "fas fa-sun"
-        },
-
-        objective: "Set <span class='highlight'>red, green, blue</span> all to 255. Use an <span class='highlight'>if</span> to verify all are 255, then cast White light and print: <span class='highlight'>The Lost Spectrum is restored!</span>",
-        initialCode: "# The Final Challenge\n# Set all three channels\nred = 255\ngreen = 255\nblue = 255\n\n# Verify all channels are at maximum\n# If all are 255, cast white light and print the message\n",
-        completeMessage: "THE LOST SPECTRUM IS RESTORED! The caverns illuminate with pure white light! You are a true Spectrum Lord!",
-
-        hints: [
-            { level: 1, text: "Check all three: if red == 255 and green == 255 and blue == 255:" },
-            { level: 2, text: "Inside the if block: hero.cast_color(red, green, blue) and print()" },
-            { level: 3, text: "if red == 255 and green == 255 and blue == 255:\n    hero.cast_color(red, green, blue)\n    print(\"The Lost Spectrum is restored!\")" }
-        ],
-
-        validateOutput: (outputLines) => {
-            return outputLines.some(line => line.includes('The Lost Spectrum is restored!'));
-        },
-
-        grimoire: [
-            {
-                leftTitle: "The Final Spell",
-                leftIcon: "fas fa-sun",
-                leftContent: `Combine conditionals, boolean logic, and RGB to cast the ultimate spell.`,
-                leftCode: 'if r == 255 and g == 255 and b == 255:\n    hero.cast_color(r, g, b)\n    print("Restored!")',
-                leftNote: "White light = all channels at 255. This is the secret of the Lost Spectrum.",
-                leftIncantations: [
-                    { code: "and", desc: "All conditions True" },
-                    { code: "== 255", desc: "Check for max value" },
-                    { code: "cast_color(r,g,b)", desc: "Cast the light" }
-                ],
-                rightTitle: "The Spectrum Complete",
-                rightIcon: "fas fa-rainbow",
-                rightContent: `You have mastered: print, variables, f-strings, RGB, functions, types, lists, loops, conditionals, and boolean logic. You ARE the Spectrum Lord.`,
-                rightColors: ["red", "orange", "yellow", "green", "blue", "indigo", "violet"],
-                rightQuote: `"The Lost Spectrum is not a place — it is a state of understanding. When a wizard masters all elements, the spectrum reveals itself."`
-            }
-        ],
-
-        skills: [
-            { name: "Spectrum Lord", type: "MASTERY", icon: "fas fa-sun", desc: "Restored the Lost Spectrum!", pct: 100 },
-            { name: "Conditionals", type: "LOGIC", icon: "fas fa-code-branch", desc: "Mastered conditional branching.", pct: 100 },
-            { name: "Color Mixing", type: "SPECTRUM", icon: "fas fa-palette", desc: "Combined all RGB channels.", pct: 100 }
-        ],
-
-        rewards: {
-            spellUnlock: null,
-            titleUnlock: 'Archmage',
-            outfitPart: 'white_robe'
-        }
-    }
+    ...CHAPTER_THREE_FOUR_STAGES
 };

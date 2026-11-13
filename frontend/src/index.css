@@ -7,7 +7,7 @@
 
   color-scheme: dark;
   color: #f1e8e0;
-  background-color: #1a0a0a;
+  background-color: #171a17;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -17,11 +17,11 @@
 
 a {
   font-weight: 500;
-  color: #dc2626;
+  color: #b88949;
   text-decoration: inherit;
 }
 a:hover {
-  color: #ef4444;
+  color: #d0a55f;
 }
 
 body {
@@ -43,16 +43,16 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a0a0a;
+  background-color: #171a17;
   cursor: pointer;
   transition: all 0.3s ease;
   color: #f1e8e0;
 }
 button:hover {
-  border-color: #dc2626;
+  border-color: #b88949;
 }
 button:focus,
 button:focus-visible {
-  outline: 2px solid #dc2626;
+  outline: 2px solid #b88949;
   outline-offset: 2px;
 }

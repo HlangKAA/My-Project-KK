@@ -20,6 +20,10 @@
   transition: opacity 0.15s ease;
 }
 
+.ws-sprite-npc {
+  mix-blend-mode: normal;
+}
+
 .ws-sprite.ws-transitioning {
   opacity: 0.5;
   transform: scale(0.95);

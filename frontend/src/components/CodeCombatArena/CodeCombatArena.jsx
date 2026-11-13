@@ -3,34 +3,70 @@
     Executes Python code commands in real-time step-by-step
     ═══════════════════════════════════════════════════ */
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 import WizardSprite from '../WizardSprite';
+import { areColorTargetsMatched, isValidRgb } from './colorTargets';
+import { colorFailure } from '../spellFeedback';
 import './CodeCombatArena.css';
 
 const TILE_SIZE = 48; // px per tile
+const PLAYFIELD_FIT = 0.9;
+const EMPTY_LIST = [];
+const DEFAULT_SPAWN = { x: 1, y: 1 };
 
-export default function CodeCombatArena({
+export default function CodeCombatArena(props) {
+    if (!props.arenaConfig) return null;
+    return <CodeCombatArenaContent {...props} />;
+}
+
+function CodeCombatArenaContent({
     arenaConfig,
     actionQueue,
     isExecuting,
     onExecutionFinish,
     onLog,
     onReset,
+    isThai = false,
 }) {
-    if (!arenaConfig) return null;
-
     const {
         cols = 10,
         rows = 7,
         theme = 'lab',
-        spawn = { x: 1, y: 1 },
-        flasks = [],
-        items: initialItems = [],
-        obstacles = [],
+        spawn = DEFAULT_SPAWN,
+        flasks = EMPTY_LIST,
+        items: initialItems = EMPTY_LIST,
+        obstacles = EMPTY_LIST,
         altar = null,
-        braziers = [],
+        braziers = EMPTY_LIST,
+        colorTargets = EMPTY_LIST,
         gate = null,
+        murals = EMPTY_LIST,
+        boss = null,
+        hazards = EMPTY_LIST,
+        blockMovement = false,
     } = arenaConfig;
+
+    const gridAreaRef = useRef(null);
+    const [gridScale, setGridScale] = useState(null);
+
+    useLayoutEffect(() => {
+        const area = gridAreaRef.current;
+        if (!area) return;
+
+        const fitGrid = () => {
+            const { width, height } = area.getBoundingClientRect();
+            if (width > 0 && height > 0) {
+                const gridWidth = cols * TILE_SIZE + 4;
+                const gridHeight = rows * TILE_SIZE + 4;
+                setGridScale(Math.min(width / gridWidth, height / gridHeight) * PLAYFIELD_FIT);
+            }
+        };
+
+        fitGrid();
+        const observer = new ResizeObserver(fitGrid);
+        observer.observe(area);
+        return () => observer.disconnect();
+    }, [cols, rows]);
 
     // ─── Arena State ───
     const [heroPos, setHeroPos] = useState(spawn);
@@ -39,6 +75,7 @@ export default function CodeCombatArena({
     const [carriedItem, setCarriedItem] = useState(null);
     const [groundItems, setGroundItems] = useState(initialItems);
     const [gateUnlocked, setGateUnlocked] = useState(false);
+    const [bossStrike, setBossStrike] = useState(0);
     const [flasksState, setFlasksState] = useState(() => {
         const initial = {};
         flasks.forEach(f => {
@@ -51,13 +88,15 @@ export default function CodeCombatArena({
         braziers.forEach(b => {
             initial[b.id] = { litColor: null };
         });
+        colorTargets.forEach(target => {
+            initial[target.id] = { litColor: null, rgb: null };
+        });
         return initial;
     });
     const [altarActivated, setAltarActivated] = useState(false);
 
     // Speed multiplier: 1x (350ms), 2x (180ms), 3x (90ms)
     const [speedMultiplier, setSpeedMultiplier] = useState(1);
-    const [currentStepIndex, setCurrentStepIndex] = useState(-1);
     const [actionLogBanner, setActionLogBanner] = useState(null);
 
     const isRunningRef = useRef(false);
@@ -73,7 +112,6 @@ export default function CodeCombatArena({
         setCarriedItem(null);
         setGroundItems(initialItems);
         setActionLogBanner(null);
-        setCurrentStepIndex(-1);
 
         const resetFlasks = {};
         flasks.forEach(f => {
@@ -85,19 +123,122 @@ export default function CodeCombatArena({
         braziers.forEach(b => {
             resetBraziers[b.id] = { litColor: null };
         });
+        colorTargets.forEach(target => {
+            resetBraziers[target.id] = { litColor: null, rgb: null };
+        });
         setBraziersState(resetBraziers);
         setAltarActivated(false);
         setGateUnlocked(false);
+        setBossStrike(0);
 
         if (isUserClick && onReset) onReset();
-    }, [spawn, initialItems, flasks, braziers, onReset]);
-
-    // Reset when arenaConfig changes (new stage)
-    useEffect(() => {
-        handleResetArena(false);
-    }, [arenaConfig]);
+    }, [spawn, initialItems, flasks, braziers, colorTargets, onReset]);
 
     // ─── Play Action Queue Step-by-Step ───
+    const checkVictory = useCallback((pos, carried, flasksSt, braziersSt, altarLit) => {
+        isRunningRef.current = false;
+
+        // Condition 0: Boss Trial with Gate
+        if (gate) {
+            const reachedGate = Math.abs(pos.x - gate.x) + Math.abs(pos.y - gate.y) <= 1 || (pos.x === gate.x && pos.y === gate.y);
+            const flasksOk = flasks.length === 0 || flasks.every(f => flasksSt[f.id]?.filled);
+            const braziersOk = braziers.length === 0 || braziers.every(b => braziersSt[b.id]?.litColor);
+            const colorsOk = colorTargets.length === 0 || areColorTargetsMatched(colorTargets, braziersSt);
+            if (reachedGate && flasksOk && braziersOk && colorsOk) {
+                setGateUnlocked(true);
+                setHeroState('success');
+                setActionLogBanner(`${gate.name} unlocked! Boss Trial Conquered!`);
+                if (onLog) onLog(`VICTORY: ${gate.name} has been unlocked!`);
+                setTimeout(() => {
+                    if (onExecutionFinish) onExecutionFinish(true, `${gate.name} unlocked!`);
+                }, 1000);
+            } else {
+                const failure = !flasksOk
+                    ? { kind: 'flaskIncomplete', name: flasks.find(f => !flasksSt[f.id]?.filled)?.label }
+                    : !colorsOk ? colorFailure(colorTargets, braziersSt)
+                        : !braziersOk ? { kind: 'brazierMissing', name: braziers.find(b => !braziersSt[b.id]?.litColor)?.name }
+                            : { kind: 'gatePosition', name: gate.name, x: gate.x, y: gate.y };
+                setActionLogBanner('Trial incomplete. Check the failed objective.');
+                if (onExecutionFinish) onExecutionFinish(false, failure);
+            }
+            return;
+        }
+
+        // Condition 1: Flask Sorting Stage
+        if (flasks.length > 0) {
+            const allFilled = flasks.every(f => flasksSt[f.id]?.filled);
+            if (allFilled) {
+                setHeroState('success');
+                setActionLogBanner('🎉 All flasks sorted correctly! Level Complete!');
+                if (onLog) onLog('🎉 VICTORY: All data types categorized properly into their containers!');
+                setTimeout(() => {
+                    if (onExecutionFinish) onExecutionFinish(true, 'All flasks filled correctly!');
+                }, 1000);
+            } else {
+                const filled = Object.values(flasksSt).filter(f => f.filled).length;
+                setActionLogBanner(`Incomplete: Only ${filled}/${flasks.length} flasks sorted.`);
+                if (onLog) onLog(`⚠️ Execution ended: Only ${filled}/${flasks.length} flasks sorted.`);
+                if (onExecutionFinish) onExecutionFinish(false, { kind: 'flaskIncomplete', name: flasks.find(f => !flasksSt[f.id]?.filled)?.label });
+            }
+            return;
+        }
+
+        // Condition 2: Altar Stage (Movement + print)
+        if (altar) {
+            const reachedAltar = pos.x === altar.x && pos.y === altar.y;
+            if (reachedAltar && altarLit) {
+                setHeroState('success');
+                setActionLogBanner('🎉 Altar awakened! Level Complete!');
+                setTimeout(() => {
+                    if (onExecutionFinish) onExecutionFinish(true, 'Altar awakened!');
+                }, 1000);
+            } else if (!reachedAltar) {
+                setActionLogBanner(`⚠️ Hero did not reach the Altar at (${altar.x}, ${altar.y})!`);
+                if (onLog) onLog(`⚠️ Hero stopped at (${pos.x}, ${pos.y}). Must reach the altar at (${altar.x}, ${altar.y})!`);
+                if (onExecutionFinish) onExecutionFinish(false, { kind: 'altarPosition', x: pos.x, y: pos.y });
+            } else {
+                setActionLogBanner(`⚠️ Hero reached altar but did not chant print("${altar.keyword || 'Lumina'}")!`);
+                if (onExecutionFinish) onExecutionFinish(false, { kind: 'altarChant' });
+            }
+            return;
+        }
+
+        // New color objects need their exact RGB values, not just any cast.
+        if (colorTargets.length > 0) {
+            const allMatched = areColorTargetsMatched(colorTargets, braziersSt);
+            if (allMatched) {
+                setHeroState('success');
+                setActionLogBanner('All color targets restored! Level Complete!');
+                if (onExecutionFinish) onExecutionFinish(true, 'All color targets restored!');
+            } else {
+                setActionLogBanner('Match the RGB color of every faded object.');
+                if (onExecutionFinish) onExecutionFinish(false, colorFailure(colorTargets, braziersSt));
+            }
+            return;
+        }
+
+        // Condition 3: Braziers Stage (RGB Colors)
+        if (braziers.length > 0) {
+            const allLit = braziers.every(b => braziersSt[b.id]?.litColor);
+            if (allLit) {
+                setHeroState('success');
+                setActionLogBanner('🎉 All Braziers ignited! Level Complete!');
+                setTimeout(() => {
+                    if (onExecutionFinish) onExecutionFinish(true, 'All braziers ignited!');
+                }, 1000);
+            } else {
+                setActionLogBanner('⚠️ Not all braziers have been lit with light!');
+                if (onExecutionFinish) onExecutionFinish(false, { kind: 'brazierMissing', name: braziers.find(b => !braziersSt[b.id]?.litColor)?.name });
+            }
+            return;
+        }
+
+        // Default: Hero moved
+        setHeroState('success');
+        if (onExecutionFinish) onExecutionFinish(true, 'Action completed!');
+    }, [gate, flasks, braziers, colorTargets, altar, onExecutionFinish, onLog]);
+
+
     useEffect(() => {
         if (!isExecuting || !actionQueue || actionQueue.length === 0) return;
 
@@ -109,7 +250,6 @@ export default function CodeCombatArena({
         setCarriedItem(null);
         setGroundItems(initialItems);
         setActionLogBanner(null);
-        setCurrentStepIndex(-1);
 
         const resetFlasks = {};
         flasks.forEach(f => {
@@ -121,9 +261,13 @@ export default function CodeCombatArena({
         braziers.forEach(b => {
             resetBraziers[b.id] = { litColor: null };
         });
+        colorTargets.forEach(target => {
+            resetBraziers[target.id] = { litColor: null, rgb: null };
+        });
         setBraziersState(resetBraziers);
         setAltarActivated(false);
         setGateUnlocked(false);
+        setBossStrike(0);
 
         let curPos = { ...spawn };
         let curCarried = null;
@@ -146,7 +290,6 @@ export default function CodeCombatArena({
             }
 
             const action = actionQueue[stepIdx];
-            setCurrentStepIndex(stepIdx);
             stepIdx++;
 
             // Process action
@@ -165,6 +308,25 @@ export default function CodeCombatArena({
                     const newX = Math.max(0, Math.min(cols - 1, curPos.x + move.dx * steps));
                     const newY = Math.max(0, Math.min(rows - 1, curPos.y + move.dy * steps));
 
+                    const pathBlocked = blockMovement && Array.from({ length: steps }, (_, index) => ({
+                        x: curPos.x + move.dx * (index + 1),
+                        y: curPos.y + move.dy * (index + 1),
+                    })).some(tile => obstacles.some(ob => ob.x === tile.x && ob.y === tile.y));
+                    const hitHazard = hazards.some(tile => tile.x === newX && tile.y === newY);
+                    if (hitHazard) {
+                        setHeroState('confused');
+                        setActionLogBanner(isThai ? 'โดนเงาของแคร็กก์โจมตี! หลบช่องที่ทำเครื่องหมายไว้' : 'Krakk\'s shadow strike hit the hero! Avoid the marked tiles.');
+                        isRunningRef.current = false;
+                        onExecutionFinish?.(false, { kind: 'hazard' });
+                        return;
+                    }
+                    if (pathBlocked) {
+                        setHeroState('confused');
+                        setActionLogBanner(`A bookshelf blocks (${newX}, ${newY}). Find another path.`);
+                        isRunningRef.current = false;
+                        onExecutionFinish?.(false, { kind: 'obstacle', x: newX, y: newY });
+                        return;
+                    }
                     curPos = { x: newX, y: newY };
                     setHeroPos({ ...curPos });
                     setHeroDir(move.dir);
@@ -178,6 +340,13 @@ export default function CodeCombatArena({
                 }
 
                 case 'move_to': {
+                    if (blockMovement) {
+                        setHeroState('confused');
+                        setActionLogBanner('Use directional moves to navigate the Archive.');
+                        isRunningRef.current = false;
+                        onExecutionFinish?.(false, { kind: 'directional' });
+                        return;
+                    }
                     const targetX = Math.max(0, Math.min(cols - 1, action.x));
                     const targetY = Math.max(0, Math.min(rows - 1, action.y));
                     curPos = { x: targetX, y: targetY };
@@ -192,6 +361,13 @@ export default function CodeCombatArena({
                 }
 
                 case 'move_to_x': {
+                    if (blockMovement) {
+                        setHeroState('confused');
+                        setActionLogBanner('Use directional moves to navigate the Archive.');
+                        isRunningRef.current = false;
+                        onExecutionFinish?.(false, { kind: 'directional' });
+                        return;
+                    }
                     const targetX = Math.max(0, Math.min(cols - 1, action.targetX));
                     curPos = { ...curPos, x: targetX };
                     setHeroPos({ ...curPos });
@@ -238,7 +414,7 @@ export default function CodeCombatArena({
                         if (onLog) onLog(`[hero.put_in] Error: Flask '${targetFlaskId}' does not exist!`);
                         setHeroState('confused');
                         isRunningRef.current = false;
-                        if (onExecutionFinish) onExecutionFinish(false, `Flask '${targetFlaskId}' not found!`);
+                        if (onExecutionFinish) onExecutionFinish(false, { kind: 'flaskUnknown', name: targetFlaskId });
                         return;
                     }
 
@@ -249,7 +425,7 @@ export default function CodeCombatArena({
                         if (onLog) onLog(`[hero.put_in] Hero is too far from ${flask.label} (dist: ${dist}). Move adjacent to it!`);
                         setHeroState('confused');
                         isRunningRef.current = false;
-                        if (onExecutionFinish) onExecutionFinish(false, `Hero is too far from ${flask.label}!`);
+                        if (onExecutionFinish) onExecutionFinish(false, { kind: 'flaskFar', name: flask.label });
                         return;
                     }
 
@@ -258,7 +434,7 @@ export default function CodeCombatArena({
                         if (onLog) onLog(`[hero.put_in] Hero is not carrying anything to put into ${flask.label}!`);
                         setHeroState('confused');
                         isRunningRef.current = false;
-                        if (onExecutionFinish) onExecutionFinish(false, `Hero is not carrying any item!`);
+                        if (onExecutionFinish) onExecutionFinish(false, { kind: 'flaskEmpty' });
                         return;
                     }
 
@@ -293,7 +469,7 @@ export default function CodeCombatArena({
                         setHeroState('confused');
                         isRunningRef.current = false;
                         if (onExecutionFinish) {
-                            onExecutionFinish(false, `TypeError: Cannot store '${item.display}' (${item.type}) into ${flask.label}!`);
+                            onExecutionFinish(false, { kind: 'flaskType', item: item.display, itemType: item.type, flask: flask.label });
                         }
                         return;
                     }
@@ -309,6 +485,35 @@ export default function CodeCombatArena({
                     setHeroState('casting');
                     const colorStr = `rgb(${r}, ${g}, ${b})`;
                     setActionLogBanner(`🎨 Cast light: (${r}, ${g}, ${b})`);
+
+                    const nearbyTarget = colorTargets
+                        .map(target => ({ target, distance: Math.abs(curPos.x - target.x) + Math.abs(curPos.y - target.y) }))
+                        .filter(({ distance }) => distance <= 1)
+                        .sort((left, right) => left.distance - right.distance)[0]?.target;
+                    if (nearbyTarget) {
+                        if (isValidRgb([r, g, b])) {
+                            const wasMatched = curBraziers[nearbyTarget.id]?.rgb?.every((channel, index) => channel === nearbyTarget.targetRgb[index]);
+                            curBraziers = {
+                                ...curBraziers,
+                                [nearbyTarget.id]: { litColor: colorStr, rgb: [r, g, b] },
+                            };
+                            setBraziersState({ ...curBraziers });
+                            if (onLog) onLog(nearbyTarget.name + ' received ' + colorStr + '.');
+                            if (!wasMatched && nearbyTarget.targetRgb.every((channel, index) => channel === [r, g, b][index])) {
+                                setActionLogBanner(boss
+                                    ? (isThai ? 'ผนึกคืนสีแล้ว! โล่ของแคร็กก์แตก' : `${nearbyTarget.name} restored! Krakk's shield cracks.`)
+                                    : (isThai ? `${nearbyTarget.name} กลับมามีสีแล้ว!` : `${nearbyTarget.name} restored!`));
+                                if (boss) setBossStrike(previous => previous + 1);
+                            }
+                        } else {
+                            const alreadyRestored = curBraziers[nearbyTarget.id]?.rgb?.every((value, index) => value === nearbyTarget.targetRgb[index]);
+                            if (!alreadyRestored) {
+                                curBraziers = { ...curBraziers, [nearbyTarget.id]: { litColor: null, rgb: null, invalid: true } };
+                                setBraziersState({ ...curBraziers });
+                            }
+                            onLog?.('RGB channels must be integers from 0 to 255.');
+                        }
+                    }
 
                     // Check if standing near brazier
                     const nearbyBrazier = braziers.find(br => Math.abs(curPos.x - br.x) + Math.abs(curPos.y - br.y) <= 1);
@@ -353,96 +558,13 @@ export default function CodeCombatArena({
             if (timerRef.current) clearTimeout(timerRef.current);
             isRunningRef.current = false;
         };
-    }, [isExecuting, actionQueue, speedMultiplier]);
+    }, [isExecuting, actionQueue, speedMultiplier, checkVictory, spawn, initialItems, flasks, braziers, colorTargets, cols, rows, obstacles, hazards, blockMovement, boss, altar, onExecutionFinish, onLog, isThai]);
 
     // ─── Check Victory ───
-    const checkVictory = (pos, carried, flasksSt, braziersSt, altarLit) => {
-        isRunningRef.current = false;
-
-        // Condition 0: Boss Trial with Gate
-        if (gate) {
-            const reachedGate = Math.abs(pos.x - gate.x) + Math.abs(pos.y - gate.y) <= 1 || (pos.x === gate.x && pos.y === gate.y);
-            const flasksOk = flasks.length === 0 || flasks.every(f => flasksSt[f.id]?.filled);
-            const braziersOk = braziers.length === 0 || braziers.every(b => braziersSt[b.id]?.litColor);
-            if (reachedGate && flasksOk && braziersOk) {
-                setGateUnlocked(true);
-                setHeroState('success');
-                setActionLogBanner('🎉 The Prism Gate shattered! Boss Trial Conquered!');
-                if (onLog) onLog('🎉 VICTORY: The Great Prism Gate has been unlocked!');
-                setTimeout(() => {
-                    if (onExecutionFinish) onExecutionFinish(true, 'The Prism Gate shattered!');
-                }, 1000);
-            } else {
-                let msg = '';
-                if (!flasksOk) msg = 'Must deposit the Key into the Lock Flask!';
-                else if (!braziersOk) msg = 'Must ignite the Guardian Brazier with Red light!';
-                else if (!reachedGate) msg = `Must move to the Prism Gate at (${gate.x}, ${gate.y})!`;
-                setActionLogBanner(`⚠️ Trial Incomplete: ${msg}`);
-                if (onLog) onLog(`⚠️ Boss Trial Incomplete: ${msg}`);
-                if (onExecutionFinish) onExecutionFinish(false, msg);
-            }
-            return;
-        }
-
-        // Condition 1: Flask Sorting Stage
-        if (flasks.length > 0) {
-            const allFilled = flasks.every(f => flasksSt[f.id]?.filled);
-            if (allFilled) {
-                setHeroState('success');
-                setActionLogBanner('🎉 All flasks sorted correctly! Level Complete!');
-                if (onLog) onLog('🎉 VICTORY: All data types categorized properly into their containers!');
-                setTimeout(() => {
-                    if (onExecutionFinish) onExecutionFinish(true, 'All flasks filled correctly!');
-                }, 1000);
-            } else {
-                const filled = Object.values(flasksSt).filter(f => f.filled).length;
-                setActionLogBanner(`Incomplete: Only ${filled}/${flasks.length} flasks sorted.`);
-                if (onLog) onLog(`⚠️ Execution ended: Only ${filled}/${flasks.length} flasks sorted.`);
-                if (onExecutionFinish) onExecutionFinish(false, `Only ${filled}/${flasks.length} flasks filled.`);
-            }
-            return;
-        }
-
-        // Condition 2: Altar Stage (Movement + print)
-        if (altar) {
-            const reachedAltar = pos.x === altar.x && pos.y === altar.y;
-            if (reachedAltar && altarLit) {
-                setHeroState('success');
-                setActionLogBanner('🎉 Altar awakened! Level Complete!');
-                setTimeout(() => {
-                    if (onExecutionFinish) onExecutionFinish(true, 'Altar awakened!');
-                }, 1000);
-            } else if (!reachedAltar) {
-                setActionLogBanner(`⚠️ Hero did not reach the Altar at (${altar.x}, ${altar.y})!`);
-                if (onLog) onLog(`⚠️ Hero stopped at (${pos.x}, ${pos.y}). Must reach the altar at (${altar.x}, ${altar.y})!`);
-                if (onExecutionFinish) onExecutionFinish(false, 'Hero did not reach the altar.');
-            } else {
-                setActionLogBanner(`⚠️ Hero reached altar but did not chant print("${altar.keyword || 'Lumina'}")!`);
-                if (onExecutionFinish) onExecutionFinish(false, 'Did not chant the sacred word.');
-            }
-            return;
-        }
-
-        // Condition 3: Braziers Stage (RGB Colors)
-        if (braziers.length > 0) {
-            const allLit = braziers.every(b => braziersSt[b.id]?.litColor);
-            if (allLit) {
-                setHeroState('success');
-                setActionLogBanner('🎉 All Braziers ignited! Level Complete!');
-                setTimeout(() => {
-                    if (onExecutionFinish) onExecutionFinish(true, 'All braziers ignited!');
-                }, 1000);
-            } else {
-                setActionLogBanner('⚠️ Not all braziers have been lit with light!');
-                if (onExecutionFinish) onExecutionFinish(false, 'Not all braziers lit.');
-            }
-            return;
-        }
-
-        // Default: Hero moved
-        setHeroState('success');
-        if (onExecutionFinish) onExecutionFinish(true, 'Action completed!');
-    };
+    const shieldsLeft = boss ? colorTargets.filter(target => {
+        const rgb = braziersState[target.id]?.rgb;
+        return !rgb || !target.targetRgb.every((channel, index) => rgb[index] === channel);
+    }).length : 0;
 
     return (
         <div className={`cca-container cca-theme-${theme}`}>
@@ -515,14 +637,65 @@ export default function CodeCombatArena({
                 </div>
             )}
 
+            {theme === 'archive' && colorTargets.length > 0 && (
+                <div className="cca-archive-restoration" aria-label={isThai ? 'ภาพที่กำลังคืนสี' : 'Image being restored'}>
+                    <div className="cca-archive-panels">
+                        {colorTargets.map(target => {
+                            const rgb = braziersState[target.id]?.rgb;
+                            const restored = rgb && target.targetRgb.every((channel, index) => rgb[index] === channel);
+                            const displayColor = restored ? target.targetRgb : target.sourceRgb;
+                            return (
+                                <div key={target.id} className={`cca-archive-panel ${restored ? 'restored' : 'faded'}`}
+                                    style={{ '--panel-color': `rgb(${displayColor.join(',')})` }}
+                                    aria-label={`${target.name}: ${restored ? (isThai ? 'คืนสีแล้ว' : 'restored') : (isThai ? 'สียังจางอยู่' : 'faded')}`}>
+                                    <div className="cca-archive-panel-art"><i className={target.icon || 'fas fa-image'} aria-hidden="true" /></div>
+                                    <span className="cca-archive-panel-name">{target.name}</span>
+                                    <span className="cca-archive-panel-state">{restored ? (isThai ? 'คืนสีแล้ว' : 'RESTORED') : (isThai ? 'สียังจางอยู่' : 'FADED')}</span>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
+
+            {theme !== 'archive' && murals.length > 0 && (
+                <div className="cca-murals" aria-label="Archive murals">
+                    {murals.map(mural => {
+                        const patches = colorTargets.filter(target => target.muralId === mural.id);
+                        const restored = patches.filter(target => {
+                            const rgb = braziersState[target.id]?.rgb;
+                            return rgb && target.targetRgb.every((channel, index) => rgb[index] === channel);
+                        }).length;
+                        return (
+                            <div className="cca-mural" key={mural.id}>
+                                <span className="cca-mural-title"><i className="fas fa-image" /> {mural.name} · {restored}/{patches.length}</span>
+                                <div className="cca-mural-patches">
+                                    {patches.map(target => (
+                                        <span key={target.id} title={`${target.name}: ${target.sourceRgb.join(', ')} → ${target.targetRgb.join(', ')}`}
+                                            style={{ backgroundColor: braziersState[target.id]?.litColor || `rgb(${target.sourceRgb.join(',')})` }} />
+                                    ))}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
+
+            {boss && <div className="cca-boss-status" role="status" aria-live="polite">
+                <strong>{boss.name}</strong><span>{shieldsLeft} / {colorTargets.length} {isThai ? 'โล่' : shieldsLeft === 1 ? 'shield' : 'shields'}</span>
+            </div>}
+
             {/* ─── Grid Viewport ─── */}
-            <div
-                className="cca-grid-viewport"
-                style={{
-                    width: cols * TILE_SIZE,
-                    height: rows * TILE_SIZE,
-                }}
-            >
+            <div className="cca-grid-area" ref={gridAreaRef}>
+                <div
+                    className="cca-grid-viewport"
+                    style={{
+                        width: cols * TILE_SIZE,
+                        height: rows * TILE_SIZE,
+                        transform: 'translate(-50%, -50%) scale(' + (gridScale ?? 1) + ')',
+                        visibility: gridScale === null ? 'hidden' : 'visible',
+                    }}
+                >
                 {/* ─── Tile Cells ─── */}
                 <div
                     className="cca-grid"
@@ -546,6 +719,26 @@ export default function CodeCombatArena({
                         );
                     })}
                 </div>
+
+                {theme === 'archive' && colorTargets.map(target => {
+                    const rgb = braziersState[target.id]?.rgb;
+                    const restored = rgb && target.targetRgb.every((channel, index) => rgb[index] === channel);
+                    return restored && <div key={target.id} className="cca-archive-color-field" aria-hidden="true"
+                        style={{ left: (target.x - 1) * TILE_SIZE, top: (target.y - 1) * TILE_SIZE,
+                            '--restored-color': `rgb(${target.targetRgb.join(',')})` }} />;
+                })}
+
+                {hazards.map(tile => <div key={`${tile.x}-${tile.y}`} className="cca-boss-hazard"
+                    style={{ left: tile.x * TILE_SIZE, top: tile.y * TILE_SIZE, width: TILE_SIZE, height: TILE_SIZE }}
+                    title={isThai ? 'เงาของแคร็กก์: ห้ามเดินผ่าน' : "Krakk's shadow strike: avoid this tile"} aria-label={`Shadow hazard at ${tile.x}, ${tile.y}`} />)}
+
+                {boss && <div className={`cca-boss-sprite ${shieldsLeft === 0 ? 'defeated' : ''}`}
+                    style={{ left: boss.x * TILE_SIZE, top: boss.y * TILE_SIZE, width: TILE_SIZE, height: TILE_SIZE }}
+                    title={boss.name}>
+                    <i className="fas fa-hat-wizard" aria-hidden="true" />
+                </div>}
+                {boss && bossStrike > 0 && <div key={bossStrike} className="cca-boss-counterattack" aria-hidden="true"
+                    style={{ left: boss.x * TILE_SIZE, top: boss.y * TILE_SIZE, width: TILE_SIZE, height: TILE_SIZE }} />}
 
                 {/* ─── Flasks Objects ─── */}
                 {flasks.map(flask => {
@@ -638,6 +831,29 @@ export default function CodeCombatArena({
                     );
                 })}
 
+                {colorTargets.map(target => {
+                    const state = braziersState[target.id];
+                    const matched = state?.rgb && target.targetRgb.every((channel, index) => state.rgb[index] === channel);
+                    return (
+                        <div
+                            key={target.id}
+                            className={'cca-color-target' + (matched ? ' matched' : '')}
+                            style={{
+                                left: target.x * TILE_SIZE,
+                                top: target.y * TILE_SIZE,
+                                width: TILE_SIZE,
+                                height: TILE_SIZE,
+                                '--target-color': state?.litColor || '#94a3b8',
+                            }}
+                            title={target.name + ': ' + target.targetRgb.join(', ')}
+                        >
+                            <i className={target.icon || 'fas fa-gem'} />
+                            <span className="cca-color-target-name">{target.name}</span>
+                            <span className="cca-color-target-rgb">{target.targetRgb.join(', ')}</span>
+                        </div>
+                    );
+                })}
+
                 {/* ─── The Prism Gate (if present) ─── */}
                 {gate && (
                     <div
@@ -683,6 +899,7 @@ export default function CodeCombatArena({
                             showGlow={false}
                         />
                     </div>
+                </div>
                 </div>
             </div>
         </div>

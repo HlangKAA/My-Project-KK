@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLanguage } from '../i18n/useLanguage';
 import './stagetypes.css';
 
 /**
@@ -6,6 +7,7 @@ import './stagetypes.css';
  * แสดง hint ที่ค่อยๆ เปิดเผยมากขึ้นตามจำนวน attempt
  */
 const HintPanel = ({ hints = [], attemptCount = 0, onRequestHint }) => {
+    const { isThai } = useLanguage();
     const [maxRevealedLevel, setMaxRevealedLevel] = useState(0);
     const [isExpanded, setIsExpanded] = useState(false);
 
@@ -40,12 +42,12 @@ const HintPanel = ({ hints = [], attemptCount = 0, onRequestHint }) => {
                     <i className="fas fa-lightbulb"></i>
                 </div>
                 <span className="hint-panel-title">
-                    Hint {currentLevel + 1} / {hints.length}
+                    {isThai ? 'คำใบ้' : 'Hint'} {currentLevel + 1} / {hints.length}
                 </span>
                 {currentLevel > 0 && (
                     <span className="hint-panel-warning">
                         <i className="fas fa-exclamation-triangle"></i>
-                        Using hints reduces XP bonus
+                        {isThai ? 'ใช้คำใบ้แล้วโบนัส XP จะลดลง' : 'Using hints reduces XP bonus'}
                     </span>
                 )}
                 <div className="hint-panel-toggle">
@@ -58,7 +60,7 @@ const HintPanel = ({ hints = [], attemptCount = 0, onRequestHint }) => {
                     <div className="hint-panel-body">
                         {hints.slice(0, currentLevel + 1).map((hint, i) => (
                             <div key={i} className={`hint-item ${i === currentLevel ? 'current' : 'previous'}`}>
-                                <span className="hint-level-badge">Hint {i + 1}</span>
+                                <span className="hint-level-badge">{isThai ? 'คำใบ้' : 'Hint'} {i + 1}</span>
                                 <p className="hint-text">{hint.text}</p>
                             </div>
                         ))}
@@ -67,7 +69,7 @@ const HintPanel = ({ hints = [], attemptCount = 0, onRequestHint }) => {
                     {currentLevel < hints.length - 1 && (
                         <button className="hint-panel-more-btn" onClick={handleRequestMore}>
                             <i className="fas fa-question-circle"></i>
-                            Need more help? ({hints.length - currentLevel - 1} more available)
+                            {isThai ? `อยากได้คำใบ้เพิ่มไหม? (เหลือ ${hints.length - currentLevel - 1})` : `Need more help? (${hints.length - currentLevel - 1} more available)`}
                         </button>
                     )}
                 </>

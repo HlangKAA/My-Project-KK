@@ -19,8 +19,8 @@ const POSES = [
   { id: 'staff-display', name: 'โชว์ไม้เท้า',   nameEn: 'Staff Display',  emoji: '⚔️', dialogue: 'อาวุธนี้คือ "คีย์บอร์ด" แห่งอำนาจ!', group: 'action' },
 ];
 
-const STORAGE_KEY = 'wizard-sprite-crops';
-const SPRITE_SRC = '/wizard-sprites.png';
+const STORAGE_KEY = 'wizard-sprite-crops-aligned';
+const SPRITE_SRC = '/wizard-sprites-aligned.png';
 // Natural image dimensions
 const NAT_W = 661;
 const NAT_H = 377;
@@ -30,7 +30,7 @@ function loadCrops() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) return JSON.parse(saved);
-  } catch (e) { /* ignore */ }
+  } catch { /* ignore */ }
   return null;
 }
 
@@ -55,14 +55,12 @@ export default function CharacterDemo() {
   const [isAutoPlaying, setIsAutoPlaying] = useState(false);
   const [autoPlaySpeed, setAutoPlaySpeed] = useState(2000);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [crops, setCrops] = useState(null);
+  const [crops, setCrops] = useState(loadCrops);
   const autoPlayRef = useRef(null);
   const poseIndexRef = useRef(0);
 
   // Load crops from localStorage on mount and listen for changes
   useEffect(() => {
-    setCrops(loadCrops());
-    
     const handleStorage = (e) => {
       if (e.key === STORAGE_KEY) {
         setCrops(loadCrops());

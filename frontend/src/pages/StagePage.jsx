@@ -1,9 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import usePythonInterpreter from '../hooks/usePythonInterpreter';
 import useCharacterProgression from '../hooks/useCharacterProgression';
 import { useGame } from '../context/GameContext';
 import { STAGE_DATA, REGIONS } from '../data/stageData';
+import { useLanguage } from '../i18n/useLanguage';
+import { localStageData, localRegion } from '../i18n/th';
 import Grimoire from '../components/Grimoire';
 import LevelComplete from '../components/LevelComplete';
 import HintPanel from '../components/HintPanel';
@@ -14,19 +16,35 @@ import WizardProfile from '../components/WizardProfile';
 import WizardSprite from '../components/WizardSprite';
 import SpellBook from '../components/SpellBook';
 import CodeCombatArena from '../components/CodeCombatArena/CodeCombatArena';
+import SpellFailureFeedback from '../components/SpellFailureFeedback';
+import { pythonFailure } from '../components/spellFeedback';
+import StoryScene from '../components/StoryScene';
 import './gamepage.css';
 import './stagepage.css';
 
+const STORY_SPRITES = {
+    Eldrin: 'eldrin',
+    Prisma: 'prisma',
+    'Loremaster Vane': 'vane',
+    'Rune Keeper': 'rune-keeper',
+    'Cave Warden': 'cave-warden',
+    Krakk: 'krakk',
+};
+
 const StagePage = () => {
     const { regionId, stageId } = useParams();
+    const { isThai } = useLanguage();
     const navigate = useNavigate();
-    const { user, saveAttempt } = useGame();
+    const { saveAttempt, user } = useGame();
     const { runCode, output, isRunning, wizardMessage, clearOutput } = usePythonInterpreter();
     const { character, levelProgress, awardXP, masterConcept } = useCharacterProgression();
 
     const stageKey = `${regionId}-${stageId}`;
-    const currentStage = STAGE_DATA[stageKey];
-    const region = REGIONS[regionId];
+    const introNpcName = STAGE_DATA[stageKey]?.storyIntro?.npcName;
+    const introCharacter = STORY_SPRITES[introNpcName] || 'hero';
+    const isPortraitIntro = introCharacter !== 'hero';
+    const currentStage = useMemo(() => localStageData(STAGE_DATA[stageKey], stageKey, isThai), [stageKey, isThai]);
+    const region = REGIONS[regionId] && localRegion(REGIONS[regionId], isThai);
 
     // Story Intro state
     const [storyPhase, setStoryPhase] = useState('intro'); // 'intro' | 'ide'
@@ -54,6 +72,11 @@ const StagePage = () => {
     // CodeCombat 2D Arena state
     const [arenaActionQueue, setArenaActionQueue] = useState([]);
     const [isArenaExecuting, setIsArenaExecuting] = useState(false);
+    const bossClockRef = useRef({ remainingMs: 120000, startedAt: null });
+    const [bossTimeLeft, setBossTimeLeft] = useState(120);
+    const [bossClockActive, setBossClockActive] = useState(false);
+    const [showEpilogue, setShowEpilogue] = useState(false);
+    const finishAttemptRef = useRef(null);
 
     // Completion result (XP breakdown, etc.)
     const [completionResult, setCompletionResult] = useState(null);
@@ -61,6 +84,7 @@ const StagePage = () => {
     const [saving, setSaving] = useState(false);
     const [saveError, setSaveError] = useState('');
     const [saveStatus, setSaveStatus] = useState('');
+    const [spellFailure, setSpellFailure] = useState(null);
     const pendingSave = useRef(null);
     const activeAttempt = useRef(null);
     const saveInFlight = useRef(false);
@@ -81,9 +105,9 @@ const StagePage = () => {
     const typingTimeoutRef = useRef(null);
 
     // Compute next stage
-    const nextStageId = String(parseInt(stageId) + 1);
-    const nextStageKey = `${regionId}-${nextStageId}`;
-    const hasNextStage = STAGE_DATA[nextStageKey] !== undefined;
+    const stageIndex = region?.stages.findIndex(stage => String(stage.id) === stageId) ?? -1;
+    const nextStageId = region?.stages[stageIndex + 1]?.id;
+    const hasNextStage = nextStageId !== undefined;
 
     // ─── Initialize ───
     useEffect(() => {
@@ -103,11 +127,16 @@ const StagePage = () => {
         setCompletionResult(null);
         setArenaActionQueue([]);
         setIsArenaExecuting(false);
+        bossClockRef.current = { remainingMs: 120000, startedAt: null };
+        setBossTimeLeft(120);
+        setBossClockActive(false);
+        setShowEpilogue(false);
         completedRef.current = false;
         activeAttempt.current = null;
         pendingSave.current = null;
         setSaveError('');
         setSaveStatus('');
+        setSpellFailure(null);
 
         // Story intro setup
         if (currentStage.hasStoryIntro) {
@@ -178,7 +207,7 @@ const StagePage = () => {
     };
 
     // ─── Level Complete ───
-    const handleLevelComplete = (extraModifiers = {}) => {
+    const handleLevelComplete = (serverResult, extraModifiers = {}) => {
         if (completedRef.current) return;
         completedRef.current = true;
 
@@ -192,7 +221,11 @@ const StagePage = () => {
             hintsUsed: extraModifiers.hintsUsed ?? hintsUsed,
         };
 
-        const result = awardXP(stageKey, currentStage.xpReward || 200, modifiers);
+        const result = awardXP(stageKey, currentStage.xpReward || 200, modifiers, {
+            earnedXP: serverResult.earnedXP,
+            appliedBonuses: serverResult.appliedBonuses,
+            totalXP: serverResult.progress.highScore,
+        });
         setCompletionResult(result);
 
         // Master teaching concepts
@@ -200,6 +233,7 @@ const StagePage = () => {
             currentStage.teachingConcepts.forEach(concept => masterConcept(concept));
         }
 
+        if (stageKey === '4-6') setShowEpilogue(true);
         setTimeout(() => setShowComplete(true), 1500);
     };
 
@@ -213,10 +247,13 @@ const StagePage = () => {
         setSaveError('');
         setSaveStatus('');
         try {
-            await saveAttempt(payload);
+            const saved = await saveAttempt({
+                ...payload,
+                hints_used: modifiers.hintsUsed ?? hintsUsed,
+            });
             pendingSave.current = null;
-            setSaveStatus('Saved to your account');
-            if (payload.result === 'Success') handleLevelComplete(modifiers);
+            setSaveStatus(isThai ? 'บันทึกความคืบหน้าแล้ว' : 'Saved to your account');
+            if (payload.result === 'Success') handleLevelComplete(saved, modifiers);
             return true;
         } catch (error) {
             setSaveError(error.response?.data?.message || 'Could not save. Check your connection and retry.');
@@ -227,26 +264,66 @@ const StagePage = () => {
         }
     };
 
-    const finishAttempt = result => {
+    const finishAttempt = (result, failure = null) => {
         const attempt = activeAttempt.current;
         if (!attempt) return;
         activeAttempt.current = null;
+        let finalResult = result;
+        if (stageKey === '4-6' && bossClockRef.current.startedAt !== null) {
+            const clock = bossClockRef.current;
+            const elapsed = performance.now() - clock.startedAt;
+            if (elapsed >= clock.remainingMs) {
+                finalResult = 'Fail';
+                failure = { kind: 'timeout' };
+            }
+            clock.remainingMs = Math.max(0, clock.remainingMs - elapsed);
+            clock.startedAt = null;
+            setBossTimeLeft(Math.ceil(clock.remainingMs / 1000));
+            setBossClockActive(false);
+        }
         setIsArenaExecuting(false);
-        setWizardState(result === 'Success' ? 'success' : 'confused');
+        setWizardState(finalResult === 'Success' ? 'success' : 'confused');
+        setSpellFailure(finalResult === 'Success' ? null : failure || { kind: 'unknown' });
         void persistAttempt({
-            stage_key: stageKey, code: attempt.code, result,
-            runtime: attempt.runtime ?? (performance.now() - attempt.started) / 1000,
+            stage_key: stageKey, code: attempt.code, result: finalResult,
+            runtime: stageKey === '4-6' ? (performance.now() - attempt.started) / 1000 : (attempt.runtime ?? (performance.now() - attempt.started) / 1000),
             submitted_at: attempt.submitted_at,
         }, { attempts: attempt.number, hintsUsed });
     };
+    finishAttemptRef.current = finishAttempt;
+
+    useEffect(() => {
+        if (stageKey !== '4-6' || !bossClockActive) return undefined;
+        const timer = setInterval(() => {
+            const clock = bossClockRef.current;
+            if (clock.startedAt === null) return;
+            const left = Math.max(0, clock.remainingMs - (performance.now() - clock.startedAt));
+            setBossTimeLeft(Math.ceil(left / 1000));
+            if (left <= 0) {
+                clock.remainingMs = 0;
+                clock.startedAt = null;
+                setBossTimeLeft(0);
+                setBossClockActive(false);
+                setIsArenaExecuting(false);
+                setArenaActionQueue([]);
+                finishAttemptRef.current?.('Fail', { kind: 'timeout' });
+            }
+        }, 100);
+        return () => clearInterval(timer);
+    }, [stageKey, bossClockActive]);
 
     const handleSpecialAttempt = (payload, modifiers) => persistAttempt({ ...payload, stage_key: stageKey }, modifiers);
 
     const handleRun = () => {
-        if (activeAttempt.current || pendingSave.current || saveInFlight.current) return;
+        if (activeAttempt.current || pendingSave.current || saveInFlight.current || (stageKey === '4-6' && bossClockRef.current.remainingMs <= 0)) return;
         completedRef.current = false;
+        if (stageKey === '4-6') {
+            bossClockRef.current.startedAt = performance.now();
+            setBossClockActive(true);
+        }
         activeAttempt.current = { code, submitted_at: new Date().toISOString(), started: performance.now(), number: attemptCount + 1 };
         setSaveStatus('');
+        setSpellFailure(null);
         clearOutput();
         setWizardState('casting');
         setAttemptCount(prev => prev + 1);
@@ -292,21 +369,22 @@ const StagePage = () => {
                 __onSuccess: () => {
                     console.log("[CodeCombat] Queuing actions to Arena:", actions);
                     if (!activeAttempt.current) return;
-                    activeAttempt.current.runtime = (performance.now() - activeAttempt.current.started) / 1000;
+                    if (stageKey !== '4-6') activeAttempt.current.runtime = (performance.now() - activeAttempt.current.started) / 1000;
                     if (actions.length === 0) {
-                        finishAttempt('Fail');
+                        finishAttempt('Fail', { kind: 'noActions' });
                         return;
                     }
                     setIsArenaExecuting(false);
                     setTimeout(() => {
+                        if (!activeAttempt.current) return;
                         setArenaActionQueue([...actions]);
                         setIsArenaExecuting(true);
                     }, 50);
                 },
-                __onError: () => finishAttempt('Error')
+                __onError: error => finishAttempt('Error', pythonFailure(error))
             };
 
-            runCode(code, arenaCallbacks);
+            runCode(currentStage.visionChecks ? `${code}\n${currentStage.visionChecks.join('\n')}` : code, arenaCallbacks);
             return;
         }
 
@@ -324,28 +402,39 @@ const StagePage = () => {
                 setVisualState(previous => ({ ...previous, foundIndex: x }));
             },
             say: () => {},
-            __onError: () => finishAttempt('Error'),
+            __onError: error => finishAttempt('Error', pythonFailure(error)),
             __onSuccess: () => {
                 let success = currentStage.validateOutput ? currentStage.validateOutput(lines) : false;
                 if (stageKey === '3-3') success = state.foundIndex === 2;
                 if (stageKey === '3-6') success = state.foundIndex === 2 && lines.some(line => line.includes('10'));
                 if (stageKey === '4-5') success = state.color === 'rgb(0,255,0)';
                 if (stageKey === '4-6') success = state.color === 'rgb(255,255,255)';
-                finishAttempt(success ? 'Success' : 'Fail');
+                const failure = stageKey === '3-3' || stageKey === '3-6'
+                    ? { kind: 'foundIndex', actual: state.foundIndex }
+                    : stageKey === '4-5' || stageKey === '4-6'
+                        ? { kind: 'wrongColor' }
+                        : { kind: 'output', actual: lines.join('').trim().slice(0, 160) };
+                finishAttempt(success ? 'Success' : 'Fail', failure);
             },
         };
         runCode(code, callbacks);
     };
 
-    const handleArenaExecutionFinish = success => finishAttempt(success ? 'Success' : 'Fail');
+    const handleArenaExecutionFinish = useCallback((success, failure) => finishAttemptRef.current?.(success ? 'Success' : 'Fail', failure), []);
 
     const handleReset = () => {
         setCode(currentStage.initialCode || '');
         setVisualState({});
         clearOutput();
+        setSpellFailure(null);
         setWizardState('idle');
         setArenaActionQueue([]);
         setIsArenaExecuting(false);
+        if (stageKey === '4-6') {
+            bossClockRef.current = { remainingMs: 120000, startedAt: null };
+            setBossTimeLeft(120);
+            setBossClockActive(false);
+        }
         completedRef.current = false;
     };
 
@@ -395,11 +484,12 @@ const StagePage = () => {
 
     // ─── Level Complete Screen ───
     if (showComplete) {
+        if (showEpilogue) {
+            return <StoryScene scene="epilogue" playerName={user?.username} isThai={isThai} onClose={() => setShowEpilogue(false)} />;
+        }
         return (
             <LevelComplete
                 level={currentStage}
-                levelId={stageKey}
-                user={user}
                 character={character}
                 levelProgress={levelProgress}
                 completionResult={completionResult}
@@ -415,9 +505,16 @@ const StagePage = () => {
     if (storyPhase === 'intro' && currentStage.hasStoryIntro) {
         const story = currentStage.storyIntro;
         const currentDialog = story.dialogues[dialogIndex];
+        const activeStoryName = STORY_SPRITES[currentDialog?.speaker]
+            ? currentDialog.speaker
+            : story.npcName;
+        const activeStoryCharacter = STORY_SPRITES[activeStoryName] || introCharacter;
+        const activeStoryTitle = activeStoryName === 'Cave Warden' && stageKey === '4-6'
+            ? 'Guardian of the Caverns'
+            : story.npcTitle;
 
         return (
-            <div className="stage-story-page">
+            <div className={`stage-story-page ${regionId === '1' ? 'chapter-one-noir' : ''} ${isPortraitIntro ? 'stage-story-page--portrait' : ''}`}>
                 {/* Background Scene */}
                 <div className="stage-story-bg">
                     {/* Tower silhouette */}
@@ -458,19 +555,20 @@ const StagePage = () => {
                 </div>
 
                 {/* NPC Character (using real sprite) */}
-                <div className={`stage-npc ${npcVisible ? 'visible' : ''}`}>
-                    <div className="stage-npc-sprite">
+                <div className={`stage-npc ${isPortraitIntro ? 'stage-npc--portrait' : ''} ${npcVisible ? 'visible' : ''}`}>
+                    <div className={`stage-npc-sprite ${isPortraitIntro ? 'stage-npc-sprite--portrait' : ''}`}>
                         <WizardSprite
                             state="idle"
                             size="lg"
+                            character={activeStoryCharacter}
                             showParticles={false}
                             showShadow={true}
                             showGlow={true}
                         />
                     </div>
                     <div className="stage-npc-name-tag">
-                        <span className="stage-npc-name">{story.npcName}</span>
-                        <span className="stage-npc-title">{story.npcTitle}</span>
+                        <span className="stage-npc-name">{activeStoryName}</span>
+                        <span className="stage-npc-title">{activeStoryTitle}</span>
                     </div>
                 </div>
 
@@ -564,7 +662,7 @@ const StagePage = () => {
     const specialContent = renderStageTypeContent();
 
     return (
-        <div className={`stage-game-page ${ideSliding ? 'ide-slide-in' : ''}`}>
+        <div className={`stage-game-page ${ideSliding ? 'ide-slide-in' : ''} ${regionId === '1' ? 'chapter-one-noir' : ''}`}>
             {/* ─── Navbar ─── */}
             <nav className="game-navbar">
                 <div className="game-nav-brand">
@@ -574,7 +672,7 @@ const StagePage = () => {
 
                 <div className="game-nav-level">
                     <i className="fas fa-dungeon"></i>
-                    Stage {regionId}-{stageId}: {currentStage.title}
+                    {isThai ? 'ด่าน' : 'Stage'} {regionId}-{stageId}: {currentStage.title}
                     {currentStage.difficulty && (
                         <span className="game-nav-difficulty">
                             {Array.from({ length: currentStage.difficulty }, (_, i) => (
@@ -586,13 +684,13 @@ const StagePage = () => {
 
                 <div className="game-nav-links">
                     <button className="game-nav-link" disabled={isRunning || isArenaExecuting || saving || !!saveError} onClick={() => navigate(`/region/${regionId}`)}>
-                        <i className="fas fa-map"></i> Map
+                        <i className="fas fa-map"></i> {isThai ? 'แผนที่' : 'Map'}
                     </button>
                     <button className="game-nav-link" onClick={() => openGrimoire(0)}>
-                        <i className="fas fa-magic"></i> Spells
+                        <i className="fas fa-magic"></i> {isThai ? 'คาถา' : 'Spells'}
                     </button>
                     <button className="game-nav-link" onClick={() => setShowSpellBook(true)}>
-                        <i className="fas fa-book-open"></i> Spell Book
+                        <i className="fas fa-book-open"></i> {isThai ? 'หนังสือคาถา' : 'Spell Book'}
                     </button>
                     <button className="game-nav-link">
                         <i className="fas fa-cog"></i>
@@ -609,12 +707,12 @@ const StagePage = () => {
             </nav>
 
             {/* ─── Main Content ─── */}
-            <div role={saveError ? 'alert' : 'status'} style={{ padding: '8px 20px', color: saveError ? '#fca5a5' : '#86efac' }}>
-                {saving ? 'Saving progress...' : saveError || saveStatus}
+            <div role={saveError ? 'alert' : 'status'} className={`game-save-status ${saveError ? 'has-error' : ''}`}>
+                {saving ? (isThai ? 'กำลังบันทึก...' : 'Saving progress...') : saveError || saveStatus}
                 {saveError && <button onClick={() => {
                     const pending = pendingSave.current;
                     if (pending) void persistAttempt(pending.payload, pending.modifiers);
-                }}>Retry save</button>}
+                }}>{isThai ? 'ลองบันทึกอีกครั้ง' : 'Retry save'}</button>}
             </div>
             <div className="game-main">
                 {specialContent ? (
@@ -631,9 +729,15 @@ const StagePage = () => {
                     <>
                         {/* ─── Scene Panel ─── */}
                         {currentStage.arena ? (
-                            <div className="game-scene" style={{ flex: 1, minWidth: 320, overflow: 'hidden' }}>
-                                <div className="game-scene-view" style={{ padding: '10px 14px', overflowY: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                    <div className="game-objective" style={{ margin: '4px auto 10px auto', width: '100%', maxWidth: 740 }}>
+                            <div className="game-scene game-arena-scene">
+                                <div className="game-scene-view game-arena-scene-view">
+                                    <div className="game-objective game-arena-objective">
+                                        {stageKey === '4-6' && <div className={`game-boss-clock ${bossTimeLeft <= 30 ? 'urgent' : ''}`} role="timer" aria-live={bossTimeLeft <= 10 ? 'assertive' : 'off'}>
+                                            <i className="fas fa-hourglass-half" /> {isThai ? 'เวลาร่ายคาถาที่เหลือ' : 'Spell time left'}: {Math.floor(bossTimeLeft / 60)}:{String(bossTimeLeft % 60).padStart(2, '0')}
+                                            {!bossClockActive && bossTimeLeft === 120 && <small>{isThai ? 'เริ่มนับเมื่อกดรัน' : 'Starts on Run'}</small>}
+                                            {!bossClockActive && bossTimeLeft > 0 && bossTimeLeft < 120 && <small>{isThai ? 'หยุดนับระหว่างแก้โค้ด' : 'Paused while editing'}</small>}
+                                            {bossTimeLeft === 0 && <small>{isThai ? 'หมดเวลา กดรีเซ็ตเพื่อเริ่มใหม่' : 'Time up. Reset to retry.'}</small>}
+                                        </div>}
                                         <div className="game-objective-badge">
                                             <div className="game-objective-dot"></div>
                                             <span className="game-objective-label">
@@ -648,14 +752,22 @@ const StagePage = () => {
                                     </div>
 
                                     <CodeCombatArena
+                                        key={stageKey}
                                         arenaConfig={currentStage.arena}
+                                        isThai={isThai}
                                         actionQueue={arenaActionQueue}
                                         isExecuting={isArenaExecuting}
                                         onExecutionFinish={handleArenaExecutionFinish}
                                         onReset={() => {
                                             if (activeAttempt.current) finishAttempt('Fail');
+                                            setSpellFailure(null);
                                             setArenaActionQueue([]);
                                             setIsArenaExecuting(false);
+                                            if (stageKey === '4-6') {
+                                                bossClockRef.current = { remainingMs: 120000, startedAt: null };
+                                                setBossTimeLeft(120);
+                                                setBossClockActive(false);
+                                            }
                                         }}
                                     />
                                 </div>
@@ -711,7 +823,7 @@ const StagePage = () => {
                                                 <div key={val} style={{
                                                     width: 44, height: 44,
                                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                    border: `2px solid ${visualState.foundIndex === idx ? '#dc2626' : 'rgba(255,255,255,0.15)'}`,
+                                                    border: `2px solid ${visualState.foundIndex === idx ? '#b88949' : 'rgba(255,255,255,0.15)'}`,
                                                     borderRadius: 6,
                                                     background: visualState.foundIndex === idx ? 'rgba(220,38,38,0.2)' : 'rgba(0,0,0,0.4)',
                                                     color: '#fff', fontSize: '0.8rem',
@@ -798,6 +910,7 @@ const StagePage = () => {
                                     )}
                                 </div>
                             </div>
+                            <SpellFailureFeedback failure={spellFailure} isThai={isThai} />
                         </div>
                     </>
                 )}
@@ -807,13 +920,13 @@ const StagePage = () => {
             {!specialContent && (
                 <div className="game-bottom-bar">
                     <button className="game-btn-reset" onClick={handleReset} disabled={isRunning || isArenaExecuting || saving || !!saveError}>
-                        <i className="fas fa-redo"></i> RESET
+                        <i className="fas fa-redo"></i> {isThai ? 'เริ่มใหม่' : 'RESET'}
                     </button>
-                    <button className="game-btn-run" onClick={handleRun} disabled={isRunning || isArenaExecuting || saving || !!saveError}>
+                    <button className="game-btn-run" onClick={handleRun} disabled={isRunning || isArenaExecuting || saving || !!saveError || (stageKey === '4-6' && bossTimeLeft === 0)}>
                         {isRunning ? (
-                            <><i className="fas fa-spinner fa-spin"></i> CASTING...</>
+                            <><i className="fas fa-spinner fa-spin"></i> {isThai ? 'กำลังร่ายคาถา...' : 'CASTING...'}</>
                         ) : (
-                            <><i className="fas fa-play"></i> RUN SPELL CODE</>
+                            <><i className="fas fa-play"></i> {isThai ? 'รันโค้ดคาถา' : 'RUN SPELL CODE'}</>
                         )}
                     </button>
                 </div>

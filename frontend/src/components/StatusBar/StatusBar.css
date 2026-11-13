@@ -23,7 +23,7 @@
 .sb-stat-icon {
     font-size: 0.75rem;
 }
-.sb-hp-icon i { color: #ef4444; }
+.sb-hp-icon i { color: #d0a55f; }
 .sb-mp-icon i { color: #60a5fa; }
 
 .sb-stat-track {
@@ -41,7 +41,7 @@
 }
 
 .sb-hp-fill {
-    background: linear-gradient(90deg, #dc2626, #ef4444);
+    background: linear-gradient(90deg, #b88949, #d0a55f);
 }
 
 .sb-mp-fill {
@@ -76,4 +76,4 @@
 .sb-zone {
     margin-left: auto;
 }
-.sb-zone i { color: #dc2626; font-size: 0.6rem; }
+.sb-zone i { color: #b88949; font-size: 0.6rem; }

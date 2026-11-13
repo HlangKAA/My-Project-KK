@@ -1,10 +1,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import WizardProfile from './WizardProfile';
+import { useLanguage } from '../i18n/useLanguage';
 import './levelcomplete.css';
 
-const LevelComplete = ({ level, levelId, user, character, levelProgress, completionResult, onReplay, onContinue }) => {
+const LevelComplete = ({ level, character, levelProgress, completionResult, onReplay, onContinue }) => {
     const navigate = useNavigate();
+    const { isThai } = useLanguage();
 
     const result = completionResult || {};
     const { earnedXP = 0, baseXP = 0, appliedBonuses = [], levelUpInfo = null, newSpellUnlock = null, newOutfitUnlock = null } = result;
@@ -15,13 +17,13 @@ const LevelComplete = ({ level, levelId, user, character, levelProgress, complet
             <nav className="lc-navbar">
                 <div className="lc-brand">
                     <div className="lc-brand-icon"><i className="fas fa-chess-rook"></i></div>
-                    <span className="lc-brand-text">The Lost Spectrum</span>
+                    <span className="lc-brand-text">{isThai ? 'โลกแห่งสีที่สาบสูญ' : 'The Lost Spectrum'}</span>
                 </div>
 
                 <div className="lc-nav-links">
-                    <button className="lc-nav-link">Grimoire</button>
-                    <button className="lc-nav-link" onClick={() => navigate('/dashboard')}>Map</button>
-                    <button className="lc-nav-link">Spell Book</button>
+                    <button className="lc-nav-link">{isThai ? 'ตำราคาถา' : 'Grimoire'}</button>
+                    <button className="lc-nav-link" onClick={() => navigate('/dashboard')}>{isThai ? 'แผนที่' : 'Map'}</button>
+                    <button className="lc-nav-link">{isThai ? 'หนังสือคาถา' : 'Spell Book'}</button>
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
@@ -37,13 +39,13 @@ const LevelComplete = ({ level, levelId, user, character, levelProgress, complet
                 <div className="lc-badge">
                     <span className="lc-badge-pill">
                         <span className="lc-badge-dot"></span>
-                        {level?.stageType === 'boss' ? 'BOSS DEFEATED' : 'STAGE COMPLETE'}
+                        {isThai ? (level?.stageType === 'boss' ? 'ชนะบอสแล้ว' : 'ผ่านด่านแล้ว') : (level?.stageType === 'boss' ? 'BOSS DEFEATED' : 'STAGE COMPLETE')}
                     </span>
                 </div>
 
                 {/* Title */}
                 <h1 className="lc-title">
-                    {level?.stageType === 'boss' ? '⚔️ BOSS DEFEATED! ⚔️' : '⭐ STAGE COMPLETE! ⭐'}
+                    {isThai ? (level?.stageType === 'boss' ? 'ชนะบอสแล้ว!' : 'ผ่านด่านแล้ว!') : (level?.stageType === 'boss' ? '⚔️ BOSS DEFEATED! ⚔️' : '⭐ STAGE COMPLETE! ⭐')}
                 </h1>
                 <p className="lc-subtitle">
                     {level?.completeMessage || 'The spectrum has been stabilized. The ancient magic flows once more.'}
@@ -68,7 +70,7 @@ const LevelComplete = ({ level, levelId, user, character, levelProgress, complet
                             <i className={levelUpInfo.newIcon || 'fas fa-arrow-up'}></i>
                         </div>
                         <div className="lc-levelup-info">
-                            <div className="lc-levelup-label">LEVEL UP!</div>
+                            <div className="lc-levelup-label">{isThai ? 'เลเวลเพิ่มแล้ว!' : 'LEVEL UP!'}</div>
                             <div className="lc-levelup-text">
                                 {levelUpInfo.oldTitle} → <strong style={{ color: levelUpInfo.newColor }}>{levelUpInfo.newTitle}</strong>
                             </div>
@@ -80,11 +82,11 @@ const LevelComplete = ({ level, levelId, user, character, levelProgress, complet
                 <div className="lc-xp-section">
                     <h3 className="lc-section-title">
                         <i className="fas fa-star" style={{ color: '#fbbf24' }}></i>
-                        XP Earned: <span className="lc-xp-total">+{earnedXP}</span>
+                        {isThai ? 'XP ที่ได้รับ:' : 'XP Earned:'} <span className="lc-xp-total">+{earnedXP}</span>
                     </h3>
                     <div className="lc-xp-breakdown">
                         <div className="lc-xp-row base">
-                            <span><i className="fas fa-scroll"></i> Base XP</span>
+                            <span><i className="fas fa-scroll"></i> {isThai ? 'XP พื้นฐาน' : 'Base XP'}</span>
                             <span>+{baseXP}</span>
                         </div>
                         {appliedBonuses.map((bonus, i) => (
@@ -151,8 +153,8 @@ const LevelComplete = ({ level, levelId, user, character, levelProgress, complet
                         </div>
                         <div className="lc-chapter-tags">
                             <span className="lc-tag xp">XP +{earnedXP || level.xpReward || 0}</span>
-                            {level?.stageType === 'boss' && <span className="lc-tag mastery">Boss Cleared</span>}
-                            {level?.stageType !== 'boss' && <span className="lc-tag mastery">Stage Complete</span>}
+                            {level?.stageType === 'boss' && <span className="lc-tag mastery">{isThai ? 'ชนะบอส' : 'Boss Cleared'}</span>}
+                            {level?.stageType !== 'boss' && <span className="lc-tag mastery">{isThai ? 'ผ่านด่าน' : 'Stage Complete'}</span>}
                         </div>
                     </div>
                 </div>
@@ -160,7 +162,7 @@ const LevelComplete = ({ level, levelId, user, character, levelProgress, complet
                 {/* Skills */}
                 {level.skills && level.skills.length > 0 && (
                     <>
-                        <h2 className="lc-skills-title">Skills Recorded</h2>
+                        <h2 className="lc-skills-title">{isThai ? 'ทักษะที่ได้เรียนรู้' : 'Skills Recorded'}</h2>
                         <div className="lc-skills-grid">
                             {level.skills.map((skill, i) => (
                                 <div key={i} className="lc-skill-card">
@@ -190,10 +192,10 @@ const LevelComplete = ({ level, levelId, user, character, levelProgress, complet
                 {/* Actions */}
                 <div className="lc-actions">
                     <button className="lc-btn-replay" onClick={onReplay}>
-                        <i className="fas fa-redo"></i> Replay Level
+                        <i className="fas fa-redo"></i> {isThai ? 'เล่นด่านนี้อีกครั้ง' : 'Replay Level'}
                     </button>
                     <button className="lc-btn-continue" onClick={onContinue}>
-                        Continue Journey <i className="fas fa-arrow-right"></i>
+                        {isThai ? 'ไปต่อ' : 'Continue Journey'} <i className="fas fa-arrow-right"></i>
                     </button>
                 </div>
             </div>

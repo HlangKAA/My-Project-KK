@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
+import { useLanguage } from '../i18n/useLanguage';
 import HintPanel from './HintPanel';
+import SpellFailureFeedback from './SpellFailureFeedback';
+import { pythonFailure } from './spellFeedback';
 import './stagetypes.css';
 
 /**
@@ -7,6 +10,7 @@ import './stagetypes.css';
  * ผู้เล่นเติม code ในช่องว่าง (___BLANK_N___) ตาม template
  */
 const GuidedStage = ({ data, onAttempt, runCode }) => {
+    const { isThai } = useLanguage();
     const [busy, setBusy] = useState(false);
     const [blankValues, setBlankValues] = useState({});
     const [submitted, setSubmitted] = useState(false);
@@ -15,6 +19,7 @@ const GuidedStage = ({ data, onAttempt, runCode }) => {
     const [hintsUsed, setHintsUsed] = useState(0);
     const [output, setOutput] = useState([]);
     const [allCorrect, setAllCorrect] = useState(false);
+    const [failure, setFailure] = useState(null);
 
     const blanks = data.blanks || [];
     const template = data.codeTemplate || '';
@@ -30,6 +35,7 @@ const GuidedStage = ({ data, onAttempt, runCode }) => {
     };
 
     const handleBlankChange = (blankId, value) => {
+        setFailure(null);
         setBlankValues(prev => ({ ...prev, [blankId]: value }));
         // Clear previous results when editing
         if (submitted) {
@@ -45,6 +51,7 @@ const GuidedStage = ({ data, onAttempt, runCode }) => {
         const submitted_at = new Date().toISOString();
         setAttemptCount(prev => prev + 1);
         setSubmitted(true);
+        setFailure(null);
 
         // Check each blank
         const results = {};
@@ -61,6 +68,7 @@ const GuidedStage = ({ data, onAttempt, runCode }) => {
 
         setBlankResults(results);
         setAllCorrect(correct);
+        if (!correct) setFailure({ kind: 'blank', labels: blanks.filter(blank => !results[blank.id]).map(blank => blank.id) });
 
         const finalCode = buildCode();
         const record = async result => {
@@ -73,7 +81,7 @@ const GuidedStage = ({ data, onAttempt, runCode }) => {
             runCode(finalCode, {
                 cast_color: () => {}, move_to_x: () => {}, say: () => {},
                 __onSuccess: () => { void record('Success'); },
-                __onError: () => { setAllCorrect(false); void record('Error'); },
+                __onError: error => { setAllCorrect(false); setFailure(pythonFailure(error)); void record('Error'); },
             });
         } else {
             await record(correct ? 'Success' : 'Fail');
@@ -147,7 +155,7 @@ const GuidedStage = ({ data, onAttempt, runCode }) => {
             <div className="stage-type-instruction">
                 <div className="stage-type-badge guided">
                     <i className="fas fa-pencil-alt"></i>
-                    <span>GUIDED EXERCISE</span>
+                    <span>{isThai ? 'แบบฝึกหัดทีละขั้น' : 'GUIDED EXERCISE'}</span>
                 </div>
                 {data.guidedInstruction && (
                     <p className="stage-type-desc" dangerouslySetInnerHTML={{ __html: data.guidedInstruction }} />
@@ -160,7 +168,7 @@ const GuidedStage = ({ data, onAttempt, runCode }) => {
                     <i className="fas fa-code"></i>
                     <span>spell_cast.py</span>
                     <span className="guided-fill-count">
-                        {Object.values(blankResults).filter(v => v === true).length} / {blanks.length} blanks filled
+                        {Object.values(blankResults).filter(v => v === true).length} / {blanks.length} {isThai ? 'ช่องที่ตอบแล้ว' : 'blanks filled'}
                     </span>
                 </div>
                 <div className="guided-editor-body">
@@ -172,7 +180,7 @@ const GuidedStage = ({ data, onAttempt, runCode }) => {
             {output.length > 0 && (
                 <div className="guided-output">
                     <div className="guided-output-header">
-                        <i className="fas fa-terminal"></i> Output
+                        <i className="fas fa-terminal"></i> {isThai ? 'ผลลัพธ์' : 'Output'}
                     </div>
                     {output.map((line, i) => (
                         <div key={i} className="guided-output-line">{line}</div>
@@ -181,12 +189,7 @@ const GuidedStage = ({ data, onAttempt, runCode }) => {
             )}
 
             {/* Result Feedback */}
-            {submitted && !allCorrect && (
-                <div className="guided-feedback wrong">
-                    <i className="fas fa-exclamation-circle"></i>
-                    <span>Some blanks are incorrect. Check the highlighted fields and try again!</span>
-                </div>
-            )}
+            <SpellFailureFeedback failure={failure} isThai={isThai} />
             {allCorrect && (
                 <div className="guided-feedback correct">
                     <i className="fas fa-check-circle"></i>
@@ -207,7 +210,7 @@ const GuidedStage = ({ data, onAttempt, runCode }) => {
             {!allCorrect && (
                 <div className="stage-type-actions">
                     <button className="stage-type-btn primary" onClick={handleSubmit} disabled={busy}>
-                        <i className="fas fa-check"></i> Check Answers
+                        <i className="fas fa-check"></i> {isThai ? 'ตรวจคำตอบ' : 'Check Answers'}
                     </button>
                 </div>
             )}

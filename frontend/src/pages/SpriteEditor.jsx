@@ -17,15 +17,15 @@ const POSES = [
   { id: 'staff-display', name: 'โชว์ไม้เท้า', emoji: '⚔️' },
 ];
 
-const STORAGE_KEY = 'wizard-sprite-crops';
-const SPRITE_SRC = '/wizard-sprites.png';
+const STORAGE_KEY = 'wizard-sprite-crops-aligned';
+const SPRITE_SRC = '/wizard-sprites-aligned.png';
 
 // Load saved crops from localStorage
 function loadCrops() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) return JSON.parse(saved);
-  } catch (e) { /* ignore */ }
+  } catch { /* ignore */ }
   return {};
 }
 

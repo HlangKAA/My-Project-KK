@@ -196,7 +196,7 @@
 .sprite-display {
   width: 200px;
   height: 230px;
-  background-image: url('/wizard-sprites.png');
+  background-image: url('/wizard-sprites-aligned.png');
   background-repeat: no-repeat;
   
   /* Scale the background so each sprite fills the display area 

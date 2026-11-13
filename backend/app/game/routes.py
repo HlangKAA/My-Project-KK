@@ -1,9 +1,29 @@
 from datetime import timezone
 from flask import Blueprint, render_template, session, redirect, url_for, request, jsonify, current_app
 from app.db import get_db_connection
+from app.game.leaderboard import read_leaderboard
 from app.game.progress import CATALOG, read_progress, save_submission, validate_submission
 
 game_bp = Blueprint('game', __name__)
+
+
+@game_bp.route('/api/leaderboard', methods=['GET'])
+def leaderboard():
+    if 'player_id' not in session:
+        return jsonify(message='Not logged in'), 401
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify(message='Database connection failed'), 503
+    try:
+        with conn:
+            with conn.cursor() as cursor:
+                result = read_leaderboard(cursor, session['player_id'])
+        return jsonify(success=True, **result)
+    except Exception:
+        current_app.logger.exception('Unable to load leaderboard')
+        return jsonify(message='Unable to load leaderboard. Please retry.'), 503
+    finally:
+        conn.close()
 
 
 @game_bp.route('/api/progress', methods=['GET'])

@@ -1,6 +1,7 @@
 import { StrictMode, Component } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
+import './App.css'
 import App from './App.jsx'
 
 class ErrorBoundary extends Component {
@@ -9,7 +10,7 @@ class ErrorBoundary extends Component {
     this.state = { hasError: false, error: null, errorInfo: null };
   }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError() {
     return { hasError: true };
   }
 

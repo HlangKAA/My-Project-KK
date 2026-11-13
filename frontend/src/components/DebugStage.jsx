@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
+import { useLanguage } from '../i18n/useLanguage';
 import HintPanel from './HintPanel';
+import SpellFailureFeedback from './SpellFailureFeedback';
+import { pythonFailure } from './spellFeedback';
 import './stagetypes.css';
 
 /**
@@ -7,11 +10,13 @@ import './stagetypes.css';
  * แสดง buggy code ให้ผู้เล่นแก้ แล้วรัน validate output
  */
 const DebugStage = ({ data, onAttempt, runCode, output = [], clearOutput }) => {
+    const { isThai } = useLanguage();
     const [code, setCode] = useState(data.buggyCode || data.initialCode || '');
     const [attemptCount, setAttemptCount] = useState(0);
     const [hintsUsed, setHintsUsed] = useState(0);
     const [isRunning, setIsRunning] = useState(false);
     const [resultStatus, setResultStatus] = useState(null); // null | 'success' | 'error'
+    const [failure, setFailure] = useState(null);
 
     const handleRun = () => {
         if (isRunning) return;
@@ -21,9 +26,11 @@ const DebugStage = ({ data, onAttempt, runCode, output = [], clearOutput }) => {
         setAttemptCount(prev => prev + 1);
         setIsRunning(true);
         setResultStatus(null);
+        setFailure(null);
         clearOutput?.();
-        const record = async result => {
+        const record = async (result, diagnosis = null) => {
             setResultStatus(result === 'Success' ? 'success' : 'error');
+            setFailure(result === 'Success' ? null : diagnosis || { kind: 'unknown' });
             await onAttempt({ code, result, submitted_at, runtime: (performance.now() - started) / 1000 },
                 { attempts: attemptCount + 1, hintsUsed });
             setIsRunning(false);
@@ -31,14 +38,15 @@ const DebugStage = ({ data, onAttempt, runCode, output = [], clearOutput }) => {
         runCode(code, {
             cast_color: () => {}, move_to_x: () => {}, say: () => {},
             __onPrint: text => lines.push(text),
-            __onSuccess: () => { void record(data.validateOutput?.(lines) ? 'Success' : 'Fail'); },
-            __onError: () => { void record('Error'); },
+            __onSuccess: () => { void record(data.validateOutput?.(lines) ? 'Success' : 'Fail', { kind: 'output', actual: lines.join('').trim().slice(0, 160) }); },
+            __onError: error => { void record('Error', pythonFailure(error)); },
         });
     };
 
     const handleReset = () => {
         setCode(data.buggyCode || data.initialCode || '');
         setResultStatus(null);
+        setFailure(null);
         if (clearOutput) clearOutput();
     };
 
@@ -54,11 +62,10 @@ const DebugStage = ({ data, onAttempt, runCode, output = [], clearOutput }) => {
             <div className="stage-type-instruction">
                 <div className="stage-type-badge debug">
                     <i className="fas fa-bug"></i>
-                    <span>DEBUG CHALLENGE</span>
+                    <span>{isThai ? 'ภารกิจแก้บั๊ก' : 'DEBUG CHALLENGE'}</span>
                 </div>
                 <p className="stage-type-desc">
-                    This code has <strong className="bug-count">{data.bugCount || '?'} bug{(data.bugCount || 0) > 1 ? 's' : ''}</strong>. 
-                    Find and fix them!
+                    {isThai ? <>โค้ดนี้มีบั๊ก <strong className="bug-count">{data.bugCount || '?'}</strong> จุด ลองหาและแก้ดู</> : <>This code has <strong className="bug-count">{data.bugCount || '?'} bug{(data.bugCount || 0) > 1 ? 's' : ''}</strong>. Find and fix them!</>}
                 </p>
             </div>
 
@@ -71,7 +78,7 @@ const DebugStage = ({ data, onAttempt, runCode, output = [], clearOutput }) => {
                     </div>
                     <div className="debug-bug-counter">
                         <i className="fas fa-crosshairs"></i>
-                        {data.bugCount || '?'} bugs to fix
+                        {data.bugCount || '?'} {isThai ? 'จุดที่ต้องแก้' : 'bugs to fix'}
                     </div>
                 </div>
                 <div className="debug-code-area">
@@ -87,6 +94,7 @@ const DebugStage = ({ data, onAttempt, runCode, output = [], clearOutput }) => {
                         onChange={(e) => {
                             setCode(e.target.value);
                             setResultStatus(null);
+                            setFailure(null);
                         }}
                         spellCheck="false"
                         placeholder="Fix the bugs in this code..."
@@ -98,10 +106,10 @@ const DebugStage = ({ data, onAttempt, runCode, output = [], clearOutput }) => {
             <div className="debug-console">
                 <div className="debug-console-header">
                     <i className="fas fa-terminal"></i>
-                    <span>Console Output</span>
+                    <span>{isThai ? 'ผลลัพธ์ในคอนโซล' : 'Console Output'}</span>
                     {resultStatus === 'success' && (
                         <span className="debug-status-badge success">
-                            <i className="fas fa-check-circle"></i> All Bugs Fixed!
+                            <i className="fas fa-check-circle"></i> {isThai ? 'แก้บั๊กครบแล้ว!' : 'All Bugs Fixed!'}
                         </span>
                     )}
                     {resultStatus === 'error' && (
@@ -112,7 +120,7 @@ const DebugStage = ({ data, onAttempt, runCode, output = [], clearOutput }) => {
                 </div>
                 <div className="debug-console-body">
                     {output.length === 0 && (
-                        <div className="debug-console-line waiting">Run code to test your fixes...</div>
+                        <div className="debug-console-line waiting">{isThai ? 'รันโค้ดเพื่อทดสอบสิ่งที่แก้...' : 'Run code to test your fixes...'}</div>
                     )}
                     {output.map((line, i) => (
                         <div key={i} className={`debug-console-line ${line.startsWith('[ERROR]') ? 'error' : ''}`}>
@@ -123,6 +131,7 @@ const DebugStage = ({ data, onAttempt, runCode, output = [], clearOutput }) => {
             </div>
 
             {/* Result Feedback */}
+            <SpellFailureFeedback failure={failure} isThai={isThai} />
             {resultStatus === 'success' && (
                 <div className="guided-feedback correct">
                     <i className="fas fa-check-circle"></i>
@@ -142,7 +151,7 @@ const DebugStage = ({ data, onAttempt, runCode, output = [], clearOutput }) => {
             {/* Actions */}
             <div className="stage-type-actions">
                 <button className="stage-type-btn secondary" onClick={handleReset} disabled={isRunning}>
-                    <i className="fas fa-redo"></i> Reset Code
+                    <i className="fas fa-redo"></i> {isThai ? 'คืนค่าโค้ด' : 'Reset Code'}
                 </button>
                 <button
                     className="stage-type-btn primary"
@@ -152,7 +161,7 @@ const DebugStage = ({ data, onAttempt, runCode, output = [], clearOutput }) => {
                     {isRunning ? (
                         <><i className="fas fa-spinner fa-spin"></i> Running...</>
                     ) : (
-                        <><i className="fas fa-play"></i> Run & Test</>
+                        <><i className="fas fa-play"></i> {isThai ? 'รันและทดสอบ' : 'Run & Test'}</>
                     )}
                 </button>
             </div>
