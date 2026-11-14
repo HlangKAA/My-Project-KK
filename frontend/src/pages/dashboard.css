@@ -163,6 +163,9 @@
     flex: 1;
     position: relative;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
 }
 
 .dash-header {
@@ -218,13 +221,19 @@
 /* Map Container */
 .dash-map {
     position: relative;
-    margin: 1rem 2rem;
-    height: calc(100% - 140px);
+    flex: 1 1 auto;
+    min-height: 0;
+    margin: 1rem 2rem 0;
     background: #233746;
     border-radius: 12px;
     border: 1px solid rgba(255, 255, 255, 0.05);
     overflow: hidden;
 }
+
+.dash-map-help { flex: 0 0 auto; display: flex; justify-content: flex-start; margin: 5px 2rem 10px; }
+.dash-map-help button { min-height: 27px; padding: 3px 5px; border: 0; background: transparent; color: #a89080; font: inherit; font-size: .76rem; opacity: .72; cursor: pointer; }
+.dash-map-help button:hover, .dash-map-help button:focus-visible { color: #e0c8ac; opacity: 1; text-decoration: underline; }
+.dash-map-help button:focus-visible { outline: 2px solid #b88949; outline-offset: 2px; }
 
 .dash-map-search {
     position: absolute;
@@ -536,7 +545,8 @@
     .dash-user-info { order: -1; flex: 1 0 100%; justify-content: flex-end; }
     .dash-header { padding: 1rem 1rem 0; }
     .dash-title { font-size: 1.4rem; }
-    .dash-map { margin: 1rem; }
+    .dash-map { margin: 1rem 1rem 0; }
+    .dash-map-help { margin: 5px 1rem 8px; }
     .dash-view-btn { padding: 0.55rem 0.7rem; }
     .dash-header-actions { gap: 0.75rem; flex-wrap: wrap; }
     .dash-map-area { min-height: 470px; }

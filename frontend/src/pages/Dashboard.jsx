@@ -9,6 +9,7 @@ import { useLanguage } from '../i18n/useLanguage';
 import { localRegion, localStage } from '../i18n/th';
 import WizardProfile from '../components/WizardProfile';
 import StoryScene from '../components/StoryScene';
+import GameplayWalkthrough from '../components/GameplayWalkthrough';
 import worldMap from '../assets/images/the-lost-spectrum-world-map.png';
 import regionRedForest from '../assets/images/region-red-forest.png';
 import regionAshPeaks from '../assets/images/region-ash-peaks.png';
@@ -33,17 +34,17 @@ const REGIONS = [
     },
     {
         id: 3,
-        name: 'ASH PEAKS',
-        image: regionAshPeaks,
-        top: '38%',
-        left: '94%',
-    },
-    {
-        id: 4,
         name: 'WHISPERING CAVERNS',
         image: regionWhisperingCaverns,
         top: '70%',
         left: '82%',
+    },
+    {
+        id: 4,
+        name: 'ASH PEAKS',
+        image: regionAshPeaks,
+        top: '38%',
+        left: '94%',
     }
 ];
 
@@ -52,28 +53,61 @@ const conceptLabel = key => CONCEPT_MAP[key]?.name
 
 const Dashboard = () => {
     const { language, setLanguage, isThai } = useLanguage();
-    const { user, logout } = useGame();
+    const { user, logout, advanceOnboarding } = useGame();
     const navigate = useNavigate();
     const { character, levelProgress } = useCharacterProgression();
     const userLevel = user?.level || 1;
     const [showLegends, setShowLegends] = useState(false);
     const [storyScene, setStoryScene] = useState(null);
-    const [dismissedPrologueFor, setDismissedPrologueFor] = useState(null);
+    const [walkthroughReplay, setWalkthroughReplay] = useState(false);
+    const [onboardingSaving, setOnboardingSaving] = useState(false);
+    const [onboardingError, setOnboardingError] = useState('');
     const [mapZoom, setMapZoom] = useState(1);
     const [leaderboard, setLeaderboard] = useState({ loading: true, error: '', entries: [], me: null });
 
-    const autoPrologue = user?.player_id && !user?.completedStages?.['1-1']
-        && dismissedPrologueFor !== user.player_id
-        && !localStorage.getItem(`lost-spectrum-prologue:${user.player_id}`)
-        ? 'prologue' : null;
-    const activeStoryScene = storyScene || autoPrologue;
+    const hasPlayed = Object.values(user?.completedStages || {}).some(Boolean);
+    const legacyPrologueSeen = user?.player_id
+        ? Boolean(localStorage.getItem(`lost-spectrum-prologue:${user.player_id}`)) : false;
+    const autoPrologue = user?.player_id && !hasPlayed && user.onboarding_step === 0 && !legacyPrologueSeen;
+    const activeStoryScene = storyScene || (autoPrologue ? 'prologue' : null);
+    const autoWalkthrough = user?.player_id && !hasPlayed
+        && (user.onboarding_step === 1 || (user.onboarding_step === 0 && legacyPrologueSeen));
+    const showWalkthrough = walkthroughReplay || (!activeStoryScene && autoWalkthrough);
 
-    const closeStoryScene = () => {
-        if (activeStoryScene === 'prologue' && user?.player_id) {
-            localStorage.setItem(`lost-spectrum-prologue:${user.player_id}`, 'seen');
-            setDismissedPrologueFor(user.player_id);
+    const closeStoryScene = async () => {
+        if (onboardingSaving) return;
+        if (storyScene || activeStoryScene !== 'prologue') {
+            setStoryScene(null);
+            return;
         }
-        setStoryScene(null);
+        setOnboardingSaving(true);
+        setOnboardingError('');
+        try {
+            await advanceOnboarding(1);
+        } catch (error) {
+            setOnboardingError(isThai ? 'บันทึกตอนเปิดเรื่องไม่สำเร็จ ลองอีกครั้งนะ' : (error.response?.data?.message || 'Could not save your introduction. Please retry.'));
+        } finally {
+            setOnboardingSaving(false);
+        }
+    };
+
+    const finishWalkthrough = async () => {
+        if (onboardingSaving) return;
+        if (walkthroughReplay) {
+            setWalkthroughReplay(false);
+            setOnboardingError('');
+            return;
+        }
+        setOnboardingSaving(true);
+        setOnboardingError('');
+        try {
+            await advanceOnboarding(2);
+            navigate('/region/1');
+        } catch (error) {
+            setOnboardingError(isThai ? 'บันทึกวิธีเล่นไม่สำเร็จ ลองอีกครั้งนะ' : (error.response?.data?.message || 'Could not save the guide. Please retry.'));
+        } finally {
+            setOnboardingSaving(false);
+        }
     };
 
     useEffect(() => {
@@ -199,6 +233,12 @@ const Dashboard = () => {
                             </button>
                         </div>
                     </div>
+                    <div className="dash-map-help">
+                        <button type="button" onClick={() => { setOnboardingError(''); setWalkthroughReplay(true); }}
+                            aria-label={isThai ? 'เปิดวิธีเล่น' : 'Open gameplay tutorial'}>
+                            <i className="fas fa-question-circle" aria-hidden="true" /> {isThai ? 'วิธีเล่น' : 'Tutorial'}
+                        </button>
+                    </div>
                 </div>
 
                 {/* Leaderboard */}
@@ -254,7 +294,7 @@ const Dashboard = () => {
                                     <button type="button" onClick={() => { setShowLegends(false); setStoryScene('prologue'); }}>
                                         <i className="fas fa-book-open" /> {isThai ? 'ดูตอนเปิดเรื่อง' : 'Replay Opening'}
                                     </button>
-                                    {user?.completedStages?.['4-6'] && <button type="button" onClick={() => { setShowLegends(false); setStoryScene('epilogue'); }}>
+                                    {user?.completedStages?.['4-7'] && <button type="button" onClick={() => { setShowLegends(false); setStoryScene('epilogue'); }}>
                                         <i className="fas fa-sun" /> {isThai ? 'ดูตอนจบ' : 'Replay Ending'}
                                     </button>}
                                 </div>
@@ -295,7 +335,10 @@ const Dashboard = () => {
                     </section>
                 </div>
             )}
-            {activeStoryScene && <StoryScene scene={activeStoryScene} playerName={user?.username} isThai={isThai} onClose={closeStoryScene} />}
+            {activeStoryScene && <StoryScene scene={activeStoryScene} playerName={user?.username} isThai={isThai}
+                onClose={closeStoryScene} saving={onboardingSaving} error={onboardingError} />}
+            {showWalkthrough && <GameplayWalkthrough isThai={isThai} onFinish={finishWalkthrough}
+                saving={onboardingSaving} error={onboardingError} replay={walkthroughReplay} />}
         </div>
     );
 };

@@ -10,7 +10,6 @@ const MAP_PARTICLES = Array.from({ length: 20 }, () => ({
     left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%`,
     animationDelay: `${Math.random() * 6}s`, animationDuration: `${4 + Math.random() * 4}s`,
 }));
-const ARCHIVE_COLORS = ['#dfa85a', '#64b7d9', '#ba8ed7', '#d5d2c9', '#76c9a0', '#e2bb6c'];
 
 const RegionMap = () => {
     const { regionId } = useParams();
@@ -73,25 +72,6 @@ const RegionMap = () => {
                     <h1 className="rmap-title">{region.name}</h1>
                     <p className="rmap-subtitle">{region.subtitle}</p>
                     <p className="rmap-description">{region.description}</p>
-                    {regionId === '2' && (
-                        <div className="rmap-archive-restoration" role="progressbar"
-                            aria-label={isThai ? 'ความคืบหน้าการคืนสีให้หอสมุด' : 'Archive color restoration'}
-                            aria-valuenow={archiveCleared} aria-valuemin={0} aria-valuemax={region.stages.length}>
-                            <div className="rmap-archive-seals">
-                                {region.stages.map((stage, index) => {
-                                    const restored = Boolean(user?.completedStages?.[`2-${stage.id}`]);
-                                    return <div key={stage.id} className={`rmap-archive-seal ${restored ? 'restored' : ''}`}
-                                        style={{ '--seal-color': ARCHIVE_COLORS[index % ARCHIVE_COLORS.length] }}
-                                        title={`${stage.name}: ${restored ? (isThai ? 'คืนสีแล้ว' : 'restored') : (isThai ? 'รอการคืนสี' : 'awaiting color')}`}>
-                                        <i className={stage.icon} aria-hidden="true" />
-                                    </div>;
-                                })}
-                            </div>
-                            <p>{archiveCleared === region.stages.length
-                                ? (isThai ? 'หอสมุดกลับมามีสีสันครบแล้ว!' : 'The Archive shines with color again!')
-                                : (isThai ? 'ผ่านด่านเพื่อปลุกแสงสีทีละส่วน' : 'Clear stages to restore its color, one piece at a time.')}</p>
-                        </div>
-                    )}
                 </div>
 
                 {/* Stage Timeline */}
@@ -130,7 +110,7 @@ const RegionMap = () => {
                                             {stage.type === 'story' ? (isThai ? '◆ เนื้อเรื่อง' : '◆ STORY') : (isThai ? '◇ ภารกิจ' : '◇ CHALLENGE')}
                                         </span>
                                     </div>
-                                    <h3 className="rmap-stage-name">{stage.name}</h3>
+                                    <h3 className="rmap-stage-name"><i className={`rmap-stage-card-icon ${stage.icon}`} aria-hidden="true" />{stage.name}</h3>
                                     <p className="rmap-stage-desc">{stage.description}</p>
 
                                     <div className="rmap-stage-card-footer">

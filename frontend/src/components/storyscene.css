@@ -7,6 +7,8 @@
 .story-scene-lines p { margin: 0 0 18px; line-height: 1.7; font-size: 1.05rem; }
 .story-scene-continue { display: block; width: 100%; margin-top: 28px; padding: 13px 18px; border: 1px solid #d2ad72; border-radius: 8px; background: #634a32; color: #fff2d9; font: inherit; font-weight: 700; cursor: pointer; }
 .story-scene-skip { margin-top: 12px; border: 0; background: transparent; color: #c4b6a2; font: inherit; text-decoration: underline; cursor: pointer; }
+.story-scene-error { color: #ffc0ae; margin: 16px 0 0; }
+.story-scene button:disabled { opacity: .6; cursor: wait; }
 @keyframes story-sigil-glow { from { box-shadow: 0 0 9px #b7965277; } to { box-shadow: 0 0 30px #e5c171aa; } }
 @media (prefers-reduced-motion: reduce) { .story-scene-sigil { animation: none; } }
 .story-scene-world { position: relative; height: 125px; margin: 0 0 22px; overflow: hidden; border: 1px solid #9c825b; border-radius: 9px; }

@@ -144,7 +144,8 @@ function CodeCombatArenaContent({
             const flasksOk = flasks.length === 0 || flasks.every(f => flasksSt[f.id]?.filled);
             const braziersOk = braziers.length === 0 || braziers.every(b => braziersSt[b.id]?.litColor);
             const colorsOk = colorTargets.length === 0 || areColorTargetsMatched(colorTargets, braziersSt);
-            if (reachedGate && flasksOk && braziersOk && colorsOk) {
+            const chantOk = !gate.keyword || altarLit;
+            if (reachedGate && flasksOk && braziersOk && colorsOk && chantOk) {
                 setGateUnlocked(true);
                 setHeroState('success');
                 setActionLogBanner(`${gate.name} unlocked! Boss Trial Conquered!`);
@@ -157,7 +158,8 @@ function CodeCombatArenaContent({
                     ? { kind: 'flaskIncomplete', name: flasks.find(f => !flasksSt[f.id]?.filled)?.label }
                     : !colorsOk ? colorFailure(colorTargets, braziersSt)
                         : !braziersOk ? { kind: 'brazierMissing', name: braziers.find(b => !braziersSt[b.id]?.litColor)?.name }
-                            : { kind: 'gatePosition', name: gate.name, x: gate.x, y: gate.y };
+                            : !chantOk ? { kind: 'gateChant', name: gate.name }
+                                : { kind: 'gatePosition', name: gate.name, x: gate.x, y: gate.y };
                 setActionLogBanner('Trial incomplete. Check the failed objective.');
                 if (onExecutionFinish) onExecutionFinish(false, failure);
             }
@@ -535,6 +537,10 @@ function CodeCombatArenaContent({
                 case 'print': {
                     const text = action.text;
                     setActionLogBanner(`💬 "${text}"`);
+                    if (gate?.keyword && Math.abs(curPos.x - gate.x) + Math.abs(curPos.y - gate.y) <= 1
+                        && text.toLowerCase().includes(gate.keyword.toLowerCase())) {
+                        curAltarLit = true;
+                    }
                     if (altar && curPos.x === altar.x && curPos.y === altar.y) {
                         if (text.toLowerCase().includes(altar.keyword?.toLowerCase() || 'lumina')) {
                             curAltarLit = true;
@@ -558,7 +564,7 @@ function CodeCombatArenaContent({
             if (timerRef.current) clearTimeout(timerRef.current);
             isRunningRef.current = false;
         };
-    }, [isExecuting, actionQueue, speedMultiplier, checkVictory, spawn, initialItems, flasks, braziers, colorTargets, cols, rows, obstacles, hazards, blockMovement, boss, altar, onExecutionFinish, onLog, isThai]);
+    }, [isExecuting, actionQueue, speedMultiplier, checkVictory, spawn, initialItems, flasks, braziers, colorTargets, cols, rows, obstacles, hazards, blockMovement, boss, gate, altar, onExecutionFinish, onLog, isThai]);
 
     // ─── Check Victory ───
     const shieldsLeft = boss ? colorTargets.filter(target => {

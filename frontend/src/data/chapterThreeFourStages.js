@@ -29,8 +29,9 @@ const stages = {
         source: [[20, 50, 90], [180, 30, 50], [70, 70, 70]],
         result: [[20, 50, 90], [255, 200, 40], [70, 70, 70]],
         probe: [[[190, 0, 0], [10, 20, 30], [40, 50, 60]], [[30, 20, 10], [40, 50, 60], [200, 0, 0]]],
+        starter: 'reds = [pixel[0] for pixel in pixels]\n    position = 0  # Find the strongest red position with max() and .index().\n    result = pixels[:] \n    result[position] = [255, 200, 40]\n    return result',
         code: 'reds = [pixel[0] for pixel in pixels]\n    position = reds.index(max(reds))\n    result = pixels[:] \n    result[position] = [255, 200, 40]\n    return result',
-        clue: 'Build a list of red values, find max(reds), then reds.index(...) gives the pixel position.',
+        clue: 'The red values are ready. Replace position = 0 with reds.index(max(reds)).',
         icon: 'fas fa-search', xp: 280,
     },
     '3-4': {
@@ -54,15 +55,7 @@ const stages = {
         clue: 'RGB uses indexes 0, 1, 2. The broken loop swaps red and green.',
         icon: 'fas fa-bug', xp: 310,
     },
-    '3-7': {
-        title: 'Pixel Trail', concept: 'Traversing a pixel row restores an image one sample at a time.',
-        task: 'Reverse the row with a loop and append(), so the rune trail reads from right to left.',
-        source: [B, G, R], result: [R, G, B], probe: [[R, B, G], [D, R, W]],
-        code: 'result = []\n    for index in range(len(pixels) - 1, -1, -1):\n        result.append(pixels[index])\n    return result',
-        clue: 'Loop over indexes 2, 1, 0 with range(len(pixels) - 1, -1, -1).',
-        icon: 'fas fa-route', xp: 330,
-    },
-    '3-8': {
+    '3-6': {
         title: 'The Hidden Pattern', concept: 'A repeated pixel pattern can reveal a feature hidden in an image.',
         task: 'If the outer pixels match, make the center gold; otherwise leave the row unchanged.',
         source: [R, D, R], result: [R, [255, 200, 40], R],
@@ -71,15 +64,15 @@ const stages = {
         clue: 'Compare pixels[0] with pixels[2]. Change only the middle pixel if they match.',
         icon: 'fas fa-chess-board', xp: 350,
     },
-    '3-6': {
-        title: 'The Peak Trial', concept: 'Indexing, searching, and loops combine to locate and restore image features.',
-        task: 'Brighten every pixel by 20, then mark the brightest original red pixel gold.',
+    '3-7': {
+        title: 'The Cavern Trial', concept: 'Searching and indexing locate a color feature in an image row.',
+        task: 'Find the pixel with the most red and turn it gold. Keep the other pixels unchanged.',
         source: [[30, 40, 50], [200, 30, 20], [70, 80, 90]],
-        result: [[50, 60, 70], [255, 200, 40], [90, 100, 110]],
+        result: [[30, 40, 50], [255, 200, 40], [70, 80, 90]],
         probe: [[[230, 0, 0], [40, 50, 60], [10, 20, 30]], [[1, 2, 3], [30, 40, 50], [180, 70, 80]]],
-        code: 'reds = [pixel[0] for pixel in pixels]\n    result = []\n    for pixel in pixels:\n        result.append([min(255, channel + 20) for channel in pixel])\n    result[reds.index(max(reds))] = [255, 200, 40]\n    return result',
-        clue: 'Save the original red values, brighten each pixel, then replace the pixel at reds.index(max(reds)).',
-        icon: 'fas fa-crown', xp: 450, type: 'boss', gate: 'Summit Gate',
+        code: 'reds = [pixel[0] for pixel in pixels]\n    result = pixels[:] \n    result[reds.index(max(reds))] = [255, 200, 40]\n    return result',
+        clue: 'Make a copy of the pixel row and change only the pixel at reds.index(max(reds)).',
+        icon: 'fas fa-crown', xp: 450, type: 'boss', gate: 'Cavern Gate',
     },
     '4-1': {
         title: 'The Crossroads', concept: 'Thresholding turns image brightness into a black or white mask.',
@@ -123,36 +116,26 @@ const stages = {
         icon: 'fas fa-bug', xp: 360,
     },
     '4-5': {
-        title: 'The Color Mixer', concept: 'Conditional color mixing changes RGB channels based on the source pixel.',
-        task: 'If red is strongest, add 40 green; otherwise add 40 blue. Cap the changed channel at 255.',
-        source: [[190, 30, 20], [20, 180, 40], [10, 20, 210]],
-        result: [[190, 70, 20], [20, 180, 80], [10, 20, 250]],
-        probe: [[[250, 250, 10], [20, 255, 250], [255, 0, 255]], [[0, 0, 0], [30, 20, 10], [1, 2, 3]]],
-        code: 'result = []\n    for r, g, b in pixels:\n        if r > g and r > b:\n            result.append([r, min(255, g + 40), b])\n        else:\n            result.append([r, g, min(255, b + 40)])\n    return result',
-        clue: 'Compare red with both other channels; only then add green. Otherwise add blue.',
-        icon: 'fas fa-tint', xp: 380,
-    },
-    '4-7': {
-        title: 'Shadow Boundaries', concept: 'Edge detection compares neighboring pixels to find a light to shadow boundary.',
-        task: 'Make a pixel gold if its average brightness differs from the previous pixel by at least 80; keep other pixels.',
+        title: 'Shadow Boundaries', concept: 'Comparing neighboring red values can reveal a color boundary.',
+        task: 'Make a pixel gold if its red value differs from the previous pixel by at least 80; keep other pixels.',
         source: [[30, 30, 30], [200, 200, 200], [210, 210, 210]],
         result: [[30, 30, 30], [255, 200, 40], [210, 210, 210]],
         probe: [[[200, 200, 200], [20, 20, 20], [200, 200, 200]], [[50, 50, 50], [129, 129, 129], [209, 209, 209]]],
-        code: 'result = [pixels[0]]\n    for index in range(1, len(pixels)):\n        left = sum(pixels[index - 1]) / 3\n        right = sum(pixels[index]) / 3\n        if abs(right - left) >= 80:\n            result.append([255, 200, 40])\n        else:\n            result.append(pixels[index])\n    return result',
-        clue: 'Use abs(right - left) to detect a large brightness change between neighbors.',
+        code: 'result = [pixels[0]]\n    for index in range(1, len(pixels)):\n        left = pixels[index - 1][0]\n        right = pixels[index][0]\n        if abs(right - left) >= 80:\n            result.append([255, 200, 40])\n        else:\n            result.append(pixels[index])\n    return result',
+        clue: 'Red is channel 0. Compare pixels[index][0] with pixels[index - 1][0].',
         icon: 'fas fa-adjust', xp: 400,
     },
-    '4-8': {
-        title: 'The Color Seal', concept: 'A color mask identifies dark pixels before applying an RGB transformation.',
-        task: 'Turn pixels with every channel below 100 into gold. For all others, brighten blue by 20.',
+    '4-6': {
+        title: 'The Color Seal', concept: 'A color mask selects dark pixels while leaving other colors alone.',
+        task: 'Turn pixels with every channel below 100 into gold. Keep all other pixels unchanged.',
         source: [[20, 30, 40], [180, 60, 40], [40, 150, 240]],
-        result: [[255, 200, 40], [180, 60, 60], [40, 150, 255]],
+        result: [[255, 200, 40], [180, 60, 40], [40, 150, 240]],
         probe: [[[99, 99, 99], [100, 99, 99], [0, 0, 240]], [[0, 0, 0], [200, 200, 200], [99, 100, 99]]],
-        code: 'result = []\n    for r, g, b in pixels:\n        if r < 100 and g < 100 and b < 100:\n            result.append([255, 200, 40])\n        else:\n            result.append([r, g, min(255, b + 20)])\n    return result',
-        clue: 'Check all three channels for the dark mask; use min(255, b + 20) on other pixels.',
+        code: 'result = []\n    for r, g, b in pixels:\n        if r < 100 and g < 100 and b < 100:\n            result.append([255, 200, 40])\n        else:\n            result.append([r, g, b])\n    return result',
+        clue: 'Check all three channels for the dark mask; otherwise append the original RGB values.',
         icon: 'fas fa-shield-alt', xp: 420,
     },
-    '4-6': {
+    '4-7': {
         title: 'The Light Convergence', concept: 'The final image combines thresholding, boolean logic, and RGB color restoration.',
         task: 'If average brightness is below 85, make white. If red is strongest, add 50 blue. Otherwise keep the pixel.',
         source: [[20, 30, 40], [200, 40, 30], [40, 180, 90]],
@@ -170,37 +153,35 @@ const probes = {
     '3-3': [[[255, 200, 40], [10, 20, 30], [40, 50, 60]], [[30, 20, 10], [40, 50, 60], [255, 200, 40]]],
     '3-4': [[[30, 30, 30], [255, 31, 32], [40, 50, 60]], [[255, 255, 255], [130, 150, 170], [250, 255, 255]]],
     '3-5': [[[20, 100, 200], [255, 10, 10], [35, 15, 15]], [[255, 0, 0], [90, 80, 90], [21, 2, 3]]],
-    '3-7': [[G, B, R], [W, R, D]],
-    '3-8': [[G, D, B], [B, [255, 200, 40], B]],
-    '3-6': [[[255, 200, 40], [60, 70, 80], [30, 40, 50]], [[21, 22, 23], [50, 60, 70], [255, 200, 40]]],
+    '3-6': [[G, D, B], [B, [255, 200, 40], B]],
+    '3-7': [[[255, 200, 40], [40, 50, 60], [10, 20, 30]], [[1, 2, 3], [30, 40, 50], [255, 200, 40]]],
     '4-1': [[[255, 255, 255], [0, 0, 0], [0, 0, 0]], [[255, 255, 255], [0, 0, 0], [255, 255, 255]]],
     '4-2': [[B, [255, 200, 40], W], [B, [255, 200, 40], W]],
     '4-3': [[[101, 0, 99], [0, 0, 0], [0, 0, 0]], [[255, 255, 0], [0, 0, 0], [150, 80, 20]]],
     '4-4': [[[0, 0, 0], [101, 101, 101], [0, 150, 150]], [[255, 255, 255], [0, 0, 0], [50, 100, 150]]],
-    '4-5': [[[250, 250, 50], [20, 255, 255], [255, 0, 255]], [[0, 0, 40], [30, 60, 10], [1, 2, 43]]],
-    '4-7': [[[200, 200, 200], [255, 200, 40], [255, 200, 40]], [[50, 50, 50], [129, 129, 129], [255, 200, 40]]],
-    '4-8': [[[255, 200, 40], [100, 99, 119], [0, 0, 255]], [[255, 200, 40], [200, 200, 220], [99, 100, 119]]],
-    '4-6': [[[255, 255, 255], [200, 0, 250], [250, 30, 255]], [[85, 85, 85], [200, 10, 240], [255, 255, 255]]],
+    '4-5': [[[200, 200, 200], [255, 200, 40], [255, 200, 40]], [[50, 50, 50], [129, 129, 129], [255, 200, 40]]],
+    '4-6': [[[255, 200, 40], [100, 99, 99], [0, 0, 240]], [[255, 200, 40], [200, 200, 200], [99, 100, 99]]],
+    '4-7': [[[255, 255, 255], [200, 0, 250], [250, 30, 255]], [[85, 85, 85], [200, 10, 240], [255, 255, 255]]],
 };
 
 const storyLore = {
-    '3-1': 'The mountain runes record where Krakk carried the stolen colors. Read each pixel carefully; his trail is hidden in their order.',
-    '3-6': 'The summit image points to the Whispering Caverns. Krakk hid his final spell beyond that darkness.',
-    '4-1': 'Krakk is close. His spell turns light into shadow, but a careful threshold can reveal the path.',
-    '4-6': 'I am Krakk, Summus Magus Monotoniae. I stole this kingdom\'s colors so no one could dream beyond my rule. Your little book cannot undo me.',
+    '3-1': 'The cavern runes record where Krakk carried the stolen colors. Read each pixel carefully; his trail is hidden in their order.',
+    '3-7': 'The cavern image points upward to Ash Peaks. Krakk hid his final spell above the clouds.',
+    '4-1': 'Krakk is close on Ash Peaks. His spell turns light into shadow, but a careful threshold can reveal the path.',
+    '4-7': 'I am Krakk, Summus Magus Monotoniae. I stole this kingdom\'s colors so no one could dream beyond my rule. Your little book cannot undo me.',
 };
 
 function createStage(key, stage) {
     const chapter = Number(key[0]);
-    const scene = chapter === 3 ? 'Ash Peaks' : 'Whispering Caverns';
-    const isFinalBoss = key === '4-6';
+    const scene = chapter === 3 ? 'Whispering Caverns' : 'Ash Peaks';
+    const isFinalBoss = key === '4-7';
     const castPath = isFinalBoss
         ? 'for index, color in enumerate(colors):\n    hero.cast_color(color[0], color[1], color[2])\n    if index < 2:\n        hero.move_up(1)\n        hero.move_right(3)\n        hero.move_down(1)\nhero.move_right(2)\nhero.move_down(2)'
         : `for color in colors:\n    hero.cast_color(color[0], color[1], color[2])\n    hero.move_right(3)${stage.gate ? '\nhero.move_down(2)' : ''}`;
     const fullCode = `def transform(pixels):\n    ${stage.code}\n\npixels = ${JSON.stringify(stage.source)}\ncolors = transform(pixels)\n${castPath}`;
     const startBody = stage.starter || 'pass  # Write the pixel filter here';
     const initialCode = fullCode.replace(`    ${stage.code}\n`, `    ${startBody}\n`);
-    const visionChecks = stage.probe.map((image, index) =>
+    const visionChecks = stage.probe.slice(0, 1).map((image, index) =>
         `assert transform(${JSON.stringify(image)}) == ${JSON.stringify(probes[key][index])}, "Image filter failed test row ${index + 1}"`
     );
     const colorTargets = stage.source.map((rgb, index) => ({
@@ -216,18 +197,18 @@ function createStage(key, stage) {
         prerequisiteConcepts: chapter === 3 ? ['rgb', 'variables'] : ['rgb', 'lists'],
         hasStoryIntro: true,
         storyIntro: {
-            sceneName: stage.title, npcName: isFinalBoss ? 'Krakk' : chapter === 3 ? 'Rune Keeper' : 'Cave Warden',
-            npcTitle: isFinalBoss ? 'Summus Magus Monotoniae' : chapter === 3 ? 'Guardian of the Ash Peaks' : 'Guardian of the Caverns',
+            sceneName: stage.title, npcName: isFinalBoss ? 'Krakk' : chapter === 3 ? 'Cave Warden' : 'Rune Keeper',
+            npcTitle: isFinalBoss ? 'Summus Magus Monotoniae' : chapter === 3 ? 'Guardian of the Caverns' : 'Guardian of Ash Peaks',
             npcIcon: isFinalBoss ? 'fas fa-hat-wizard' : stage.icon,
             dialogues: [
-                ...(storyLore[key] ? [{ speaker: isFinalBoss ? 'Krakk' : chapter === 3 ? 'Rune Keeper' : 'Cave Warden', text: storyLore[key], emotion: 'mysterious' }] : []),
-                { speaker: chapter === 3 ? 'Rune Keeper' : 'Cave Warden', text: stage.concept, emotion: 'teaching' },
-                { speaker: chapter === 3 ? 'Rune Keeper' : 'Cave Warden', text: stage.task, emotion: 'mysterious' },
+                ...(storyLore[key] ? [{ speaker: isFinalBoss ? 'Krakk' : chapter === 3 ? 'Cave Warden' : 'Rune Keeper', text: storyLore[key], emotion: 'mysterious' }] : []),
+                { speaker: chapter === 3 ? 'Cave Warden' : 'Rune Keeper', text: stage.concept, emotion: 'teaching' },
+                { speaker: chapter === 3 ? 'Cave Warden' : 'Rune Keeper', text: stage.task, emotion: 'mysterious' },
             ],
             enterButtonText: 'Restore the Image', enterButtonIcon: stage.icon,
         },
         arena: {
-            theme: chapter === 3 ? 'peaks' : 'cavern', blockMovement: true,
+            theme: chapter === 3 ? 'cavern' : 'peaks', blockMovement: true,
             cols: 10, rows: 5, spawn: { x: 1, y: 2 },
             murals: [{ id: `${key}-image`, name: `${stage.title} image` }],
             colorTargets,
@@ -239,13 +220,13 @@ function createStage(key, stage) {
             } : {}),
         },
         objective: isFinalBoss
-            ? `${stage.task} Avoid the marked shadow tiles, restore all three seals, and reach the gate. <span class="highlight">Two minutes of active execution time.</span>`
+            ? `${stage.task} Avoid the marked shadow tiles, restore all three seals, and reach the gate. <span class="highlight">Five minutes of active execution time.</span>`
             : `${stage.task} <span class="highlight">${stage.concept}</span>`,
         initialCode, visionChecks,
         completeMessage: isFinalBoss ? 'Krakk is defeated. The stolen colors return to the kingdom!' : `The image at ${stage.title} shines again!`,
         hints: [
             { level: 1, text: stage.clue },
-            { level: 2, text: isFinalBoss ? 'The marked tiles at (3, 2) and (6, 2) are dangerous. Move up, across, and down between seals.' : 'Return exactly three RGB pixels. The same filter must also work for different pixel rows.' },
+            { level: 2, text: isFinalBoss ? 'The marked tiles at (3, 2) and (6, 2) are dangerous. Move up, across, and down between seals.' : 'Return exactly three RGB pixels. Your filter also needs to work on one more simple row.' },
             { level: 3, text: `def transform(pixels):\n    ${stage.code}` },
         ],
         grimoire: [{

@@ -1,4 +1,4 @@
-// The Chromatic Archive builds on Chapter 1 RGB movement with color arithmetic.
+// Computer vision begins here: each visible object is an RGB pixel or image patch.
 const archiveIntro = (sceneName, dialogues, button) => ({
     sceneName,
     npcName: 'Loremaster Vane',
@@ -7,6 +7,15 @@ const archiveIntro = (sceneName, dialogues, button) => ({
     dialogues: dialogues.map(text => ({ speaker: 'Loremaster Vane', text, emotion: 'teaching' })),
     enterButtonText: button,
     enterButtonIcon: 'fas fa-palette',
+});
+
+const prismaIntro = (sceneName, task) => ({
+    sceneName, npcName: 'Prisma', npcTitle: 'Color Sage', npcIcon: 'fas fa-palette',
+    dialogues: [
+        { speaker: 'Prisma', text: 'Now that you can write Python spells, I can show you how an image stores color: every pixel has red, green, and blue channels.', emotion: 'teaching' },
+        { speaker: 'Prisma', text: task, emotion: 'encouraging' },
+    ],
+    enterButtonText: 'Restore the Color', enterButtonIcon: 'fas fa-palette',
 });
 
 const archiveGrimoire = (title, explanation, example) => [{
@@ -29,7 +38,7 @@ const archiveGrimoire = (title, explanation, example) => [{
 const archiveStage = ({
     title, location, stageType = 'challenge', difficulty = 2, xpReward,
     teachingConcepts, objective, initialCode, completeMessage, hints,
-    arena, grimoireTitle, grimoireText, grimoireCode, storyIntro, rewards = {},
+    arena, grimoireTitle, grimoireText, grimoireCode, storyIntro, visionChecks, rewards = {},
 }) => ({
     title,
     chapter: `Chapter 2: ${title}`,
@@ -38,12 +47,13 @@ const archiveStage = ({
     difficulty,
     xpReward,
     teachingConcepts,
-    prerequisiteConcepts: ['rgb', 'variables'],
+    prerequisiteConcepts: ['variables'],
     hasStoryIntro: Boolean(storyIntro),
     ...(storyIntro ? { storyIntro } : {}),
     arena: { theme: 'archive', blockMovement: true, ...arena },
     objective,
     initialCode,
+    ...(visionChecks ? { visionChecks } : {}),
     completeMessage,
     hints: hints.map((text, index) => ({ level: index + 1, text })),
     grimoire: archiveGrimoire(grimoireTitle, grimoireText, grimoireCode),
@@ -65,7 +75,7 @@ export const CHAPTER_TWO_STAGES = {
             obstacles: [{ x: 3, y: 0 }, { x: 4, y: 0 }],
         },
         storyIntro: archiveIntro('The Illuminated Hall', [
-            'Vane has guarded the Archive since Krakk drained its illuminated pages. The books remember where the stolen light was carried.',
+            'Vane has guarded the Archive since Krakk drained its illuminated pages. Here you will learn how RGB pixels make an image.',
             'The ink begins at RGB (80, 55, 30). Add 40 to each channel and keep every value at or below 255.',
             'Move beside the manuscript and cast the new color to bring its words back.',
         ], 'Restore the Manuscript'),
@@ -84,6 +94,7 @@ export const CHAPTER_TWO_STAGES = {
     '2-2': archiveStage({
         title: 'The Tinted Lenses', location: 'Glass Observatory', xpReward: 200,
         teachingConcepts: ['channel-tint'],
+        storyIntro: prismaIntro('The Glass Observatory', 'Change one RGB channel at a time. The other two must stay as they are.'),
         arena: {
             cols: 10, rows: 5, spawn: { x: 1, y: 2 },
             colorTargets: [
@@ -163,16 +174,16 @@ export const CHAPTER_TWO_STAGES = {
             cols: 10, rows: 6, spawn: { x: 1, y: 3 },
             colorTargets: [
                 { id: 'bright-lock', name: 'Radiance Lock', icon: 'fas fa-lock',
-                  x: 2, y: 1, sourceRgb: [110, 60, 30], targetRgb: [150, 100, 70] },
+                  x: 2, y: 1, sourceRgb: [20, 30, 40], targetRgb: [60, 70, 80] },
                 { id: 'inverse-lock', name: 'Mirror Lock', icon: 'fas fa-lock',
-                  x: 5, y: 1, sourceRgb: [20, 100, 160], targetRgb: [235, 155, 95] },
+                  x: 5, y: 1, sourceRgb: [0, 100, 255], targetRgb: [255, 155, 0] },
                 { id: 'gray-lock', name: 'Silver Lock', icon: 'fas fa-lock',
-                  x: 8, y: 1, sourceRgb: [20, 80, 140], targetRgb: [80, 80, 80] },
+                  x: 8, y: 1, sourceRgb: [60, 90, 120], targetRgb: [90, 90, 90] },
             ],
             obstacles: [{ x: 3, y: 3 }, { x: 6, y: 3 }],
         },
         objective: 'Open three locks using the right transformation: <span class="highlight">+40 brightness</span>, <span class="highlight">inversion</span>, then <span class="highlight">grayscale</span>.',
-        initialCode: '# Restore the three locks in order.\nbright_r, bright_g, bright_b = 110, 60, 30\ninverse_r, inverse_g, inverse_b = 20, 100, 160\ngray_r, gray_g, gray_b = 20, 80, 140\n\n',
+        initialCode: '# Restore the three locks in order.\nbright_r, bright_g, bright_b = 20, 30, 40\ninverse_r, inverse_g, inverse_b = 0, 100, 255\ngray_r, gray_g, gray_b = 60, 90, 120\n\n',
         completeMessage: 'The prism vault opens as every lock finds its color!',
         hints: [
             'Use one transformation per lock: +40, 255 minus each channel, then the average.',
@@ -183,6 +194,60 @@ export const CHAPTER_TWO_STAGES = {
         grimoireCode: 'r, g, b = 20, 100, 160\nhero.cast_color(255-r, 255-g, 255-b)',
     }),
     '2-6': archiveStage({
+        title: 'The Color Mixer', location: 'Prism Workshop', xpReward: 380,
+        teachingConcepts: ['color-mixing', 'rgb'],
+        storyIntro: prismaIntro('The Prism Workshop', 'Mix red with green for yellow, then red with blue for magenta. Restore both relics.'),
+        arena: {
+            cols: 10, rows: 5, spawn: { x: 1, y: 2 },
+            colorTargets: [
+                { id: 'yellow-relic', name: 'Golden Relic', icon: 'fas fa-seedling', x: 3, y: 2,
+                  sourceRgb: [40, 40, 40], targetRgb: [255, 255, 0] },
+                { id: 'magenta-relic', name: 'Magenta Relic', icon: 'fas fa-gem', x: 7, y: 2,
+                  sourceRgb: [40, 40, 40], targetRgb: [255, 0, 255] },
+            ],
+        },
+        objective: 'Mix RGB light for two relics: yellow <span class="highlight">(255, 255, 0)</span> and magenta <span class="highlight">(255, 0, 255)</span>.',
+        initialCode: '# Mix two secondary colors. Start beside the Golden Relic.\nred, green, blue = 255, 255, 0\nhero.move_right(1)\nhero.cast_color(red, green, blue)\n\n# Move beside the Magenta Relic and cast its color.\n',
+        completeMessage: 'Both relics shine with newly mixed light!',
+        hints: [
+            'Yellow is red plus green. Magenta is red plus blue.',
+            'The second relic is four tiles to the right of your first casting position.',
+            'hero.move_right(4)\nhero.cast_color(255, 0, 255)',
+        ],
+        grimoireTitle: 'Color Mixing', grimoireText: 'Secondary colors combine two full-strength RGB channels.',
+        grimoireCode: 'hero.cast_color(255, 255, 0)  # Yellow\nhero.cast_color(255, 0, 255)  # Magenta',
+    }),
+    '2-7': archiveStage({
+        title: 'Pixel Trail', location: 'Mosaic Corridor', xpReward: 330,
+        teachingConcepts: ['rgb', 'for-loops', 'lists'],
+        storyIntro: prismaIntro('The Mosaic Corridor', 'A row of pixels is an image in miniature. Use one loop to restore every tile in the trail.'),
+        arena: {
+            cols: 10, rows: 5, spawn: { x: 1, y: 2 },
+            murals: [{ id: 'pixel-trail', name: 'Pixel Trail' }],
+            colorTargets: [
+                { id: 'trail-1', muralId: 'pixel-trail', name: 'Trail Pixel 1', icon: 'fas fa-square', x: 2, y: 2,
+                  sourceRgb: [40, 20, 10], targetRgb: [70, 20, 10] },
+                { id: 'trail-2', muralId: 'pixel-trail', name: 'Trail Pixel 2', icon: 'fas fa-square', x: 5, y: 2,
+                  sourceRgb: [20, 60, 120], targetRgb: [50, 60, 120] },
+                { id: 'trail-3', muralId: 'pixel-trail', name: 'Trail Pixel 3', icon: 'fas fa-square', x: 8, y: 2,
+                  sourceRgb: [90, 70, 30], targetRgb: [120, 70, 30] },
+            ],
+        },
+        objective: 'Write a function that adds <span class="highlight">30 red</span> to every pixel in the row. The given values stay below 255. Cast each result along the trail.',
+        initialCode: '# Repair the row with one reusable loop.\ndef restore(pixels):\n    result = []\n    for r, g, b in pixels:\n        # Add 30 to red.\n        pass\n    return result\n\npixels = [[40, 20, 10], [20, 60, 120], [90, 70, 30]]\ncolors = restore(pixels)\nfor index, color in enumerate(colors):\n    hero.cast_color(color[0], color[1], color[2])\n    if index < len(colors) - 1:\n        hero.move_right(3)\n',
+        visionChecks: [
+            'assert restore([[10, 20, 30], [40, 50, 60]]) == [[40, 20, 30], [70, 50, 60]], "Add 30 red to each pixel"',
+        ],
+        completeMessage: 'The entire pixel trail glows again!',
+        hints: [
+            'Loop over every pixel; keep green and blue unchanged.',
+            'Each red value in this row stays below 255 after adding 30.',
+            'Inside the loop: result.append([r + 30, g, b])',
+        ],
+        grimoireTitle: 'Pixel Row Filter', grimoireText: 'A loop applies one RGB transformation to every pixel in an image row.',
+        grimoireCode: 'for r, g, b in pixels:\n    result.append([r + 30, g, b])',
+    }),
+    '2-8': archiveStage({
         title: 'The Living Atlas', location: 'Grand Atlas Hall', stageType: 'boss',
         difficulty: 3, xpReward: 500, teachingConcepts: ['palette-repair', 'grayscale'],
         arena: {
@@ -190,23 +255,23 @@ export const CHAPTER_TWO_STAGES = {
             murals: [{ id: 'atlas', name: 'Living Atlas' }],
             colorTargets: [
                 { id: 'atlas-light', muralId: 'atlas', name: 'Sunlit Page', icon: 'fas fa-scroll',
-                  x: 2, y: 1, sourceRgb: [40, 60, 90], targetRgb: [90, 110, 140] },
+                  x: 2, y: 1, sourceRgb: [20, 30, 40], targetRgb: [70, 80, 90] },
                 { id: 'atlas-mirror', muralId: 'atlas', name: 'Mirror Page', icon: 'fas fa-scroll',
-                  x: 5, y: 1, sourceRgb: [20, 100, 180], targetRgb: [235, 155, 75] },
+                  x: 5, y: 1, sourceRgb: [0, 100, 255], targetRgb: [255, 155, 0] },
                 { id: 'atlas-gray', muralId: 'atlas', name: 'Silver Page', icon: 'fas fa-scroll',
-                  x: 8, y: 1, sourceRgb: [120, 60, 30], targetRgb: [70, 70, 70] },
+                  x: 8, y: 1, sourceRgb: [60, 90, 120], targetRgb: [90, 90, 90] },
             ],
             gate: { x: 9, y: 4, name: 'Atlas Gate' },
             obstacles: [{ x: 4, y: 4 }, { x: 7, y: 4 }],
         },
         storyIntro: archiveIntro('The Grand Atlas Hall', [
-            'The Living Atlas reveals a trail of stolen light leading to the rune walls of Ash Peaks.',
+            'The Living Atlas reveals a trail of stolen light leading to the rune walls of the Whispering Caverns.',
             'Brighten the first, invert the second, and turn the third to silver. Then reach the Atlas Gate.',
             'Your code will restore the images one step at a time.',
         ], 'Open the Living Atlas'),
         objective: 'Restore the Atlas pages with <span class="highlight">+50 brightness</span>, <span class="highlight">inversion</span>, and <span class="highlight">grayscale</span>. Then move beside the Atlas Gate.',
-        initialCode: '# Restore all three pages, then reach the gate at (9, 4).\nlight_r, light_g, light_b = 40, 60, 90\nmirror_r, mirror_g, mirror_b = 20, 100, 180\nsilver_r, silver_g, silver_b = 120, 60, 30\n\n',
-        completeMessage: 'The Atlas shines again. Its restored map points toward Krakk\'s trail in Ash Peaks!',
+        initialCode: '# Restore all three pages, then reach the gate at (9, 4).\nlight_r, light_g, light_b = 20, 30, 40\nmirror_r, mirror_g, mirror_b = 0, 100, 255\nsilver_r, silver_g, silver_b = 60, 90, 120\n\n',
+        completeMessage: 'The Atlas shines again. Its restored map points toward Krakk\'s trail in the Whispering Caverns!',
         hints: [
             'The three pages need +50 brightness, 255 minus each channel, and the channel average.',
             'Move to (1, 1), cast, then move right 3 between pages. Finish at (9, 3) beside the gate.',

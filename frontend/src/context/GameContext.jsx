@@ -57,6 +57,22 @@ export const GameProvider = ({ children }) => {
     }
   };
 
+  const deleteAccount = async (password) => {
+    const playerId = user?.player_id;
+    await api.delete('/api/account', { data: { password } });
+    ++generation.current;
+    setUser(null);
+    setSessionError('');
+    if (playerId) {
+      try {
+        localStorage.removeItem(`lost_spectrum_character:${playerId}`);
+        localStorage.removeItem(`lost-spectrum-prologue:${playerId}`);
+      } catch {
+        // The account is already deleted on the server.
+      }
+    }
+  };
+
   const saveAttempt = async (attempt) => {
     const version = generation.current;
     const res = await api.post('/api/submissions', attempt);
@@ -75,8 +91,17 @@ export const GameProvider = ({ children }) => {
     return res.data;
   };
 
+  const advanceOnboarding = async (step) => {
+    const version = generation.current;
+    const res = await api.patch('/api/onboarding', { step });
+    if (version === generation.current) {
+      setUser(previous => previous ? { ...previous, onboarding_step: res.data.onboarding_step } : previous);
+    }
+    return res.data.onboarding_step;
+  };
+
   return (
-    <GameContext.Provider value={{ user, loading, login, logout, saveAttempt, updateProfile }}>
+    <GameContext.Provider value={{ user, loading, login, logout, deleteAccount, saveAttempt, updateProfile, advanceOnboarding }}>
       {sessionError ? (
         <div role="alert" style={{ padding: 32, color: 'white' }}>
           <p>{sessionError}</p>

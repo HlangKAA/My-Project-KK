@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import { useGame } from '../context/GameContext';
+import { useLanguage } from '../i18n/useLanguage';
 import useCharacterProgression from '../hooks/useCharacterProgression';
 import ProfileNameForm from '../components/ProfileNameForm';
 import { SPELLS } from '../data/characterData';
@@ -12,11 +13,18 @@ const dateLabel = value => value
     : 'Not completed';
 
 export default function ProfilePage() {
-    const { user } = useGame();
+    const { user, deleteAccount } = useGame();
+    const { isThai } = useLanguage();
+    const navigate = useNavigate();
     const { character, levelProgress } = useCharacterProgression();
     const [history, setHistory] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [showDelete, setShowDelete] = useState(false);
+    const [deletePassword, setDeletePassword] = useState('');
+    const [deleteError, setDeleteError] = useState('');
+    const [deleting, setDeleting] = useState(false);
+    const passwordRef = useRef(null);
 
     useEffect(() => {
         let active = true;
@@ -28,6 +36,49 @@ export default function ProfilePage() {
             .finally(() => { if (active) setLoading(false); });
         return () => { active = false; };
     }, []);
+
+    useEffect(() => {
+        if (!showDelete) return undefined;
+        passwordRef.current?.focus();
+        const onEscape = event => {
+            if (event.key === 'Escape' && !deleting) {
+                setShowDelete(false);
+                setDeletePassword('');
+                setDeleteError('');
+            }
+        };
+        window.addEventListener('keydown', onEscape);
+        return () => window.removeEventListener('keydown', onEscape);
+    }, [showDelete, deleting]);
+
+    const closeDeleteDialog = () => {
+        if (deleting) return;
+        setShowDelete(false);
+        setDeletePassword('');
+        setDeleteError('');
+    };
+
+    const handleDelete = async event => {
+        event.preventDefault();
+        if (deleting) return;
+        if (!deletePassword) {
+            setDeleteError(isThai ? 'ใส่รหัสผ่านปัจจุบันก่อนนะ' : 'Enter your current password.');
+            return;
+        }
+        setDeleting(true);
+        setDeleteError('');
+        try {
+            await deleteAccount(deletePassword);
+            navigate('/login', { replace: true });
+        } catch (failure) {
+            setDeletePassword('');
+            setDeleteError(isThai
+                ? (failure.response?.status === 403 ? 'รหัสผ่านไม่ถูกต้อง ลองอีกครั้งนะ' : 'ลบบัญชีไม่สำเร็จ ลองอีกครั้งนะ')
+                : (failure.response?.data?.message || 'Could not delete your account. Please retry.'));
+        } finally {
+            setDeleting(false);
+        }
+    };
 
     const successfulCount = history.filter(row => row.completed_at).length;
 
@@ -54,6 +105,11 @@ export default function ProfilePage() {
                     <div><strong>{successfulCount}</strong><span>Stages passed</span></div>
                     <div><strong>{history.reduce((sum, row) => sum + row.attempts, 0)}</strong><span>Total attempts</span></div>
                     <div><strong>{character.unlockedSpells?.length || 0}</strong><span>Spells unlocked</span></div>
+                </div>
+                <div className="profile-account-corner">
+                    <button type="button" className="profile-delete-entry" onClick={() => setShowDelete(true)}>
+                        {isThai ? 'ลบบัญชี' : 'Delete account'}
+                    </button>
                 </div>
             </section>
 
@@ -102,6 +158,30 @@ export default function ProfilePage() {
                     })}
                 </div>
             </section>
+            {showDelete && (
+                <div className="profile-delete-backdrop">
+                    <section className="profile-delete-dialog" role="dialog" aria-modal="true" aria-labelledby="profile-delete-title" aria-describedby="profile-delete-description">
+                        <h2 id="profile-delete-title">{isThai ? 'ลบบัญชีถาวร' : 'Delete account permanently'}</h2>
+                        <p id="profile-delete-description">{isThai
+                            ? 'บัญชี ด่านที่ผ่าน โค้ดที่ส่ง คะแนน และรางวัลทั้งหมดจะถูกลบถาวร และกู้คืนไม่ได้'
+                            : 'Your account, stage progress, code submissions, score, and achievements will be permanently deleted. This cannot be undone.'}</p>
+                        <form onSubmit={handleDelete}>
+                            <label htmlFor="profile-delete-password">{isThai ? 'ยืนยันด้วยรหัสผ่านปัจจุบัน' : 'Confirm with your current password'}</label>
+                            <input id="profile-delete-password" ref={passwordRef} type="password" autoComplete="current-password"
+                                value={deletePassword} onChange={event => setDeletePassword(event.target.value)} disabled={deleting} required />
+                            {deleteError && <p className="profile-delete-error" role="alert">{deleteError}</p>}
+                            <div className="profile-delete-actions">
+                                <button type="button" className="profile-delete-cancel" onClick={closeDeleteDialog} disabled={deleting}>
+                                    {isThai ? 'ยกเลิก' : 'Cancel'}
+                                </button>
+                                <button type="submit" className="profile-delete-confirm" disabled={deleting || !deletePassword}>
+                                    {deleting ? (isThai ? 'กำลังลบ...' : 'Deleting...') : (isThai ? 'ลบบัญชีถาวร' : 'Delete permanently')}
+                                </button>
+                            </div>
+                        </form>
+                    </section>
+                </div>
+            )}
         </main>
     );
 }

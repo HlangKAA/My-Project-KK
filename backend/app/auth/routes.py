@@ -398,7 +398,7 @@ def login():
         cursor = connection.cursor()
         
         cursor.execute("""
-            SELECT player_id, username, email, password, is_verified 
+            SELECT player_id, username, email, password, is_verified, onboarding_step
             FROM players 
             WHERE email = %s
         """, (email,))
@@ -448,7 +448,8 @@ def login():
             'user': {
                 'player_id': user['player_id'],
                 'username': user['username'],
-                'email': user['email']
+                'email': user['email'],
+                'onboarding_step': user['onboarding_step']
             }
         }), 200
         
@@ -636,7 +637,7 @@ def get_user():
     try:
         with connection:
             with connection.cursor() as cursor:
-                cursor.execute('SELECT player_id, username, email FROM public.players WHERE player_id = %s',
+                cursor.execute('SELECT player_id, username, email, onboarding_step FROM public.players WHERE player_id = %s',
                                (session['player_id'],))
                 user = cursor.fetchone()
         if not user:
@@ -645,6 +646,36 @@ def get_user():
     except Exception:
         current_app.logger.exception('Unable to load profile')
         return jsonify(message='Unable to load profile. Please retry.'), 503
+    finally:
+        connection.close()
+
+
+@auth_bp.route('/api/onboarding', methods=['PATCH'])
+def advance_onboarding():
+    if 'player_id' not in session:
+        return jsonify(message='Not logged in'), 401
+    data = request.get_json(silent=True)
+    step = data.get('step') if isinstance(data, dict) else None
+    if type(step) is not int or step not in (1, 2):
+        return jsonify(message='Onboarding step must be 1 or 2.'), 400
+    connection = get_db_connection()
+    if connection is None:
+        return jsonify(message='Database connection failed. Please retry.'), 503
+    try:
+        with connection:
+            with connection.cursor() as cursor:
+                cursor.execute('''UPDATE public.players
+                                  SET onboarding_step = GREATEST(onboarding_step, %s)
+                                  WHERE player_id = %s
+                                  RETURNING onboarding_step''',
+                               (step, session['player_id']))
+                row = cursor.fetchone()
+        if not row:
+            return jsonify(message='Please log in again.'), 401
+        return jsonify(success=True, onboarding_step=row['onboarding_step'])
+    except Exception:
+        current_app.logger.exception('Unable to save onboarding progress')
+        return jsonify(message='Unable to save the introduction. Please retry.'), 503
     finally:
         connection.close()
 
@@ -680,5 +711,42 @@ def update_profile():
     except Exception:
         current_app.logger.exception('Unable to update profile')
         return jsonify(message='Unable to save your name. Please retry.'), 503
+    finally:
+        connection.close()
+
+
+@auth_bp.route('/api/account', methods=['DELETE'])
+def delete_account():
+    player_id = session.get('player_id')
+    if player_id is None:
+        return jsonify(message='Not logged in'), 401
+    data = request.get_json(silent=True)
+    password = data.get('password') if isinstance(data, dict) else None
+    if not isinstance(password, str) or not password:
+        return jsonify(message='Enter your current password.'), 400
+
+    connection = get_db_connection()
+    if connection is None:
+        return jsonify(message='Database connection failed. Please retry.'), 503
+    try:
+        with connection:
+            with connection.cursor() as cursor:
+                cursor.execute('SELECT password FROM public.players WHERE player_id = %s FOR UPDATE', (player_id,))
+                player = cursor.fetchone()
+                if not player:
+                    return jsonify(message='Please log in again.'), 401
+                if not check_password_hash(player['password'], password):
+                    return jsonify(message='Current password is incorrect.'), 403
+
+                # Other player-owned rows cascade. Logs have a restrictive foreign key.
+                cursor.execute('DELETE FROM public.game_logs WHERE player_id = %s', (player_id,))
+                cursor.execute('DELETE FROM public.players WHERE player_id = %s RETURNING player_id', (player_id,))
+                if not cursor.fetchone():
+                    raise RuntimeError('Player disappeared while deleting account')
+        session.clear()
+        return jsonify(success=True)
+    except Exception:
+        current_app.logger.exception('Unable to delete account')
+        return jsonify(message='Could not delete your account. Please retry.'), 503
     finally:
         connection.close()

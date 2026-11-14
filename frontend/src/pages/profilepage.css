@@ -31,6 +31,24 @@
 .profile-stats div { display: flex; flex-direction: column; gap: 3px; padding: 12px; border-radius: 9px; background: #ffffff08; }
 .profile-stats strong { font-size: 1.25rem; color: #f6bf77; }
 .profile-stats span { color: #c7b6aa; font-size: .82rem; }
+.profile-account-corner { display: flex; justify-content: flex-end; margin-top: 10px; }
+.profile-delete-entry { min-height: 32px; padding: 5px 8px; border: 0; background: transparent; color: #a38e8b; font: inherit; font-size: .76rem; opacity: .68; cursor: pointer; }
+.profile-delete-entry:hover, .profile-delete-entry:focus-visible { color: #f3a7a2; opacity: 1; text-decoration: underline; }
+.profile-delete-entry:focus-visible { outline: 2px solid #e0ab79; outline-offset: 2px; }
+.profile-delete-backdrop { position: fixed; inset: 0; z-index: 3000; display: grid; place-items: center; padding: 18px; background: #080609dc; backdrop-filter: blur(6px); }
+.profile-delete-dialog { width: min(430px, 100%); max-height: 90vh; overflow: auto; padding: 26px; border: 1px solid #8f6761; border-radius: 14px; background: #21191c; box-shadow: 0 20px 70px #000b; }
+.profile-delete-dialog h2 { margin: 0 0 12px; font: 700 1.25rem Cinzel, serif; color: #f4d4c9; }
+.profile-delete-dialog p { margin: 0 0 20px; color: #d5c4bd; line-height: 1.6; }
+.profile-delete-dialog label { display: block; margin-bottom: 8px; font-size: .9rem; color: #f1d1c3; }
+.profile-delete-dialog input { width: 100%; padding: 11px 12px; border: 1px solid #806365; border-radius: 8px; background: #171216; color: #fff; font: inherit; }
+.profile-delete-dialog input:focus-visible { outline: 2px solid #e0ab79; outline-offset: 2px; }
+.profile-delete-dialog .profile-delete-error { margin: 8px 0 0; color: #ffaaa2; font-size: .85rem; }
+.profile-delete-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; }
+.profile-delete-actions button { min-height: 40px; padding: 8px 12px; border-radius: 8px; font: inherit; font-size: .9rem; cursor: pointer; }
+.profile-delete-cancel { border: 1px solid #766467; background: transparent; color: #f1e8e0; }
+.profile-delete-confirm { border: 1px solid #a75d5d; background: #6a3035; color: #fff0ed; }
+.profile-delete-actions button:disabled { opacity: .55; cursor: default; }
+.profile-delete-actions button:focus-visible { outline: 2px solid #e0ab79; outline-offset: 2px; }
 .profile-collections { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 18px; }
 .profile-collection-card { padding: 18px 20px; border: 1px solid rgba(231, 196, 168, .18); border-radius: 12px; background: rgba(24, 18, 22, .8); }
 .profile-collection-card h2 { margin: 0 0 10px; font: 700 1.05rem Cinzel, serif; }

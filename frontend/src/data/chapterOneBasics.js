@@ -1,0 +1,105 @@
+// The Red Forest teaches Python before the Archive introduces image processing.
+const forestStage = ({ title, concept, task, check, code, starter, reference, hint, arena, xpReward, type = 'challenge', icon = 'fas fa-code' }) => ({
+    title,
+    chapter: `Chapter 1: ${title}`,
+    location: `The Red Forest - ${title}`,
+    stageType: type,
+    difficulty: type === 'boss' ? 3 : 2,
+    xpReward,
+    teachingConcepts: concept,
+    prerequisiteConcepts: ['print', 'variables'],
+    hasStoryIntro: true,
+    storyIntro: {
+        sceneName: title, npcName: 'Eldrin', npcTitle: 'Guardian of the Tower', npcIcon: icon,
+        dialogues: [
+            { speaker: 'Eldrin', text: 'Krakk stole the color from our world. First, learn to shape reliable Python spells; the Archive will teach you how images hold color.', emotion: 'mysterious' },
+            { speaker: 'Eldrin', text: task, emotion: 'teaching' },
+        ],
+        enterButtonText: type === 'boss' ? 'Face the Trial' : 'Practice the Spell', enterButtonIcon: icon,
+    },
+    arena: { theme: 'forest', ...arena },
+    objective: task,
+    initialCode: starter,
+    visionChecks: check,
+    completeMessage: `${title} is restored. Your Python spell worked!`,
+    hints: [
+        { level: 1, text: hint },
+        { level: 2, text: 'Run the code and watch each command play out in the arena.' },
+        { level: 3, text: code },
+    ],
+    grimoire: [{
+        leftTitle: title, leftIcon: icon, leftContent: task,
+        leftCode: reference, leftNote: hint,
+        leftIncantations: [
+            { code: 'hero.move_right(n)', desc: 'Move toward the objective' },
+            { code: 'print(value)', desc: 'Speak a Python value' },
+        ],
+        rightTitle: 'Python Spellcraft', rightIcon: 'fas fa-book',
+        rightContent: 'Read the objective, try a short spell, then watch the arena to see what each command changed.',
+        rightColors: ['#d3b47a', '#a58965', '#b9a77c'],
+    }],
+    skills: [{ name: title, type: 'PYTHON', icon, desc: task, pct: 100 }],
+    rewards: { spellUnlock: null, titleUnlock: type === 'boss' ? 'Apprentice of the Red Forest' : null, outfitPart: null },
+});
+
+const gate = (name) => ({
+    cols: 8, rows: 5, spawn: { x: 1, y: 2 },
+    gate: { x: 7, y: 2, name },
+    obstacles: [{ x: 3, y: 0 }, { x: 4, y: 4 }],
+});
+
+export const CHAPTER_ONE_BASICS = {
+    '1-3': forestStage({
+        title: 'The Whispering Runes', concept: ['strings', 'f-strings'], icon: 'fas fa-feather-alt', xpReward: 250,
+        task: 'Use a string and an f-string to greet Eldrin. Walk to the rune at (5, 2), then print the greeting.',
+        arena: { cols: 8, rows: 5, spawn: { x: 1, y: 2 }, altar: { x: 5, y: 2, name: 'Whispering Rune', keyword: 'Welcome, Eldrin!' } },
+        code: '# Greet Eldrin with an f-string.\nname = "Eldrin"\nhero.move_right(4)\nprint(f"Welcome, {name}!")\n',
+        starter: '# Give Eldrin a greeting using the name below.\nname = "Eldrin"\nhero.move_right(4)\nprint(f"Welcome, ...!")  # Put the name variable inside braces.\n',
+        reference: 'name = "Prisma"\nprint(f"Hello, {name}!")',
+        hint: 'Put the name variable inside braces in an f-string: f"Welcome, {name}!".',
+    }),
+    '1-4': forestStage({
+        title: 'The Forked Path', concept: ['comparison', 'conditionals', 'boolean-logic'], icon: 'fas fa-code-branch', xpReward: 300,
+        task: 'Use if/else to choose five steps when the lantern is lit and two when it is dark. Reach the gate at (7, 2).',
+        arena: gate('Forked Path Gate'),
+        code: '# Choose a route with a boolean condition.\nlantern_lit = True\nif lantern_lit:\n    steps = 5\nelse:\n    steps = 2\nhero.move_right(steps)\n',
+        starter: '# Choose a route using if and else.\nlantern_lit = True\nif lantern_lit:\n    steps = 0  # Change this for the lit path.\nelse:\n    steps = 2\nhero.move_right(steps)\n',
+        reference: 'if lantern_lit:\n    print("Take the lit path")\nelse:\n    print("Wait for light")',
+        hint: 'Set steps to 5 when lantern_lit is True; otherwise set it to 2.',
+    }),
+    '1-5': forestStage({
+        title: 'Echo Grove', concept: ['lists', 'for-loops'], icon: 'fas fa-sync-alt', xpReward: 350,
+        task: 'Count the steps in a list with a for loop, then use the total to cross Echo Grove.',
+        arena: gate('Echo Grove Gate'),
+        code: '# Add every step in the list, then move that many tiles.\nsteps = [1, 1, 1, 1, 1]\ntotal = 0\nfor step in steps:\n    total += step\nhero.move_right(total)\n',
+        starter: '# Add every step in the list, then move that many tiles.\nsteps = [1, 1, 1, 1, 1]\ntotal = 0\nfor step in steps:\n    pass  # Add step to total.\nhero.move_right(total)\n',
+        reference: 'runes = [1, 2, 3]\nfor rune in runes:\n    print(rune)',
+        hint: 'Start total at 0 and add each value inside the loop with total += step.',
+    }),
+    '1-6': forestStage({
+        title: 'Spell Workshop', concept: ['functions-basic'], icon: 'fas fa-magic', xpReward: 400,
+        task: 'Write a reusable function that doubles a step count. Use its result to reach the workshop gate.',
+        arena: gate('Workshop Gate'),
+        code: '# A function can turn a small input into a reusable route.\ndef double_steps(steps):\n    return steps * 2\n\nhero.move_right(double_steps(2) + 1)\n',
+        starter: '# A function can turn a small input into a reusable route.\ndef double_steps(steps):\n    pass  # Return twice the number of steps.\n\nhero.move_right(double_steps(2) + 1)\n',
+        reference: 'def add_one(value):\n    return value + 1\n\nprint(add_one(3))',
+        check: ['assert double_steps(3) == 6 and double_steps(0) == 0, "The function must use its parameter"'],
+        hint: 'Return steps * 2, then add one extra step to reach the gate.',
+    }),
+    '1-7': forestStage({
+        title: 'The Apprentice Gate', concept: ['print', 'variables', 'f-strings', 'conditionals', 'for-loops', 'functions-basic'],
+        icon: 'fas fa-crown', xpReward: 500, type: 'boss',
+        task: 'Collect the string key, place it in the Lock Flask, walk to the gate, and print an f-string with its opening words. No RGB spell is needed.',
+        arena: {
+            cols: 11, rows: 6, spawn: { x: 0, y: 3 }, theme: 'gate',
+            gate: { x: 10, y: 3, name: 'Apprentice Gate', keyword: 'Open, Eldrin!' },
+            items: [{ id: 'gate-key', value: 'FOREST_KEY', display: '"FOREST_KEY"', type: 'str', x: 2, y: 1, icon: 'fas fa-key', color: '#c9a96b' }],
+            flasks: [{ id: 'str', type: 'str', label: '[str] Lock Flask', name: 'Flask of Keys', x: 2, y: 5, color: '#c9a96b', icon: 'fas fa-lock-open' }],
+            obstacles: [{ x: 4, y: 1 }, { x: 4, y: 2 }, { x: 4, y: 4 }, { x: 4, y: 5 }],
+        },
+        code: '# Collect the key and speak at the gate.\nname = "Eldrin"\nhero.move_right(2)\nhero.move_up(2)\nhero.pick_up()\nhero.move_down(4)\nhero.put_in("str")\nhero.move_up(2)\nhero.move_right(8)\nprint(f"Open, {name}!")\n',
+        starter: '# Collect the key and speak at the gate.\nname = "Eldrin"\nhero.move_right(2)\nhero.move_up(2)\nhero.pick_up()\nhero.move_down(4)\nhero.put_in("str")\nhero.move_up(2)\nhero.move_right(8)\nprint(f"Open, ...!")  # Use the name variable.\n',
+        reference: 'hero.pick_up()\nhero.put_in("str")\nprint(f"Hello, {name}!")',
+        hint: 'The flask accepts the string key. The opening phrase must be printed near the gate.',
+    }),
+};

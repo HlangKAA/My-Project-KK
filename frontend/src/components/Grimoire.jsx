@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { STAGE_GUIDES } from '../data/stageGuides';
 import './grimoire.css';
 
 const WHEEL_COLORS = [
@@ -11,9 +12,40 @@ const WHEEL_COLORS = [
     { name: 'violet', hex: '#8b5cf6', angle: 308 },
 ];
 
-const Grimoire = ({ level, startPage = 0, onClose }) => {
+const Grimoire = ({ level, stageKey, isThai = false, startPage = 0, onClose }) => {
     const pages = level.grimoire;
     const [currentPage, setCurrentPage] = useState(startPage);
+    const [activeTab, setActiveTab] = useState('guide');
+    const closeRef = useRef(null);
+    const dialogRef = useRef(null);
+    const guide = STAGE_GUIDES[stageKey]?.[isThai ? 'th' : 'en'];
+
+    useEffect(() => {
+        const previousFocus = document.activeElement;
+        closeRef.current?.focus();
+        return () => {
+            if (previousFocus?.isConnected) previousFocus.focus();
+        };
+    }, []);
+
+    const handleKeyDown = (event) => {
+        if (event.key === 'Escape') {
+            event.stopPropagation();
+            onClose();
+        }
+        if (event.key !== 'Tab') return;
+        const focusable = [...dialogRef.current.querySelectorAll('button:not([disabled])')];
+        if (!focusable.length) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
+        }
+    };
 
     if (!pages || pages.length === 0) return null;
 
@@ -25,13 +57,31 @@ const Grimoire = ({ level, startPage = 0, onClose }) => {
 
     return (
         <div className="grimoire-overlay" onClick={onClose}>
-            {/* Close Button */}
-            <button className="grimoire-close" onClick={onClose}>
-                <i className="fas fa-times"></i>
-                <span className="grimoire-close-label">SEAL</span>
-            </button>
-
-            <div className="grimoire-book" onClick={(e) => e.stopPropagation()}>
+            <div className="grimoire-book" ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="grimoire-title" onClick={(e) => e.stopPropagation()} onKeyDown={handleKeyDown}>
+                <div className="grimoire-header">
+                    <div>
+                        <span className="grimoire-eyebrow">{isThai ? 'คัมภีร์เวท' : 'SPELLS'}</span>
+                        <h2 id="grimoire-title">{level.title}</h2>
+                    </div>
+                    <button ref={closeRef} className="grimoire-close" type="button" onClick={onClose} aria-label={isThai ? 'ปิดคัมภีร์' : 'Close spells'}>
+                        <i className="fas fa-times" aria-hidden="true"></i>
+                        <span className="grimoire-close-label">{isThai ? 'ปิด' : 'CLOSE'}</span>
+                    </button>
+                </div>
+                <div className="grimoire-tabs" role="tablist" aria-label={isThai ? 'หน้าคัมภีร์' : 'Spellbook pages'}>
+                    <button type="button" role="tab" id="grimoire-guide-tab" aria-selected={activeTab === 'guide'} aria-controls="grimoire-guide-panel" className={activeTab === 'guide' ? 'active' : ''} onClick={() => setActiveTab('guide')}>{isThai ? 'วิธีเล่นด่านนี้' : 'Quick Guide'}</button>
+                    <button type="button" role="tab" id="grimoire-reference-tab" aria-selected={activeTab === 'reference'} aria-controls="grimoire-reference-panel" className={activeTab === 'reference' ? 'active' : ''} onClick={() => setActiveTab('reference')}>{isThai ? 'ข้อมูลอ้างอิง' : 'Reference'}</button>
+                </div>
+                {activeTab === 'guide' ? (
+                    <div className="grimoire-guide" id="grimoire-guide-panel" role="tabpanel" aria-labelledby="grimoire-guide-tab">
+                        <div className="grimoire-guide-row"><span>{isThai ? 'เป้าหมาย' : 'GOAL'}</span><p>{guide?.goal}</p></div>
+                        <div className="grimoire-guide-row"><span>{isThai ? 'แนวคิด' : 'KEY IDEA'}</span><p>{guide?.idea}</p></div>
+                        <div className="grimoire-guide-row"><span>{isThai ? 'เริ่มตรงนี้' : 'TRY FIRST'}</span><p>{guide?.first}</p></div>
+                        <div className="grimoire-guide-example"><span>{isThai ? 'ตัวอย่างสั้น ๆ' : 'TINY EXAMPLE'}</span><pre><code>{guide?.example}</code></pre></div>
+                        <button type="button" className="grimoire-start-btn" onClick={onClose}>{isThai ? 'เริ่มเล่น' : 'START PLAYING'}</button>
+                    </div>
+                ) : (
+                <div className="grimoire-pages" id="grimoire-reference-panel" role="tabpanel" aria-labelledby="grimoire-reference-tab">
                 {/* ─── Left Page ─── */}
                 <div className="grimoire-page grimoire-page-left">
                     <h2 className="grimoire-section-title">
@@ -47,7 +97,7 @@ const Grimoire = ({ level, startPage = 0, onClose }) => {
                     </div>
 
                     {/* Index Demo */}
-                    <div className="grimoire-index-demo">
+                    {stageKey === '3-2' && <div className="grimoire-index-demo">
                         <div style={{ textAlign: 'center' }}>
                             <div className="grimoire-index-box">0</div>
                             <div className="grimoire-index-label">Index</div>
@@ -58,7 +108,7 @@ const Grimoire = ({ level, startPage = 0, onClose }) => {
                                 g.leftCode.match(/\['([^']+)'/)?.[1] || g.leftCode.match(/= (\d+)/)?.[1] || 'item'
                                 : g.leftCode.match(/= (\S+)/)?.[1] || 'value'}
                         </div>
-                    </div>
+                    </div>}
 
                     <p className="grimoire-note" dangerouslySetInnerHTML={{ __html: g.leftNote }} />
 
@@ -161,6 +211,8 @@ const Grimoire = ({ level, startPage = 0, onClose }) => {
                         </span>
                     </div>
                 </div>
+                </div>
+                )}
             </div>
         </div>
     );

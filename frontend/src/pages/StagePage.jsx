@@ -30,6 +30,7 @@ const STORY_SPRITES = {
     'Cave Warden': 'cave-warden',
     Krakk: 'krakk',
 };
+const BOSS_TIME_LIMIT_SECONDS = 300;
 
 const StagePage = () => {
     const { regionId, stageId } = useParams();
@@ -61,6 +62,7 @@ const StagePage = () => {
     const [visualState, setVisualState] = useState({});
     const [showGrimoire, setShowGrimoire] = useState(false);
     const [grimoireStartPage, setGrimoireStartPage] = useState(0);
+    const initializedStageRef = useRef(null);
     const [showComplete, setShowComplete] = useState(false);
     const [wizardState, setWizardState] = useState('idle');
     const [showSpellBook, setShowSpellBook] = useState(false);
@@ -72,8 +74,8 @@ const StagePage = () => {
     // CodeCombat 2D Arena state
     const [arenaActionQueue, setArenaActionQueue] = useState([]);
     const [isArenaExecuting, setIsArenaExecuting] = useState(false);
-    const bossClockRef = useRef({ remainingMs: 120000, startedAt: null });
-    const [bossTimeLeft, setBossTimeLeft] = useState(120);
+    const bossClockRef = useRef({ remainingMs: BOSS_TIME_LIMIT_SECONDS * 1000, startedAt: null });
+    const [bossTimeLeft, setBossTimeLeft] = useState(BOSS_TIME_LIMIT_SECONDS);
     const [bossClockActive, setBossClockActive] = useState(false);
     const [showEpilogue, setShowEpilogue] = useState(false);
     const finishAttemptRef = useRef(null);
@@ -115,6 +117,8 @@ const StagePage = () => {
             navigate('/dashboard');
             return;
         }
+        if (initializedStageRef.current === stageKey) return;
+        initializedStageRef.current = stageKey;
 
         setCode(currentStage.initialCode || '');
         setVisualState({});
@@ -127,8 +131,8 @@ const StagePage = () => {
         setCompletionResult(null);
         setArenaActionQueue([]);
         setIsArenaExecuting(false);
-        bossClockRef.current = { remainingMs: 120000, startedAt: null };
-        setBossTimeLeft(120);
+        bossClockRef.current = { remainingMs: BOSS_TIME_LIMIT_SECONDS * 1000, startedAt: null };
+        setBossTimeLeft(BOSS_TIME_LIMIT_SECONDS);
         setBossClockActive(false);
         setShowEpilogue(false);
         completedRef.current = false;
@@ -137,6 +141,8 @@ const StagePage = () => {
         setSaveError('');
         setSaveStatus('');
         setSpellFailure(null);
+        setShowGrimoire(false);
+        setGrimoireStartPage(0);
 
         // Story intro setup
         if (currentStage.hasStoryIntro) {
@@ -149,8 +155,9 @@ const StagePage = () => {
             setTimeout(() => setNpcVisible(true), 800);
         } else {
             setStoryPhase('ide');
+            setShowGrimoire(true);
         }
-    }, [regionId, stageId, navigate, clearOutput, currentStage]);
+    }, [stageKey, navigate, clearOutput, currentStage]);
 
     // ─── Typewriter effect for dialog ───
     useEffect(() => {
@@ -203,6 +210,8 @@ const StagePage = () => {
         setIdeSliding(true);
         setTimeout(() => {
             setStoryPhase('ide');
+            setGrimoireStartPage(0);
+            setShowGrimoire(true);
         }, 100);
     };
 
@@ -233,7 +242,7 @@ const StagePage = () => {
             currentStage.teachingConcepts.forEach(concept => masterConcept(concept));
         }
 
-        if (stageKey === '4-6') setShowEpilogue(true);
+        if (stageKey === '4-7') setShowEpilogue(true);
         setTimeout(() => setShowComplete(true), 1500);
     };
 
@@ -269,7 +278,7 @@ const StagePage = () => {
         if (!attempt) return;
         activeAttempt.current = null;
         let finalResult = result;
-        if (stageKey === '4-6' && bossClockRef.current.startedAt !== null) {
+        if (stageKey === '4-7' && bossClockRef.current.startedAt !== null) {
             const clock = bossClockRef.current;
             const elapsed = performance.now() - clock.startedAt;
             if (elapsed >= clock.remainingMs) {
@@ -286,14 +295,14 @@ const StagePage = () => {
         setSpellFailure(finalResult === 'Success' ? null : failure || { kind: 'unknown' });
         void persistAttempt({
             stage_key: stageKey, code: attempt.code, result: finalResult,
-            runtime: stageKey === '4-6' ? (performance.now() - attempt.started) / 1000 : (attempt.runtime ?? (performance.now() - attempt.started) / 1000),
+            runtime: stageKey === '4-7' ? (performance.now() - attempt.started) / 1000 : (attempt.runtime ?? (performance.now() - attempt.started) / 1000),
             submitted_at: attempt.submitted_at,
         }, { attempts: attempt.number, hintsUsed });
     };
     finishAttemptRef.current = finishAttempt;
 
     useEffect(() => {
-        if (stageKey !== '4-6' || !bossClockActive) return undefined;
+        if (stageKey !== '4-7' || !bossClockActive) return undefined;
         const timer = setInterval(() => {
             const clock = bossClockRef.current;
             if (clock.startedAt === null) return;
@@ -315,9 +324,9 @@ const StagePage = () => {
     const handleSpecialAttempt = (payload, modifiers) => persistAttempt({ ...payload, stage_key: stageKey }, modifiers);
 
     const handleRun = () => {
-        if (activeAttempt.current || pendingSave.current || saveInFlight.current || (stageKey === '4-6' && bossClockRef.current.remainingMs <= 0)) return;
+        if (activeAttempt.current || pendingSave.current || saveInFlight.current || (stageKey === '4-7' && bossClockRef.current.remainingMs <= 0)) return;
         completedRef.current = false;
-        if (stageKey === '4-6') {
+        if (stageKey === '4-7') {
             bossClockRef.current.startedAt = performance.now();
             setBossClockActive(true);
         }
@@ -369,7 +378,7 @@ const StagePage = () => {
                 __onSuccess: () => {
                     console.log("[CodeCombat] Queuing actions to Arena:", actions);
                     if (!activeAttempt.current) return;
-                    if (stageKey !== '4-6') activeAttempt.current.runtime = (performance.now() - activeAttempt.current.started) / 1000;
+                    if (stageKey !== '4-7') activeAttempt.current.runtime = (performance.now() - activeAttempt.current.started) / 1000;
                     if (actions.length === 0) {
                         finishAttempt('Fail', { kind: 'noActions' });
                         return;
@@ -405,15 +414,7 @@ const StagePage = () => {
             __onError: error => finishAttempt('Error', pythonFailure(error)),
             __onSuccess: () => {
                 let success = currentStage.validateOutput ? currentStage.validateOutput(lines) : false;
-                if (stageKey === '3-3') success = state.foundIndex === 2;
-                if (stageKey === '3-6') success = state.foundIndex === 2 && lines.some(line => line.includes('10'));
-                if (stageKey === '4-5') success = state.color === 'rgb(0,255,0)';
-                if (stageKey === '4-6') success = state.color === 'rgb(255,255,255)';
-                const failure = stageKey === '3-3' || stageKey === '3-6'
-                    ? { kind: 'foundIndex', actual: state.foundIndex }
-                    : stageKey === '4-5' || stageKey === '4-6'
-                        ? { kind: 'wrongColor' }
-                        : { kind: 'output', actual: lines.join('').trim().slice(0, 160) };
+                const failure = { kind: 'output', actual: lines.join('').trim().slice(0, 160) };
                 finishAttempt(success ? 'Success' : 'Fail', failure);
             },
         };
@@ -430,9 +431,9 @@ const StagePage = () => {
         setWizardState('idle');
         setArenaActionQueue([]);
         setIsArenaExecuting(false);
-        if (stageKey === '4-6') {
-            bossClockRef.current = { remainingMs: 120000, startedAt: null };
-            setBossTimeLeft(120);
+        if (stageKey === '4-7') {
+            bossClockRef.current = { remainingMs: BOSS_TIME_LIMIT_SECONDS * 1000, startedAt: null };
+            setBossTimeLeft(BOSS_TIME_LIMIT_SECONDS);
             setBossClockActive(false);
         }
         completedRef.current = false;
@@ -493,7 +494,7 @@ const StagePage = () => {
                 character={character}
                 levelProgress={levelProgress}
                 completionResult={completionResult}
-                onReplay={() => { setShowComplete(false); handleReset(); }}
+                onReplay={() => { setShowComplete(false); handleReset(); setGrimoireStartPage(0); setShowGrimoire(true); }}
                 onContinue={handleContinue}
             />
         );
@@ -509,8 +510,8 @@ const StagePage = () => {
             ? currentDialog.speaker
             : story.npcName;
         const activeStoryCharacter = STORY_SPRITES[activeStoryName] || introCharacter;
-        const activeStoryTitle = activeStoryName === 'Cave Warden' && stageKey === '4-6'
-            ? 'Guardian of the Caverns'
+        const activeStoryTitle = activeStoryName === 'Rune Keeper' && stageKey === '4-7'
+            ? 'Guardian of Ash Peaks'
             : story.npcTitle;
 
         return (
@@ -732,10 +733,10 @@ const StagePage = () => {
                             <div className="game-scene game-arena-scene">
                                 <div className="game-scene-view game-arena-scene-view">
                                     <div className="game-objective game-arena-objective">
-                                        {stageKey === '4-6' && <div className={`game-boss-clock ${bossTimeLeft <= 30 ? 'urgent' : ''}`} role="timer" aria-live={bossTimeLeft <= 10 ? 'assertive' : 'off'}>
+                                        {stageKey === '4-7' && <div className={`game-boss-clock ${bossTimeLeft <= 30 ? 'urgent' : ''}`} role="timer" aria-live={bossTimeLeft <= 10 ? 'assertive' : 'off'}>
                                             <i className="fas fa-hourglass-half" /> {isThai ? 'เวลาร่ายคาถาที่เหลือ' : 'Spell time left'}: {Math.floor(bossTimeLeft / 60)}:{String(bossTimeLeft % 60).padStart(2, '0')}
-                                            {!bossClockActive && bossTimeLeft === 120 && <small>{isThai ? 'เริ่มนับเมื่อกดรัน' : 'Starts on Run'}</small>}
-                                            {!bossClockActive && bossTimeLeft > 0 && bossTimeLeft < 120 && <small>{isThai ? 'หยุดนับระหว่างแก้โค้ด' : 'Paused while editing'}</small>}
+                                            {!bossClockActive && bossTimeLeft === BOSS_TIME_LIMIT_SECONDS && <small>{isThai ? 'เริ่มนับเมื่อกดรัน' : 'Starts on Run'}</small>}
+                                            {!bossClockActive && bossTimeLeft > 0 && bossTimeLeft < BOSS_TIME_LIMIT_SECONDS && <small>{isThai ? 'หยุดนับระหว่างแก้โค้ด' : 'Paused while editing'}</small>}
                                             {bossTimeLeft === 0 && <small>{isThai ? 'หมดเวลา กดรีเซ็ตเพื่อเริ่มใหม่' : 'Time up. Reset to retry.'}</small>}
                                         </div>}
                                         <div className="game-objective-badge">
@@ -763,9 +764,9 @@ const StagePage = () => {
                                             setSpellFailure(null);
                                             setArenaActionQueue([]);
                                             setIsArenaExecuting(false);
-                                            if (stageKey === '4-6') {
-                                                bossClockRef.current = { remainingMs: 120000, startedAt: null };
-                                                setBossTimeLeft(120);
+                                            if (stageKey === '4-7') {
+                                                bossClockRef.current = { remainingMs: BOSS_TIME_LIMIT_SECONDS * 1000, startedAt: null };
+                                                setBossTimeLeft(BOSS_TIME_LIMIT_SECONDS);
                                                 setBossClockActive(false);
                                             }
                                         }}
@@ -922,7 +923,7 @@ const StagePage = () => {
                     <button className="game-btn-reset" onClick={handleReset} disabled={isRunning || isArenaExecuting || saving || !!saveError}>
                         <i className="fas fa-redo"></i> {isThai ? 'เริ่มใหม่' : 'RESET'}
                     </button>
-                    <button className="game-btn-run" onClick={handleRun} disabled={isRunning || isArenaExecuting || saving || !!saveError || (stageKey === '4-6' && bossTimeLeft === 0)}>
+                    <button className="game-btn-run" onClick={handleRun} disabled={isRunning || isArenaExecuting || saving || !!saveError || (stageKey === '4-7' && bossTimeLeft === 0)}>
                         {isRunning ? (
                             <><i className="fas fa-spinner fa-spin"></i> {isThai ? 'กำลังร่ายคาถา...' : 'CASTING...'}</>
                         ) : (
@@ -936,6 +937,8 @@ const StagePage = () => {
             {showGrimoire && (
                 <Grimoire
                     level={currentStage}
+                    stageKey={stageKey}
+                    isThai={isThai}
                     startPage={grimoireStartPage}
                     onClose={() => setShowGrimoire(false)}
                 />
