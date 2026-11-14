@@ -85,7 +85,6 @@ const StagePage = () => {
 
     const [saving, setSaving] = useState(false);
     const [saveError, setSaveError] = useState('');
-    const [saveStatus, setSaveStatus] = useState('');
     const [spellFailure, setSpellFailure] = useState(null);
     const pendingSave = useRef(null);
     const activeAttempt = useRef(null);
@@ -139,7 +138,6 @@ const StagePage = () => {
         activeAttempt.current = null;
         pendingSave.current = null;
         setSaveError('');
-        setSaveStatus('');
         setSpellFailure(null);
         setShowGrimoire(false);
         setGrimoireStartPage(0);
@@ -254,14 +252,12 @@ const StagePage = () => {
         saveInFlight.current = true;
         setSaving(true);
         setSaveError('');
-        setSaveStatus('');
         try {
             const saved = await saveAttempt({
                 ...payload,
                 hints_used: modifiers.hintsUsed ?? hintsUsed,
             });
             pendingSave.current = null;
-            setSaveStatus(isThai ? 'บันทึกความคืบหน้าแล้ว' : 'Saved to your account');
             if (payload.result === 'Success') handleLevelComplete(saved, modifiers);
             return true;
         } catch (error) {
@@ -331,7 +327,6 @@ const StagePage = () => {
             setBossClockActive(true);
         }
         activeAttempt.current = { code, submitted_at: new Date().toISOString(), started: performance.now(), number: attemptCount + 1 };
-        setSaveStatus('');
         setSpellFailure(null);
         clearOutput();
         setWizardState('casting');
@@ -708,13 +703,13 @@ const StagePage = () => {
             </nav>
 
             {/* ─── Main Content ─── */}
-            <div role={saveError ? 'alert' : 'status'} className={`game-save-status ${saveError ? 'has-error' : ''}`}>
-                {saving ? (isThai ? 'กำลังบันทึก...' : 'Saving progress...') : saveError || saveStatus}
-                {saveError && <button onClick={() => {
+            {saveError && <div role="alert" className="game-save-error">
+                <span>{saveError}</span>
+                <button type="button" disabled={saving} onClick={() => {
                     const pending = pendingSave.current;
                     if (pending) void persistAttempt(pending.payload, pending.modifiers);
-                }}>{isThai ? 'ลองบันทึกอีกครั้ง' : 'Retry save'}</button>}
-            </div>
+                }}>{isThai ? 'ลองบันทึกอีกครั้ง' : 'Retry save'}</button>
+            </div>}
             <div className="game-main">
                 {specialContent ? (
                     /* ─── Specialized Stage Types (Guided / Debug / Puzzle) ─── */

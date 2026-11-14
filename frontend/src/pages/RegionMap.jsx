@@ -34,7 +34,7 @@ const RegionMap = () => {
     };
 
     return (
-        <div className={`rmap-page ${regionId === '1' ? 'chapter-one-noir' : ''} ${regionId === '2' ? 'chapter-two-restoring' : ''}`}
+        <div className={`rmap-page ${regionId === '1' ? 'chapter-one-noir' : ''} ${regionId === '2' ? 'chapter-two-restoring' : ''} ${regionId === '3' ? 'chapter-three-caverns' : ''} ${regionId === '4' ? 'chapter-four-peaks' : ''}`}
             style={regionId === '2' ? { '--archive-glow': 0.12 + archiveCleared / region.stages.length * 0.55 } : undefined}>
             {/* ─── Navbar ─── */}
             <nav className="rmap-navbar">

@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 import secrets
 from app import mail
 from app.db import get_db_connection
+from app.auth.password_policy import password_error
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -289,22 +290,28 @@ def resend_verification():
 def signup():
     """Handle user registration"""
     try:
-        data = request.get_json()
-        
-        name = data.get('name', '').strip()
-        email = data.get('email', '').strip()
+        data = request.get_json(silent=True)
+        data = data if isinstance(data, dict) else {}
+
+        name = data.get('name', '')
+        email = data.get('email', '')
         password = data.get('password', '')
-        
+        if not isinstance(name, str) or not isinstance(email, str):
+            return jsonify(success=False, message='All fields are required'), 400
+        name = name.strip()
+        email = email.strip()
+
         if not name or not email or not password:
             return jsonify({
                 'success': False,
                 'message': 'All fields are required'
             }), 400
         
-        if len(password) < 6:
+        password_problem = password_error(password)
+        if password_problem:
             return jsonify({
                 'success': False,
-                'message': 'Password must be at least 6 characters'
+                'message': password_problem
             }), 400
         
         connection = get_db_connection()
@@ -536,7 +543,8 @@ def forgot_password():
 def reset_password():
     """Handle password reset"""
     try:
-        data = request.get_json()
+        data = request.get_json(silent=True)
+        data = data if isinstance(data, dict) else {}
         token = data.get('token', '')
         new_password = data.get('password', '')
         
@@ -546,10 +554,11 @@ def reset_password():
                 'message': 'Token and password are required'
             }), 400
         
-        if len(new_password) < 6:
+        password_problem = password_error(new_password)
+        if password_problem:
             return jsonify({
                 'success': False,
-                'message': 'Password must be at least 6 characters'
+                'message': password_problem
             }), 400
         
         connection = get_db_connection()

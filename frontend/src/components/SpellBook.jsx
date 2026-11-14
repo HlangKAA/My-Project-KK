@@ -3,6 +3,18 @@ import { SPELLS } from '../data/characterData';
 import { useLanguage } from '../i18n/useLanguage';
 import './stagetypes.css';
 
+const SPELL_CATEGORIES_TH = {
+    OUTPUT: 'การแสดงผล',
+    STORAGE: 'การเก็บค่า',
+    FORMATTING: 'การจัดข้อความ',
+    SPECTRUM: 'แสงและสี',
+    SPELLCRAFT: 'การสร้างคาถา',
+    MOVEMENT: 'การเคลื่อนที่',
+    STRUCTURE: 'โครงสร้างข้อมูล',
+    ITERATION: 'การวนซ้ำ',
+    LOGIC: 'เงื่อนไข',
+};
+
 /**
  * SpellBook — Grid of unlocked spells
  * แสดง spells ทั้งหมด ที่ปลดล็อกแล้วจะสด ที่ยังไม่ปลดล็อกจะเทา
@@ -70,7 +82,7 @@ const SpellBook = ({ unlockedSpells = [], onClose }) => {
                                     {isUnlocked ? (isThai ? spellNames[key] || spell.name : spell.name) : '???'}
                                 </div>
                                 <div className="spell-card-category">
-                                    {isUnlocked ? spell.category : (isThai ? 'ยังไม่ปลดล็อก' : 'LOCKED')}
+                                    {isUnlocked ? (isThai ? SPELL_CATEGORIES_TH[spell.category] || spell.category : spell.category) : (isThai ? 'ยังไม่ปลดล็อก' : 'LOCKED')}
                                 </div>
 
                                 {/* Glow effect for unlocked */}
@@ -85,7 +97,7 @@ const SpellBook = ({ unlockedSpells = [], onClose }) => {
                     <div className="spell-detail-modal" role="dialog" aria-modal="true" aria-labelledby="spell-detail-title" onClick={event => event.stopPropagation()} style={{ '--spell-color': activeSpell.color }}>
                         <button type="button" className="spell-detail-close" aria-label={isThai ? 'ปิดรายละเอียดคาถา' : 'Close spell details'} onClick={() => setSelectedSpell(null)} autoFocus><i className="fas fa-times" /></button>
                         <i className={`${activeSpell.icon} spell-detail-icon`} />
-                        <div className="spell-card-category">{activeSpell.category}</div>
+                        <div className="spell-card-category">{isThai ? SPELL_CATEGORIES_TH[activeSpell.category] || activeSpell.category : activeSpell.category}</div>
                         <h2 id="spell-detail-title">{isThai ? spellNames[selectedSpell] || activeSpell.name : activeSpell.name}</h2>
                         <p className="spell-detail-description">{isThai ? activeSpell.descriptionTh : activeSpell.description}</p>
                         <h3>{isThai ? 'ตัวอย่างโค้ด' : 'Example code'}</h3>

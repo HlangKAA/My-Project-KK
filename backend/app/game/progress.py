@@ -126,8 +126,17 @@ def save_submission(cursor, player_id, data):
         # Backfill the secondary records if an attempt saved before they were enabled.
         _update_player_stats(cursor, player_id, stages[data['stage_key']]['chapter'])
         _log_attempt(cursor, player_id, previous['submission_id'], data)
+        cursor.execute('''SELECT detail::jsonb AS detail FROM public.game_logs
+                          WHERE player_id = %s AND action = %s
+                          ORDER BY created_at LIMIT 1''',
+                       (player_id, f"stage_attempt:{previous['submission_id']}"))
+        log = cursor.fetchone()
+        detail = log['detail'] if log else {}
+        if isinstance(detail, str):
+            detail = json.loads(detail)
         return {'submission_id': previous['submission_id'], 'progress': read_progress(cursor, player_id),
-                'earnedXP': 0, 'appliedBonuses': []}
+                'earnedXP': detail.get('earned_xp', 0),
+                'appliedBonuses': detail.get('applied_bonuses', [])}
     cursor.execute('''SELECT COUNT(*)::int AS attempts,
                              COUNT(*) FILTER (WHERE result = 'Success')::int AS wins
                       FROM public.code_submissions WHERE player_id = %s AND level_id = %s''',
@@ -138,19 +147,13 @@ def save_submission(cursor, player_id, data):
     no_hints = first_clear and data.get('hints_used') == 0
     base_xp = stages[data['stage_key']]['map_data']['xp_reward']
     earned_xp = (base_xp * (3 if first_attempt else 2) * (13 if no_hints else 10) // 20) if first_clear else 0
-    applied_bonuses = []
-    if first_attempt:
-        applied_bonuses.append({'key': 'firstAttempt', 'label': 'First Attempt Bonus',
-                                'icon': 'fas fa-bolt', 'bonusXP': base_xp // 2})
-    if no_hints:
-        applied_bonuses.append({'key': 'noHints', 'label': 'No Hints Used',
-                                'icon': 'fas fa-brain', 'bonusXP': base_xp * 3 // 10})
+    applied_bonuses = _applied_bonuses(base_xp, first_attempt, no_hints)
     cursor.execute('''INSERT INTO public.code_submissions (player_id, level_id, code, result, runtime, submitted_at)
                       VALUES (%s, %s, %s, %s, %s, %s) RETURNING submission_id''',
                    (player_id, level_id, data['code'], data['result'], data['runtime'], data['submitted_at']))
     submission_id = cursor.fetchone()['submission_id']
     _update_player_stats(cursor, player_id, stages[data['stage_key']]['chapter'])
-    _log_attempt(cursor, player_id, submission_id, data, earned_xp)
+    _log_attempt(cursor, player_id, submission_id, data, earned_xp, applied_bonuses)
     progress = read_progress(cursor, player_id)
     if data['result'] == 'Success':
         cursor.execute('''UPDATE public.game_progress SET current_level = %s, last_played = NOW()
@@ -185,7 +188,18 @@ def _update_player_stats(cursor, player_id, current_level):
                           VALUES (%s, %s, NOW())''', (player_id, current_level))
 
 
-def _log_attempt(cursor, player_id, submission_id, data, earned_xp=0):
+def _applied_bonuses(base_xp, first_attempt, no_hints):
+    bonuses = []
+    if first_attempt:
+        bonuses.append({'key': 'firstAttempt', 'label': 'First Attempt Bonus',
+                        'icon': 'fas fa-bolt', 'bonusXP': base_xp // 2})
+    if no_hints:
+        bonuses.append({'key': 'noHints', 'label': 'No Hints Used',
+                        'icon': 'fas fa-brain', 'bonusXP': base_xp * 3 // 10})
+    return bonuses
+
+
+def _log_attempt(cursor, player_id, submission_id, data, earned_xp=0, applied_bonuses=None):
     """Append a readable attempt event once, using its existing submission ID."""
     action = f'stage_attempt:{submission_id}'
     detail = json.dumps({
@@ -193,6 +207,7 @@ def _log_attempt(cursor, player_id, submission_id, data, earned_xp=0):
         'result': data['result'],
         'runtime_seconds': data['runtime'],
         'earned_xp': earned_xp,
+        'applied_bonuses': applied_bonuses or [],
     }, separators=(',', ':'), sort_keys=True)
     cursor.execute('''INSERT INTO public.game_logs (player_id, action, detail, created_at)
                       SELECT %s, %s, %s, NOW()

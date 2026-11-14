@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import bgAuth from '../assets/images/bg-auth.png';
+import PasswordChecklist from '../components/PasswordChecklist';
+import { isValidPassword } from '../utils/passwordPolicy';
 import './auth.css';
 
 const Register = () => {
@@ -21,6 +23,10 @@ const Register = () => {
         e.preventDefault();
         setError('');
 
+        if (!isValidPassword(formData.password)) {
+            setError('Please meet all password requirements.');
+            return;
+        }
         if (formData.password !== formData.confirmPassword) {
             setError('Incantations do not match');
             return;
@@ -100,6 +106,7 @@ const Register = () => {
                                 placeholder="••••••••"
                                 value={formData.password}
                                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                autoComplete="new-password"
                                 required
                             />
                             <i
@@ -107,6 +114,7 @@ const Register = () => {
                                 onClick={() => setShowPassword(!showPassword)}
                             ></i>
                         </div>
+                        <PasswordChecklist password={formData.password} />
                     </div>
 
                     <div className="auth-field">
@@ -119,6 +127,7 @@ const Register = () => {
                                 placeholder="••••••••"
                                 value={formData.confirmPassword}
                                 onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                                autoComplete="new-password"
                                 required
                             />
                             <i

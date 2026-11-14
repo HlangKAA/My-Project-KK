@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import bgAuth from "../assets/images/bg-auth.png";
+import PasswordChecklist from "../components/PasswordChecklist";
+import { isValidPassword } from "../utils/passwordPolicy";
 import "./auth.css";
 
 const ResetPassword = () => {
@@ -19,6 +21,10 @@ const ResetPassword = () => {
     setError("");
     setMessage("");
 
+    if (!isValidPassword(password)) {
+      setError("Please meet all password requirements.");
+      return;
+    }
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
       return;
@@ -75,6 +81,7 @@ const ResetPassword = () => {
                 placeholder="••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                autoComplete="new-password"
                 required
                 minLength={6}
               />
@@ -83,6 +90,7 @@ const ResetPassword = () => {
                 onClick={() => setShowPassword(!showPassword)}
               ></i>
             </div>
+            <PasswordChecklist password={password} />
           </div>
 
           <div className="auth-field">
@@ -95,6 +103,7 @@ const ResetPassword = () => {
                 placeholder="••••••"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+                autoComplete="new-password"
                 required
                 minLength={6}
               />

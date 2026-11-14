@@ -202,6 +202,33 @@
     background: rgba(0, 0, 0, 0.45);
 }
 
+.auth-password-checklist {
+    display: grid;
+    gap: 0.3rem;
+    margin: 0.65rem 0 0;
+    padding: 0;
+    list-style: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.74rem;
+    color: #b8ada0;
+}
+
+.auth-password-checklist li {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.auth-password-checklist li.met {
+    color: #9fe1ae;
+}
+
+.auth-password-checklist i {
+    width: 0.9rem;
+    text-align: center;
+    font-size: 0.68rem;
+}
+
 .auth-icon-left {
     position: absolute;
     left: 1rem;

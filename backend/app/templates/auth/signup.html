@@ -68,6 +68,7 @@
               type="password"
               id="password"
               name="password"
+              autocomplete="new-password"
               required
               placeholder="••••••••"
               style="padding-right: 2.8rem"
@@ -77,6 +78,7 @@
               onclick="togglePassword('password', this)"
             ></i>
           </div>
+          <ul id="passwordChecklist" class="password-checklist" aria-label="Password requirements"></ul>
         </div>
 
         <div class="form-group">
@@ -87,6 +89,7 @@
               type="password"
               id="confirm_password"
               name="confirm_password"
+              autocomplete="new-password"
               required
               placeholder="••••••••"
               style="padding-right: 2.8rem"
@@ -120,7 +123,9 @@
       is restricted to authorized personnel of the Grand Tower.
     </div>
 
+    <script src="{{ url_for('static', filename='js/password_policy.js') }}"></script>
     <script>
+      PasswordPolicy.bind("password", "passwordChecklist");
       document
         .getElementById("signupForm")
         .addEventListener("submit", async (e) => {
@@ -133,6 +138,11 @@
           const status = document.getElementById("statusMessage");
           const btn = e.target.querySelector("button");
 
+          if (!PasswordPolicy.valid(password)) {
+            status.innerText = "Please meet all password requirements.";
+            status.className = "helper-text error-text";
+            return;
+          }
           if (password !== confirmPassword) {
             status.innerText = "Incantations do not match";
             status.className = "helper-text error-text";

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { STAGE_GUIDES } from '../data/stageGuides';
+import { localGrimoirePage } from '../data/grimoireTh';
 import './grimoire.css';
 
 const WHEEL_COLORS = [
@@ -49,7 +50,7 @@ const Grimoire = ({ level, stageKey, isThai = false, startPage = 0, onClose }) =
 
     if (!pages || pages.length === 0) return null;
 
-    const g = pages[currentPage] || pages[0];
+    const g = localGrimoirePage(pages[currentPage] || pages[0], stageKey, level.title, isThai);
     const totalPages = pages.length;
 
     const handlePrev = () => setCurrentPage(p => Math.max(0, p - 1));
@@ -100,7 +101,7 @@ const Grimoire = ({ level, stageKey, isThai = false, startPage = 0, onClose }) =
                     {stageKey === '3-2' && <div className="grimoire-index-demo">
                         <div style={{ textAlign: 'center' }}>
                             <div className="grimoire-index-box">0</div>
-                            <div className="grimoire-index-label">Index</div>
+                            <div className="grimoire-index-label">{isThai ? 'ตำแหน่ง' : 'Index'}</div>
                         </div>
                         <span className="grimoire-index-arrow">→</span>
                         <div className="grimoire-index-value">
@@ -113,7 +114,7 @@ const Grimoire = ({ level, stageKey, isThai = false, startPage = 0, onClose }) =
                     <p className="grimoire-note" dangerouslySetInnerHTML={{ __html: g.leftNote }} />
 
                     {/* Incantations */}
-                    <div className="grimoire-incantations-title">Common Incantations:</div>
+                    <div className="grimoire-incantations-title">{isThai ? 'คำสั่งที่ใช้บ่อย:' : 'Common Incantations:'}</div>
                     <ul className="grimoire-incantations">
                         {g.leftIncantations.map((inc, i) => (
                             <li key={i}>
@@ -125,7 +126,7 @@ const Grimoire = ({ level, stageKey, isThai = false, startPage = 0, onClose }) =
                     {/* Page Navigation */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto', paddingTop: '1rem' }}>
                         <span className="grimoire-page-num" style={{ position: 'static' }}>
-                            PAGE {currentPage * 2 + 1}
+                            {isThai ? 'หน้า' : 'PAGE'} {currentPage * 2 + 1}
                         </span>
                         {currentPage > 0 && (
                             <button onClick={handlePrev} style={{
@@ -133,7 +134,7 @@ const Grimoire = ({ level, stageKey, isThai = false, startPage = 0, onClose }) =
                                 color: '#5a4a3a', padding: '0.3rem 0.8rem', cursor: 'pointer',
                                 fontFamily: "'Cinzel', serif", fontSize: '0.6rem', letterSpacing: 1
                             }}>
-                                ← PREV
+                                ← {isThai ? 'ก่อนหน้า' : 'PREV'}
                             </button>
                         )}
                     </div>
@@ -152,7 +153,7 @@ const Grimoire = ({ level, stageKey, isThai = false, startPage = 0, onClose }) =
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', margin: '1rem 0' }}>
                             <div className="grimoire-color-wheel">
                                 <div className="grimoire-wheel-circle">
-                                    <span className="grimoire-wheel-label">Primary<br />Power</span>
+                                    <span className="grimoire-wheel-label">{isThai ? <>พลัง<br />สีหลัก</> : <>Primary<br />Power</>}</span>
                                     {WHEEL_COLORS
                                         .filter(c => g.rightColors.includes(c.name))
                                         .map((c) => {
@@ -203,11 +204,11 @@ const Grimoire = ({ level, stageKey, isThai = false, startPage = 0, onClose }) =
                                 fontFamily: "'Cinzel', serif", fontSize: '0.6rem', letterSpacing: 1,
                                 marginLeft: 'auto'
                             }}>
-                                NEXT →
+                                {isThai ? 'ถัดไป' : 'NEXT'} →
                             </button>
                         )}
                         <span className="grimoire-page-num" style={{ position: 'static', marginLeft: currentPage >= totalPages - 1 ? 'auto' : '0' }}>
-                            PAGE {currentPage * 2 + 2}
+                            {isThai ? 'หน้า' : 'PAGE'} {currentPage * 2 + 2}
                         </span>
                     </div>
                 </div>

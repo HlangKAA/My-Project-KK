@@ -384,6 +384,20 @@ input:focus {
   margin-top: 1.5rem;
 }
 
+.password-checklist {
+  display: grid;
+  gap: 0.3rem;
+  margin: 0.65rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+
+.password-checklist li.met {
+  color: #9fe1ae;
+}
+
 .error-text {
   color: #f87171;
 }
