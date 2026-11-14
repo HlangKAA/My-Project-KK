@@ -62,3 +62,8 @@ AGENTS.md
 /docs/agents/
 /.scratch/
 /.triage/
+
+# Local diagram helpers and generated process diagrams
+/make_flowchart.py
+/make_process_diagrams.py
+/documents/process_diagrams/
