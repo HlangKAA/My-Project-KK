@@ -1,5 +1,5 @@
 import { writeFileSync } from 'node:fs';
-import { REGIONS, STAGE_DATA } from '../frontend/src/data/stageData.js';
+import { REGIONS, STAGE_DATA } from '../frontend/src/features/stages/stageData.js';
 
 // Export only playable stages; keep SQL data changes separate from schema changes.
 const catalog = 'spectrum_stages_v1';
