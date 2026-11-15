@@ -8,8 +8,6 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
-import CharacterDemo from './pages/CharacterDemo';
-import SpriteEditor from './pages/SpriteEditor';
 import Dashboard from './pages/Dashboard';
 import RegionMap from './pages/RegionMap';
 import StagePage from './pages/StagePage';
@@ -43,8 +41,6 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
-          <Route path="/demo-characters" element={<CharacterDemo />} />
-          <Route path="/sprite-editor" element={<SpriteEditor />} />
           
           <Route
             path="/dashboard" 

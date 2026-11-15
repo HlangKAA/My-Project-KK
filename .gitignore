@@ -67,3 +67,19 @@ AGENTS.md
 /make_flowchart.py
 /make_process_diagrams.py
 /documents/process_diagrams/
+
+# Local project notes, demos, and optional tools
+/PROJECT_STATUS.md
+/implementation_plan.md
+/stage_solutions.md
+/backend/PROGRESS_PERSISTENCE.md
+/documents/
+/backend/ngrok.exe
+/backend/test_secret.py
+/frontend/public/vite.svg
+/frontend/src/assets/react.svg
+/frontend/src/pages/CharacterDemo.jsx
+/frontend/src/pages/CharacterDemo.css
+/frontend/src/pages/SpriteEditor.jsx
+/frontend/src/pages/SpriteEditor.css
+/frontend/src/features/dev/
