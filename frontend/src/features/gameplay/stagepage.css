@@ -200,12 +200,20 @@
 /* ─── Story Indicator (top) ─── */
 .stage-story-indicator {
     position: absolute;
+    box-sizing: border-box;
     top: 2rem;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
     align-items: center;
     gap: 0.8rem;
+    max-width: calc(100% - 1.5rem);
+    padding: 0.7rem 1rem;
+    border: 1px solid rgba(218, 186, 130, .55);
+    border-radius: 10px;
+    background: rgba(10, 10, 15, .88);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .55);
+    backdrop-filter: blur(8px);
     z-index: 10;
     animation: fadeInDown 1s ease;
 }
@@ -214,20 +222,20 @@
     font-family: 'Cinzel', serif;
     font-size: 0.7rem;
     font-weight: 700;
-    color: #b88949;
+    color: #f0c985;
     text-transform: uppercase;
     letter-spacing: 3px;
 }
 
 .stage-story-divider {
-    color: rgba(255, 255, 255, 0.2);
+    color: #d6c4a9;
 }
 
 .stage-story-stage {
     font-family: 'Cinzel', serif;
     font-size: 0.7rem;
     font-weight: 600;
-    color: #a89080;
+    color: #f2ebe1;
     letter-spacing: 2px;
     text-transform: uppercase;
 }
