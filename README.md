@@ -37,48 +37,16 @@ Write real Python code to restore color to a grayscale world!
 
 ## 🏗️ Architecture
 
-```
-My-Project-KK/
-├── backend/                              # Flask API and Supabase persistence
-│   ├── app/
-│   │   ├── __init__.py                   # Flask app factory and blueprint setup
-│   │   ├── db.py                         # PostgreSQL/Supabase connection
-│   │   ├── auth/
-│   │   │   └── routes.py                 # Login, registration, and profile routes
-│   │   ├── game/
-│   │   │   ├── routes.py                 # Game, progress, and submission endpoints
-│   │   │   ├── progress.py               # Progress and submission persistence
-│   │   │   ├── levels.py                 # Level definitions
-│   │   │   └── catalog.json              # Stage catalog used by the API
-│   │   ├── main/
-│   │   │   └── routes.py                 # Main and dashboard routes
-│   │   ├── templates/                    # Jinja2 auth, game, and dashboard pages
-│   │   └── static/                       # Backend CSS and image assets
-│   ├── tests/                            # Backend progress and profile tests
-│   │   ├── test_progress.py
-│   │   └── test_profile.py
-│   ├── PROGRESS_PERSISTENCE.md            # Progress persistence setup and behavior
-│   ├── seed_game_catalog.sql              # SQL for loading the game catalog
-│   ├── requirements.txt
-│   └── run.py                            # Flask entry point
-├── frontend/                             # React + Vite single-page app
-│   ├── src/
-│   │   ├── App.jsx                       # Client routes
-│   │   ├── api/axios.js                   # Shared API client
-│   │   ├── pages/                        # Game, stage, map, dashboard, auth, and profile pages
-│   │   ├── components/                   # Game UI, editor, visualizer, spell book, and profile controls
-│   │   ├── hooks/                        # Game world, progression, and Python interpreter
-│   │   ├── context/GameContext.jsx       # Game session and progress state
-│   │   └── data/                         # Stage, region, quest, and character data
-│   ├── public/                           # Public static assets
-│   └── package.json
-├── scripts/
-│   └── export-game-catalog.mjs           # Exports the game catalog
-├── PROJECT_STATUS.md                     # Current project status
-├── implementation_plan.md                # Implementation plan
-├── start.bat                             # Starts the app locally
-└── README.md
-```
+The React app groups source files by feature. `frontend/src/App.jsx` owns routes;
+`frontend/src/features/` contains `auth`, `world`, `gameplay`, `character`,
+`stages`, and `dev`. Shared API, context, translations, and styles live under
+`frontend/src/shared/`. Existing artwork stays in `frontend/src/assets/` and
+`frontend/public/`. Cross-folder imports use the `@/` alias for `frontend/src/`.
+
+The Flask API and Supabase persistence live under `backend/app/`. The playable
+stage list is `frontend/src/features/stages/stageData.js`; run
+`node scripts/export-game-catalog.mjs` after changing it to regenerate the
+backend catalog. See `frontend/README.md` for a folder-by-folder guide.
 
 ## 🛠️ Tech Stack
 
@@ -140,6 +108,10 @@ cd backend && python run.py
 # Frontend (new terminal)
 cd frontend && npm run dev
 ```
+
+## API documentation
+
+With the servers running, open [Swagger UI](http://localhost:5173/api/docs) to browse the Flask JSON endpoints, request bodies, and responses. The machine-readable OpenAPI document is at `http://localhost:5173/api/openapi.json`. Both URLs also work on the backend's port 5000. Sign in to the game in the same browser before trying endpoints that use the Flask session cookie.
 
 ## 🎮 How to Play
 

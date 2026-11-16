@@ -1,16 +1,20 @@
-# React + Vite
+# The Lost Spectrum frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The React and Vite app is organized by game feature:
 
-Currently, two official plugins are available:
+| Folder | Contents |
+| --- | --- |
+| `src/features/auth/` | Login, registration, password recovery, and their UI |
+| `src/features/world/` | Dashboard, map, story scenes, and walkthrough |
+| `src/features/gameplay/` | Stage screen, puzzles, spellbook, editor, and arena |
+| `src/features/character/` | Profile and character progression |
+| `src/features/stages/` | Playable stage data and supporting content |
+| `src/features/dev/` | Character and sprite demo routes |
+| `src/shared/` | API client, game context, translations, and shared styles |
+| `src/assets/` and `public/` | Artwork and other static assets |
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+`src/App.jsx` owns routes. Import across folders with `@/`; use relative imports within a folder. The alias is configured in `vite.config.js` and `jsconfig.json`.
 
-## React Compiler
+The playable stage list is in `src/features/stages/stageData.js`. After changing stages, run `node scripts/export-game-catalog.mjs` from the repository root. Do not edit generated backend catalog files by hand.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Run `npm.cmd run lint` and `npm.cmd run build` here to verify frontend changes on Windows.

@@ -62,7 +62,8 @@ const StagePage = () => {
     const introNpcName = STAGE_DATA[stageKey]?.storyIntro?.npcName;
     const introCharacter = STORY_SPRITES[introNpcName] || 'hero';
     const isPortraitIntro = introCharacter !== 'hero';
-    const currentStage = useMemo(() => localStageData(STAGE_DATA[stageKey], stageKey, isThai), [stageKey, isThai]);
+    const playableStage = REGIONS[regionId]?.stages.some(stage => String(stage.id) === stageId);
+    const currentStage = useMemo(() => playableStage ? localStageData(STAGE_DATA[stageKey], stageKey, isThai) : null, [playableStage, stageKey, isThai]);
     const region = REGIONS[regionId] && localRegion(REGIONS[regionId], isThai);
 
     // Story Intro state
@@ -690,7 +691,7 @@ const StagePage = () => {
 
                 <div className="game-nav-level">
                     <i className="fas fa-dungeon"></i>
-                    {isThai ? 'ด่าน' : 'Stage'} {regionId}-{stageId}: {currentStage.title}
+                    {isThai ? 'ด่าน' : 'Stage'} {regionId}-{regionId === '3' || regionId === '4' ? stageIndex + 1 : stageId}: {currentStage.title}
                     {currentStage.difficulty && (
                         <span className="game-nav-difficulty">
                             {Array.from({ length: currentStage.difficulty }, (_, i) => (

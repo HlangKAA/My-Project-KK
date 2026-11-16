@@ -58,30 +58,26 @@ export const REGIONS = {
         id: 3,
         name: 'WHISPERING CAVERNS',
         subtitle: 'The Matrix',
-        description: 'Decode image pixels on cavern rune walls with lists, indexing, loops, and pattern searches.',
+        description: 'Restore cavern runes with list positions, simple loops, and red pixels.',
         stages: [
             { id: 1, name: 'The Inscription Wall',   type: 'lesson',    icon: 'fas fa-th-list',         description: 'Learn about lists and how to create them.' },
             { id: 2, name: 'Rune Positions',          type: 'challenge', icon: 'fas fa-hand-pointer',    description: 'Use pixel positions to repair a scrambled image.' },
-            { id: 3, name: 'The Matrix Search',       type: 'challenge', icon: 'fas fa-search',          description: 'Find values in lists using .index().' },
             { id: 4, name: 'The Echo Loop',           type: 'lesson',    icon: 'fas fa-sync-alt',        description: 'Learn for loops to iterate over lists.' },
             { id: 5, name: 'Broken Arrays',           type: 'challenge', icon: 'fas fa-bug',             description: 'Repair a broken pixel processing loop.' },
-            { id: 6, name: 'The Hidden Pattern',      type: 'challenge', icon: 'fas fa-chess-board',     description: 'Find a repeated color pattern in the rune image.' },
-            { id: 7, name: 'The Cavern Trial',        type: 'boss',      icon: 'fas fa-crown',           description: 'Find the strongest red pixel and restore the cavern image.' }
+            { id: 7, name: 'The Cavern Trial',        type: 'boss',      icon: 'fas fa-crown',           description: 'Use a simple loop to turn red cave runes gold.' }
         ]
     },
     4: {
         id: 4,
         name: 'ASH PEAKS',
         subtitle: 'The Light',
-        description: 'Climb Ash Peaks and use thresholds, masks, edges, and RGB conditions to restore the Lost Spectrum.',
+        description: 'Climb Ash Peaks and use simple color choices to restore the Lost Spectrum.',
         stages: [
             { id: 1, name: 'The Crossroads',         type: 'lesson',    icon: 'fas fa-code-branch',     description: 'Learn if/elif/else conditional logic.' },
             { id: 2, name: 'Path Selection',          type: 'challenge', icon: 'fas fa-directions',      description: 'Choose an image filter with if, elif, and else.' },
             { id: 3, name: 'Truth and Lies',          type: 'challenge', icon: 'fas fa-toggle-on',       description: 'Combine boolean masks to reveal hidden pixels.' },
-            { id: 4, name: 'Broken Bridges',          type: 'challenge', icon: 'fas fa-bug',             description: 'Repair conditional logic in a broken image mask.' },
-            { id: 5, name: 'Shadow Boundaries',       type: 'challenge', icon: 'fas fa-adjust',          description: 'Find color boundaries by comparing neighboring red values.' },
-            { id: 6, name: 'The Color Seal',          type: 'challenge', icon: 'fas fa-shield-alt',      description: 'Use a dark-pixel mask to open the seal.' },
-            { id: 7, name: 'The Light Convergence',   type: 'boss',      icon: 'fas fa-sun',             description: 'Restore the final image with a conditional RGB filter.' }
+            { id: 6, name: 'The Color Seal',          type: 'challenge', icon: 'fas fa-shield-alt',      description: 'Turn dark pixels gold with a simple color choice.' },
+            { id: 7, name: 'The Light Convergence',   type: 'boss',      icon: 'fas fa-sun',             description: 'Restore the final image by choosing colors with if/else.' }
         ]
     }
 };

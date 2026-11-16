@@ -105,7 +105,7 @@ const RegionMap = () => {
                                     }}
                                 >
                                     <div className="rmap-stage-card-header">
-                                        <span className="rmap-stage-number">{isThai ? 'ด่าน' : 'Stage'} {regionId}-{stage.id}</span>
+                                        <span className="rmap-stage-number">{isThai ? 'ด่าน' : 'Stage'} {regionId}-{regionId === '3' || regionId === '4' ? index + 1 : stage.id}</span>
                                         <span className={`rmap-stage-type ${stage.type}`}>
                                             {stage.type === 'story' ? (isThai ? '◆ เนื้อเรื่อง' : '◆ STORY') : (isThai ? '◇ ภารกิจ' : '◇ CHALLENGE')}
                                         </span>

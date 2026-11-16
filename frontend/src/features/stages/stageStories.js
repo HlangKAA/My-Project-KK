@@ -104,22 +104,22 @@ export const STAGE_STORIES = {
         say(C, 'If the outer pixels match, turn the center gold; otherwise leave the row unchanged.', 'ถ้าพิกเซลริมทั้งสองตรงกัน ให้เปลี่ยนตรงกลางเป็นสีทอง ถ้าไม่ตรงให้คงแถวเดิม', 'teaching'),
     ]),
     '3-7': scene(C, [
-        say(C, 'The cavern wall points upward to ASH PEAKS. Find its brightest red marker to open the last passage.', 'ผนังถ้ำชี้ขึ้นไปยัง ASH PEAKS หาจุดสีแดงที่เด่นที่สุดเพื่อเปิดทางออกสุดท้าย'),
+        say(C, 'The cavern wall points upward to ASH PEAKS. Red runes mark the last passage.', 'ผนังถ้ำชี้ขึ้นไปยัง ASH PEAKS รูนสีแดงบอกทางออกสุดท้าย'),
         say(H, 'Krakk is close now. I can feel the color waiting beyond the peaks.', 'แคร็กก์อยู่ใกล้แล้ว ฉันรู้สึกได้ว่าสียังรออยู่หลังยอดเขา'),
-        say(C, 'Find the pixel with the most red and turn it gold. Keep every other pixel unchanged.', 'หาพิกเซลที่มีสีแดงมากที่สุดแล้วเปลี่ยนเป็นสีทอง พิกเซลอื่นคงเดิม', 'teaching'),
+        say(C, 'Turn pixels with red above 100 gold. Keep the others unchanged.', 'เปลี่ยนพิกเซลที่มีค่าสีแดงมากกว่า 100 เป็นสีทอง ที่เหลือคงเดิม', 'teaching'),
     ]),
     '4-1': scene(R, [
-        say(R, 'Krakk split the road across ASH PEAKS into light and shadow. The true path lies inside the brightness of each pixel.', 'แคร็กก์แยกทางบน ASH PEAKS เป็นแสงกับเงา ทางจริงซ่อนอยู่ในความสว่างของแต่ละพิกเซล'),
-        say(H, 'Show me the threshold. I will find the way through.', 'บอกเกณฑ์ให้ฉัน ฉันจะหาทางผ่านเอง'),
-        say(R, 'Average each RGB pixel; make it white at 128 or above and black below 128.', 'หาค่าเฉลี่ย RGB ของแต่ละพิกเซล ถ้าตั้งแต่ 128 ขึ้นไปให้เป็นสีขาว ต่ำกว่านั้นเป็นสีดำ', 'teaching'),
+        say(R, 'Krakk split the road across ASH PEAKS into light and shadow. The red runes reveal the path.', 'แคร็กก์แยกทางบน ASH PEAKS เป็นแสงกับเงา รูนสีแดงบอกทางที่ถูกต้อง'),
+        say(H, 'Show me which runes are bright enough. I will find the way through.', 'บอกฉันว่ารูนไหนสว่างพอ แล้วฉันจะหาทางผ่านเอง'),
+        say(R, 'Make pixels white when red is at least 128; otherwise make them black.', 'ถ้าค่าสีแดงตั้งแต่ 128 ขึ้นไปให้เป็นสีขาว ที่เหลือเป็นสีดำ', 'teaching'),
     ]),
     '4-2': scene(R, [
-        say(R, 'Three bands of light cross the next slope. Each brightness range leads to a different path.', 'แสงสามระดับพาดผ่านเนินถัดไป แต่ละช่วงความสว่างพาไปคนละทาง'),
+        say(R, 'Three red rune strengths cross the next slope. Each range leads to a different color.', 'รูนสีแดงสามระดับอยู่บนเนินถัดไป แต่ละช่วงใช้สีต่างกัน'),
         say(R, 'Use if/elif/else: below 85 is blue, below 170 is gold, and the rest is white.', 'ใช้ if/elif/else: ต่ำกว่า 85 เป็นสีน้ำเงิน ต่ำกว่า 170 เป็นสีทอง ที่เหลือเป็นสีขาว', 'teaching'),
     ]),
     '4-3': scene(R, [
-        say(R, 'Krakk planted decoy runes among the real ones. Two color conditions together reveal the truth.', 'แคร็กก์วางรูนลวงปนกับของจริง เงื่อนไขสีสองข้อรวมกันจะบอกความจริง'),
-        say(R, 'Keep pixels with red above 100 AND blue below 100; turn all others black.', 'เก็บพิกเซลที่สีแดงมากกว่า 100 และสีน้ำเงินน้อยกว่า 100 ที่เหลือเปลี่ยนเป็นสีดำ', 'teaching'),
+        say(R, 'Krakk planted decoy runes among the real ones. Their red color reveals the truth.', 'แคร็กก์วางรูนลวงปนกับของจริง ค่าสีแดงช่วยบอกว่ารูนไหนเป็นของจริง'),
+        say(R, 'Keep pixels with red above 100; turn all others black.', 'เก็บพิกเซลที่มีค่าสีแดงมากกว่า 100 ที่เหลือเปลี่ยนเป็นสีดำ', 'teaching'),
     ]),
     '4-4': scene(R, [
         say(R, 'A broken mask hides the bridge. It selects the shadows instead of the stones.', 'หน้ากากภาพที่เสียทำให้สะพานหายไป มันเลือกเงาแทนหิน'),
@@ -130,13 +130,13 @@ export const STAGE_STORIES = {
         say(R, 'Compare each red value with the previous pixel. Mark differences of 80 or more in gold.', 'เทียบค่าสีแดงกับพิกเซลก่อนหน้า ถ้าต่างกันตั้งแต่ 80 ให้ทำเครื่องหมายสีทอง', 'teaching'),
     ]),
     '4-6': scene(R, [
-        say(R, 'Past the traps lies the final seal. Only its darkest pixels carry the key.', 'หลังกับดักคือผนึกสุดท้าย มีเพียงพิกเซลที่มืดที่สุดที่เก็บกุญแจไว้'),
-        say(R, 'Turn pixels whose three channels are all below 100 gold. Leave the others as they are.', 'เปลี่ยนพิกเซลที่ทั้งสามช่องสีต่ำกว่า 100 เป็นสีทอง ที่เหลือคงเดิม', 'teaching'),
+        say(R, 'Past the traps lies the final seal. Its low-red runes carry the key.', 'หลังกับดักคือผนึกสุดท้าย รูนที่มีค่าสีแดงน้อยเก็บกุญแจไว้'),
+        say(R, 'Turn pixels with red below 100 gold. Leave the others as they are.', 'เปลี่ยนพิกเซลที่มีค่าสีแดงน้อยกว่า 100 เป็นสีทอง ที่เหลือคงเดิม', 'teaching'),
     ]),
     '4-7': scene(K, [
         say(K, 'I stole the colors so no one could dream of a kingdom beyond my rule. You cannot undo what I sealed.', 'ข้าขโมยสีไป เพื่อไม่ให้ใครฝันถึงอาณาจักรที่พ้นจากอำนาจข้า เจ้าทำลายผนึกไม่ได้'),
         say(H, 'The colors belong to everyone. I will bring them home.', 'สีเป็นของทุกคน ฉันจะพามันกลับมา'),
-        say(R, 'Restore the three seals with brightness and RGB conditions, avoid the shadow tiles, and reach the gate before the active five-minute clock runs out.', 'ใช้เงื่อนไขความสว่างและ RGB คืนสีให้ผนึกทั้งสาม หลบช่องเงา แล้วไปถึงประตูก่อนเวลาร่ายคาถา 5 นาทีจะหมด', 'teaching'),
+        say(R, 'Restore the three seals with two red checks, avoid the shadow tiles, and reach the gate within five minutes of active casting.', 'ใช้เงื่อนไขค่าสีแดงสองช่วงคืนสีให้ผนึกทั้งสาม หลบช่องเงา แล้วไปถึงประตูภายในเวลาร่ายคาถา 5 นาที', 'teaching'),
     ]),
 };
 

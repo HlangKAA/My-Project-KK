@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Lost Spectrum API · Swagger UI</title>
+  <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.34.1/swagger-ui.css">
+  <style>
+    body { margin: 0; background: #f7f6f2; font-family: Arial, sans-serif; }
+    .api-docs-header { padding: 18px 28px; background: #1b211f; color: #f2dfbd; }
+    .api-docs-header a { color: #f2dfbd; text-decoration: none; font-weight: 700; }
+    .api-docs-header small { display: block; margin-top: 6px; color: #c8c9be; }
+    .api-docs-header code { color: #e8c388; }
+  </style>
+</head>
+<body>
+  <header class="api-docs-header">
+    <a href="/api/openapi.json">The Lost Spectrum API</a>
+    <small>Sign in to the game in this browser to try session-protected requests. Operations that change data act on your current account.</small>
+  </header>
+  <div id="swagger-ui"></div>
+  <script src="https://unpkg.com/swagger-ui-dist@5.34.1/swagger-ui-bundle.js"></script>
+  <script>
+    window.onload = () => {
+      window.ui = SwaggerUIBundle({
+        url: '/api/openapi.json',
+        dom_id: '#swagger-ui',
+        deepLinking: true,
+        requestInterceptor: request => {
+          request.credentials = 'same-origin';
+          return request;
+        }
+      });
+    };
+  </script>
+</body>
+</html>
