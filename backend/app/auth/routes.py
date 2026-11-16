@@ -249,7 +249,7 @@ def resend_verification():
                 'message': 'Email not found'
             }), 404
         
-        if user['is_verified'] and not user['verification_token']:
+        if user['is_verified']:
             return jsonify({
                 'success': False,
                 'message': 'Email is already verified'
@@ -447,7 +447,7 @@ def login():
                 'message': 'Invalid email or password'
             }), 401
         
-        if not user['is_verified'] or user['verification_token']:
+        if not user['is_verified']:
             cursor.close()
             connection.close()
             return jsonify({
