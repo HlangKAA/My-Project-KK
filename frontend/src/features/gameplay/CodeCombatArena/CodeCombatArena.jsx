@@ -324,7 +324,7 @@ function CodeCombatArenaContent({
                     }
                     if (pathBlocked) {
                         setHeroState('confused');
-                        setActionLogBanner(`A bookshelf blocks (${newX}, ${newY}). Find another path.`);
+                        setActionLogBanner(isThai ? `มีสิ่งกีดขวางที่ (${newX}, ${newY}) ลองเดินอ้อมนะ` : `An obstacle blocks (${newX}, ${newY}). Walk around it.`);
                         isRunningRef.current = false;
                         onExecutionFinish?.(false, { kind: 'obstacle', x: newX, y: newY });
                         return;

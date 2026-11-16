@@ -14,10 +14,10 @@ const Home = () => (
                 <i className="fas fa-chess-rook"></i>
             </div>
             <h1 className="auth-title" style={{ fontSize: '2.5rem', marginBottom: '0.8rem' }}>
-                CODEQUEST
+                THE LOST<br />SPECTRUM
             </h1>
             <p className="auth-subtitle" style={{ fontSize: '1rem', marginBottom: '2rem' }}>
-                Master the arcane arts of Python in a world of neon and magic.
+                Restore color to a forgotten realm through the arcane art of Python.
             </p>
             <Link to="/login" style={{ textDecoration: 'none' }}>
                 <button className="auth-btn" style={{ fontSize: '1.1rem', padding: '1.1rem 2.5rem' }}>

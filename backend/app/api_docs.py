@@ -68,14 +68,25 @@ SCHEMAS = {
             'unlocked_at': {'type': 'string', 'format': 'date-time'},
         },
     },
+    'AchievementStatus': {
+        'type': 'object',
+        'properties': {
+            'achievement_id': {'type': 'integer'}, 'title': {'type': 'string'},
+            'description': {'type': 'string'}, 'unlocked': {'type': 'boolean'},
+            'unlockedAt': {'type': 'string', 'format': 'date-time', 'nullable': True},
+            'completedCount': {'type': 'integer'}, 'requiredCount': {'type': 'integer'},
+        },
+    },
     'Progress': {
         'type': 'object',
         'properties': {
-            'level': {'type': 'integer', 'description': 'First region not fully completed.'},
+            'level_id': {'type': 'integer', 'nullable': True,
+                         'description': 'Database ID of the next unfinished playable stage, or null when all are complete.'},
             'stageProgress': {'type': 'object', 'additionalProperties': {'type': 'integer'}},
             'completedStages': {'type': 'object', 'additionalProperties': ref('CompletedStage')},
             'completedRegions': {'type': 'array', 'items': {'type': 'integer'}},
             'achievements': {'type': 'array', 'items': ref('Achievement')},
+            'achievementCatalog': {'type': 'array', 'items': ref('AchievementStatus')},
             'highScore': {'type': 'integer', 'description': 'Server-saved total XP.'},
         },
     },

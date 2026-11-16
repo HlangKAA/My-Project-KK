@@ -56,7 +56,6 @@ const Dashboard = () => {
     const { user, logout, advanceOnboarding } = useGame();
     const navigate = useNavigate();
     const { character, levelProgress } = useCharacterProgression();
-    const userLevel = user?.level || 1;
     const [showLegends, setShowLegends] = useState(false);
     const [storyScene, setStoryScene] = useState(null);
     const [walkthroughReplay, setWalkthroughReplay] = useState(false);
@@ -137,8 +136,9 @@ const Dashboard = () => {
     }, [showLegends]);
 
     const getRegionStatus = (regionId) => {
-        if (regionId < userLevel) return 'complete';
-        if (regionId === userLevel) return 'active';
+        const completed = user?.completedRegions || [];
+        if (completed.includes(regionId)) return 'complete';
+        if (regionId === 1 || completed.includes(regionId - 1)) return 'active';
         return 'locked';
     };
 

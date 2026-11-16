@@ -12,6 +12,7 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": ["http://localhost:5173", "http://localhost:5174"]}}, supports_credentials=True)
 
 app.secret_key = os.getenv('SECRET_KEY')
+app.config['FRONTEND_URL'] = os.getenv('FRONTEND_URL', 'http://localhost:5173').rstrip('/')
 
 # Email configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'

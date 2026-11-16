@@ -15,6 +15,7 @@ const ResetPassword = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const handleReset = async (e) => {
     e.preventDefault();
@@ -98,7 +99,7 @@ const ResetPassword = () => {
             <div className="auth-input-wrap">
               <i className="fas fa-lock auth-icon-left"></i>
               <input
-                type={showPassword ? "text" : "password"}
+                type={showConfirm ? "text" : "password"}
                 className="auth-input"
                 placeholder="••••••"
                 value={confirmPassword}
@@ -107,11 +108,15 @@ const ResetPassword = () => {
                 required
                 minLength={6}
               />
+              <i
+                className={`fas ${showConfirm ? "fa-eye" : "fa-eye-slash"} auth-icon-right`}
+                onClick={() => setShowConfirm(!showConfirm)}
+              ></i>
             </div>
           </div>
 
           {error && <div className="auth-error">{error}</div>}
-          {message && <div className="auth-error" style={{ color: "#34d399" }}>{message}</div>}
+          {message && <div className="auth-success" role="status">{message}</div>}
 
           <button type="submit" className="auth-btn" disabled={loading || message !== ""}>
             {loading ? (
@@ -125,6 +130,10 @@ const ResetPassword = () => {
             )}
           </button>
         </form>
+
+        <div className="auth-bottom">
+          <span className="auth-link" onClick={() => navigate("/login")}>Return to Login</span>
+        </div>
       </div>
 
       <div className="auth-footer">

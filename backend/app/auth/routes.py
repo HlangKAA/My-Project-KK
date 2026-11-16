@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request, jsonify, session, redirect, url_for, current_app
+from html import escape
 from psycopg2.errors import UniqueViolation
 from flask_mail import Message
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -7,6 +8,7 @@ from datetime import datetime, timedelta
 import secrets
 from app import mail
 from app.db import get_db_connection
+from app.game.progress import CATALOG
 from app.auth.password_policy import password_error
 
 auth_bp = Blueprint('auth', __name__)
@@ -21,40 +23,41 @@ def send_verification_email(email, token, username):
             recipients=[email]
         )
         
+        safe_username = escape(username)
         msg.html = f"""
         <!DOCTYPE html>
         <html>
-        <body style="font-family: 'Arial', sans-serif; background-color: #0f172a; margin: 0; padding: 0;">
-            <div style="width: 100%; padding: 40px 0; background-color: #0f172a;">
-                <div style="max-width: 600px; margin: 0 auto; background-color: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);">
+        <body style="font-family: Georgia, serif; background-color: #15130f; margin: 0; padding: 0;">
+            <div style="width: 100%; padding: 40px 0; background-color: #15130f;">
+                <div style="max-width: 600px; margin: 0 auto; background-color: #1e1d18; border: 1px solid rgba(184,137,73,0.4); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);">
                     
                     <!-- Header -->
-                    <div style="background: linear-gradient(90deg, #0f172a, #1e293b); padding: 30px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05);">
-                        <h1 style="margin: 0; font-size: 24px; color: #f1f5f9; text-transform: uppercase; letter-spacing: 2px;">
-                            The Lost <span style="color: #22d3ee; text-shadow: 0 0 10px rgba(34, 211, 238, 0.5);">Spectrum</span>
+                    <div style="background: linear-gradient(90deg, #1e1d18, #30291e); padding: 30px; text-align: center; border-bottom: 1px solid rgba(184,137,73,0.2);">
+                        <h1 style="margin: 0; font-size: 24px; color: #f3e7d0; text-transform: uppercase; letter-spacing: 2px;">
+                            The Lost <span style="color: #b88949;">Spectrum</span>
                         </h1>
                     </div>
 
                     <!-- Content -->
                     <div style="padding: 40px 30px; text-align: center;">
-                        <h2 style="color: #f8fafc; margin-top: 0; font-size: 20px;">Verify Your Identity</h2>
-                        <p style="color: #94a3b8; font-size: 16px; line-height: 1.6; margin-bottom: 30px;">
-                            Welcome, Explorer <strong>{username}</strong>.<br>
-                            To access the void, you must verify your communication channel.
+                        <h2 style="color: #f3e7d0; margin-top: 0; font-size: 20px;">Verify Your Arcane Mail</h2>
+                        <p style="color: #c2b49e; font-size: 16px; line-height: 1.6; margin-bottom: 30px;">
+                            Welcome, Explorer <strong>{safe_username}</strong>.<br>
+                            Confirm your address to enter the realm.
                         </p>
 
-                        <a href="{verification_url}" style="background-color: transparent; border: 2px solid #22d3ee; color: #22d3ee; padding: 12px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block; text-transform: uppercase; letter-spacing: 1px;">
+                        <a href="{verification_url}" style="background-color: #b88949; border: 1px solid #d0a55f; color: #1e1d18; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; display: inline-block; text-transform: uppercase; letter-spacing: 1px;">
                             Verify Email
                         </a>
 
-                        <p style="color: #64748b; font-size: 14px; margin-top: 30px;">
+                        <p style="color: #a89080; font-size: 14px; margin-top: 30px;">
                             Or paste this link into your browser:<br>
-                            <a href="{verification_url}" style="color: #3b82f6; text-decoration: none; word-break: break-all;">{verification_url}</a>
+                            <a href="{verification_url}" style="color: #d0a55f; text-decoration: none; word-break: break-all;">{verification_url}</a>
                         </p>
                     </div>
 
                     <!-- Footer -->
-                    <div style="background-color: #020617; padding: 20px; text-align: center; font-size: 12px; color: #475569;">
+                    <div style="background-color: #15130f; padding: 20px; text-align: center; font-size: 12px; color: #8f806c;">
                         <p style="margin: 0;">Link expires in 24 hours.</p>
                         <p style="margin: 5px 0 0;">&copy; The Lost Spectrum</p>
                     </div>
@@ -73,7 +76,8 @@ def send_verification_email(email, token, username):
 def send_password_reset_email(email, token, username):
     """Send password reset email to user"""
     try:
-        reset_url = f"http://localhost:5173/reset-password/{token}"
+        reset_url = f"{current_app.config['FRONTEND_URL']}/reset-password/{token}"
+        safe_username = escape(username)
         
         msg = Message(
             'Reset Your Password - Lost Spectrum',
@@ -83,37 +87,37 @@ def send_password_reset_email(email, token, username):
         msg.html = f"""
         <!DOCTYPE html>
         <html>
-        <body style="font-family: 'Arial', sans-serif; background-color: #0f172a; margin: 0; padding: 0;">
-            <div style="width: 100%; padding: 40px 0; background-color: #0f172a;">
-                <div style="max-width: 600px; margin: 0 auto; background-color: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);">
+        <body style="font-family: Georgia, serif; background-color: #15130f; margin: 0; padding: 0;">
+            <div style="width: 100%; padding: 40px 0; background-color: #15130f;">
+                <div style="max-width: 600px; margin: 0 auto; background-color: #1e1d18; border: 1px solid rgba(184,137,73,0.4); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);">
                     
                     <!-- Header -->
-                    <div style="background: linear-gradient(90deg, #0f172a, #1e293b); padding: 30px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05);">
-                        <h1 style="margin: 0; font-size: 24px; color: #f1f5f9; text-transform: uppercase; letter-spacing: 2px;">
-                            The Lost <span style="color: #a855f7; text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);">Spectrum</span>
+                    <div style="background: linear-gradient(90deg, #1e1d18, #30291e); padding: 30px; text-align: center; border-bottom: 1px solid rgba(184,137,73,0.2);">
+                        <h1 style="margin: 0; font-size: 24px; color: #f3e7d0; text-transform: uppercase; letter-spacing: 2px;">
+                            The Lost <span style="color: #b88949;">Spectrum</span>
                         </h1>
                     </div>
 
                     <!-- Content -->
                     <div style="padding: 40px 30px; text-align: center;">
-                        <h2 style="color: #f8fafc; margin-top: 0; font-size: 20px;">Access Recovery Initiated</h2>
-                        <p style="color: #94a3b8; font-size: 16px; line-height: 1.6; margin-bottom: 30px;">
-                            Hello, Explorer <strong>{username}</strong>.<br>
+                        <h2 style="color: #f3e7d0; margin-top: 0; font-size: 20px;">Forge a New Incantation</h2>
+                        <p style="color: #c2b49e; font-size: 16px; line-height: 1.6; margin-bottom: 30px;">
+                            Hello, Explorer <strong>{safe_username}</strong>.<br>
                             A request to reset your access key has been received.
                         </p>
 
-                        <a href="{reset_url}" style="background-color: transparent; border: 2px solid #a855f7; color: #a855f7; padding: 12px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block; text-transform: uppercase; letter-spacing: 1px;">
+                        <a href="{reset_url}" style="background-color: #b88949; border: 1px solid #d0a55f; color: #1e1d18; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; display: inline-block; text-transform: uppercase; letter-spacing: 1px;">
                             Reset Password
                         </a>
 
-                        <p style="color: #64748b; font-size: 14px; margin-top: 30px;">
+                        <p style="color: #a89080; font-size: 14px; margin-top: 30px;">
                             Or paste this link into your browser:<br>
-                            <a href="{reset_url}" style="color: #3b82f6; text-decoration: none; word-break: break-all;">{reset_url}</a>
+                            <a href="{reset_url}" style="color: #d0a55f; text-decoration: none; word-break: break-all;">{reset_url}</a>
                         </p>
                     </div>
 
                     <!-- Footer -->
-                    <div style="background-color: #020617; padding: 20px; text-align: center; font-size: 12px; color: #475569;">
+                    <div style="background-color: #15130f; padding: 20px; text-align: center; font-size: 12px; color: #8f806c;">
                         <p style="margin: 0;">Link expires in 1 hour.</p>
                         <p style="margin: 5px 0 0;">If you didn't request this, ignore this message.</p>
                     </div>
@@ -131,23 +135,20 @@ def send_password_reset_email(email, token, username):
 
 @auth_bp.route('/login')
 def login_page():
-    """Render login page"""
-    return render_template('auth/login.html')
+    """Keep legacy links in the React authentication flow."""
+    return redirect(f"{current_app.config['FRONTEND_URL']}/login")
 
 @auth_bp.route('/signup')
 def signup_page():
-    """Render signup page"""
-    return render_template('auth/signup.html')
+    return redirect(f"{current_app.config['FRONTEND_URL']}/register")
 
 @auth_bp.route('/forgot-password')
 def forgot_password_page():
-    """Render forgot password page"""
-    return render_template('auth/forgot_password.html')
+    return redirect(f"{current_app.config['FRONTEND_URL']}/forgot-password")
 
 @auth_bp.route('/reset-password/<token>')
 def reset_password_page(token):
-    """Render reset password page"""
-    return render_template('auth/reset_password.html', token=token)
+    return redirect(f"{current_app.config['FRONTEND_URL']}/reset-password/{token}")
 
 @auth_bp.route('/verify-email/<token>')
 def verify_email(token):
@@ -173,12 +174,6 @@ def verify_email(token):
             return render_template('auth/verification_result.html',
                                  success=False,
                                  message='Invalid verification link')
-        
-        if user['is_verified']:
-            return render_template('auth/verification_result.html',
-                                 success=True,
-                                 message='Your email is already verified! You can now log in.',
-                                 already_verified=True)
         
         if user['token_expiry'] and datetime.now() > user['token_expiry']:
             return render_template('auth/verification_result.html',
@@ -211,11 +206,19 @@ def verify_email(token):
         connection.close()
 
 @auth_bp.route('/resend-verification', methods=['POST'])
+@auth_bp.route('/api/resend-verification', methods=['POST'])
 def resend_verification():
     """Resend verification email"""
+    connection = None
+    cursor = None
     try:
-        data = request.get_json()
-        email = data.get('email', '').strip()
+        data = request.get_json(silent=True) or {}
+        if not isinstance(data, dict):
+            return jsonify(success=False, message='Email is required'), 400
+        email = data.get('email', '')
+        if not isinstance(email, str):
+            return jsonify(success=False, message='Email is required'), 400
+        email = email.strip()
         
         if not email:
             return jsonify({
@@ -233,7 +236,7 @@ def resend_verification():
         cursor = connection.cursor()
         
         cursor.execute("""
-            SELECT player_id, username, email, is_verified 
+            SELECT player_id, username, email, is_verified, verification_token
             FROM players 
             WHERE email = %s
         """, (email,))
@@ -246,7 +249,7 @@ def resend_verification():
                 'message': 'Email not found'
             }), 404
         
-        if user['is_verified']:
+        if user['is_verified'] and not user['verification_token']:
             return jsonify({
                 'success': False,
                 'message': 'Email is already verified'
@@ -281,8 +284,9 @@ def resend_verification():
             'message': 'Server error'
         }), 500
     finally:
-        if connection:
+        if cursor:
             cursor.close()
+        if connection:
             connection.close()
 
 # API Routes
@@ -340,6 +344,14 @@ def signup():
                 'success': False,
                 'message': 'Username already exists'
             }), 409
+
+        cursor.execute("SELECT level_id FROM public.levels WHERE map_data->>'catalog' = %s AND map_data->>'stage_key' = '1-1'",
+                       (CATALOG,))
+        first_stage = cursor.fetchone()
+        if not first_stage:
+            cursor.close()
+            connection.close()
+            return jsonify(success=False, message='The first playable stage has not been installed.'), 503
         
         token = secrets.token_urlsafe(32)
         expiry = datetime.now() + timedelta(hours=24)
@@ -349,12 +361,16 @@ def signup():
         insert_query = """
             INSERT INTO players (username, email, password, date_joined, 
                                is_verified, verification_token, token_expiry) 
-            VALUES (%s, %s, %s, NOW(), TRUE, %s, %s)
+            VALUES (%s, %s, %s, NOW(), FALSE, %s, %s)
             RETURNING player_id
         """
         cursor.execute(insert_query, (name, email, hashed_password, token, expiry))
         res = cursor.fetchone()
         player_id = res['player_id'] if res else getattr(cursor, 'lastrowid', None)
+        cursor.execute('INSERT INTO public.game_progress (player_id, level_id, last_played) VALUES (%s, %s, NULL)',
+                       (player_id, first_stage['level_id']))
+        cursor.execute('INSERT INTO public.player_stats (player_id, level_id, last_played) VALUES (%s, %s, NULL)',
+                       (player_id, first_stage['level_id']))
         connection.commit()
         
         cursor.close()
@@ -364,7 +380,11 @@ def signup():
         
         return jsonify({
             'success': True,
-            'message': 'Account created! Please check your email to verify your account.',
+            'message': (
+                'Account created. Please check your email to verify your account.'
+                if email_sent else
+                'Account created, but the verification email could not be sent. Please request another link from the login page.'
+            ),
             'player_id': player_id,
             'email_sent': email_sent
         }), 201
@@ -405,7 +425,7 @@ def login():
         cursor = connection.cursor()
         
         cursor.execute("""
-            SELECT player_id, username, email, password, is_verified, onboarding_step
+            SELECT player_id, username, email, password, is_verified, verification_token, onboarding_step
             FROM players 
             WHERE email = %s
         """, (email,))
@@ -427,14 +447,14 @@ def login():
                 'message': 'Invalid email or password'
             }), 401
         
-        # if not user['is_verified']:
-        #     cursor.close()
-        #     connection.close()
-        #     return jsonify({
-        #         'success': False,
-        #         'message': 'Please verify your email before logging in',
-        #         'email_not_verified': True
-        #     }), 403
+        if not user['is_verified'] or user['verification_token']:
+            cursor.close()
+            connection.close()
+            return jsonify({
+                'success': False,
+                'message': 'Verify your email before logging in. You can request a new link below.',
+                'email_not_verified': True
+            }), 403
         
         cursor.execute(
             "UPDATE players SET last_login = NOW() WHERE player_id = %s",

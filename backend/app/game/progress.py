@@ -72,16 +72,16 @@ def read_progress(cursor, player_id):
                                   'xp': r['xp']}
                  for r in cursor.fetchall() if r['stage_key'] in stages}
     cursor.execute('''SELECT a.achievement_id, a.title, a.description, a.unlock_condition, pa.unlocked_at
-                      FROM public.player_achievements pa JOIN public.achievements a USING (achievement_id)
-                      WHERE pa.player_id = %s ORDER BY a.achievement_id''', (player_id,))
+                      FROM public.achievements a
+                      LEFT JOIN public.player_achievements pa
+                        ON pa.achievement_id = a.achievement_id AND pa.player_id = %s
+                      WHERE a.unlock_condition = %s OR a.unlock_condition = ANY(%s)
+                      ORDER BY a.achievement_id''', (player_id, f'{CATALOG}:all',
+                                                   [f'{CATALOG}:stage:1-1'] + [f'{CATALOG}:region:{r}' for r in range(1, 5)]))
     award_rows = cursor.fetchall()
-    legacy_completed_regions = {
-        region for region in (1, 2, 3, 4)
-        if any(row['unlock_condition'] == f'{CATALOG}:region:{region}' for row in award_rows)
-    }
     achievements = [
         {key: value for key, value in row.items() if key != 'unlock_condition'}
-        for row in award_rows
+        for row in award_rows if row['unlocked_at'] is not None
     ]
     stage_progress = {}
     completed_regions = []
@@ -93,14 +93,38 @@ def read_progress(cursor, player_id):
                 break
             contiguous += 1
         stage_progress[str(region)] = contiguous
-        if all(key in completed for key in keys) or region in legacy_completed_regions:
+        if all(key in completed for key in keys):
             completed_regions.append(region)
-    level = 1
-    while level in completed_regions:
-        level += 1
+    next_key = next((key for key in stages if key not in completed), None)
+    next_level_id = None
+    if next_key is not None:
+        cursor.execute("SELECT level_id FROM public.levels WHERE map_data->>'catalog' = %s AND map_data->>'stage_key' = %s",
+                       (CATALOG, next_key))
+        next_level = cursor.fetchone()
+        if not next_level:
+            raise LookupError(f'Playable stage {next_key} is missing from the database.')
+        next_level_id = next_level['level_id']
+    achievement_catalog = []
+    for row in award_rows:
+        condition = row['unlock_condition']
+        if condition == f'{CATALOG}:stage:1-1':
+            required, earned = 1, int('1-1' in completed)
+        elif condition == f'{CATALOG}:all':
+            required, earned = len(stages), len(completed)
+        else:
+            region = int(condition.rsplit(':', 1)[1])
+            keys = [key for key, stage in stages.items() if stage['chapter'] == region]
+            required, earned = len(keys), sum(key in completed for key in keys)
+        achievement_catalog.append({
+            'achievement_id': row['achievement_id'], 'title': row['title'],
+            'description': row['description'], 'unlocked': row['unlocked_at'] is not None,
+            'unlockedAt': row['unlocked_at'].replace(tzinfo=timezone.utc).isoformat() if row['unlocked_at'] else None,
+            'completedCount': earned, 'requiredCount': required,
+        })
     cursor.execute('SELECT COALESCE(MAX(high_score), 0) AS high_score FROM public.game_progress WHERE player_id = %s', (player_id,))
-    return {'level': level, 'stageProgress': stage_progress, 'completedStages': completed,
+    return {'level_id': next_level_id, 'stageProgress': stage_progress, 'completedStages': completed,
             'completedRegions': completed_regions, 'achievements': achievements,
+            'achievementCatalog': achievement_catalog,
             'highScore': cursor.fetchone()['high_score']}
 
 
@@ -124,7 +148,8 @@ def save_submission(cursor, player_id, data):
         if previous['code'] != data['code'] or previous['result'] != data['result']:
             raise ValueError('Attempt timestamp already used. Please run again.')
         # Backfill the secondary records if an attempt saved before they were enabled.
-        _update_player_stats(cursor, player_id, stages[data['stage_key']]['chapter'])
+        progress = read_progress(cursor, player_id)
+        _update_player_stats(cursor, player_id, progress['level_id'])
         _log_attempt(cursor, player_id, previous['submission_id'], data)
         cursor.execute('''SELECT detail::jsonb AS detail FROM public.game_logs
                           WHERE player_id = %s AND action = %s
@@ -134,7 +159,7 @@ def save_submission(cursor, player_id, data):
         detail = log['detail'] if log else {}
         if isinstance(detail, str):
             detail = json.loads(detail)
-        return {'submission_id': previous['submission_id'], 'progress': read_progress(cursor, player_id),
+        return {'submission_id': previous['submission_id'], 'progress': progress,
                 'earnedXP': detail.get('earned_xp', 0),
                 'appliedBonuses': detail.get('applied_bonuses', [])}
     cursor.execute('''SELECT COUNT(*)::int AS attempts,
@@ -152,15 +177,15 @@ def save_submission(cursor, player_id, data):
                       VALUES (%s, %s, %s, %s, %s, %s) RETURNING submission_id''',
                    (player_id, level_id, data['code'], data['result'], data['runtime'], data['submitted_at']))
     submission_id = cursor.fetchone()['submission_id']
-    _update_player_stats(cursor, player_id, stages[data['stage_key']]['chapter'])
     _log_attempt(cursor, player_id, submission_id, data, earned_xp, applied_bonuses)
     progress = read_progress(cursor, player_id)
+    _update_player_stats(cursor, player_id, progress['level_id'])
     if data['result'] == 'Success':
-        cursor.execute('''UPDATE public.game_progress SET current_level = %s, last_played = NOW()
-                          WHERE player_id = %s''', (progress['level'], player_id))
+        cursor.execute('''UPDATE public.game_progress SET level_id = %s, last_played = NOW()
+                          WHERE player_id = %s''', (progress['level_id'], player_id))
         if cursor.rowcount == 0:
-            cursor.execute('''INSERT INTO public.game_progress (player_id, current_level, last_played)
-                              VALUES (%s, %s, NOW())''', (player_id, progress['level']))
+            cursor.execute('''INSERT INTO public.game_progress (player_id, level_id, last_played)
+                              VALUES (%s, %s, NOW())''', (player_id, progress['level_id']))
         if earned_xp:
             cursor.execute('''UPDATE public.game_progress
                               SET high_score = COALESCE(high_score, 0) + %s
@@ -178,14 +203,14 @@ def save_submission(cursor, player_id, data):
             'earnedXP': earned_xp, 'appliedBonuses': applied_bonuses}
 
 
-def _update_player_stats(cursor, player_id, current_level):
-    """Keep the legacy stats table current without requiring a new unique key."""
+def _update_player_stats(cursor, player_id, level_id):
+    """Store the next playable stage in the stats table."""
     cursor.execute('''UPDATE public.player_stats
-                      SET current_level = %s, last_played = NOW()
-                      WHERE player_id = %s''', (current_level, player_id))
+                      SET level_id = %s, last_played = NOW()
+                      WHERE player_id = %s''', (level_id, player_id))
     if cursor.rowcount == 0:
-        cursor.execute('''INSERT INTO public.player_stats (player_id, current_level, last_played)
-                          VALUES (%s, %s, NOW())''', (player_id, current_level))
+        cursor.execute('''INSERT INTO public.player_stats (player_id, level_id, last_played)
+                          VALUES (%s, %s, NOW())''', (player_id, level_id))
 
 
 def _applied_bonuses(base_xp, first_attempt, no_hints):

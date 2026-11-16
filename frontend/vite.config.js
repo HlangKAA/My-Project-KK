@@ -16,14 +16,6 @@ export default defineConfig({
       '/api': {
         target: 'http://127.0.0.1:5000',
         changeOrigin: true
-      },
-      '/levels': {
-        target: 'http://127.0.0.1:5000',
-        changeOrigin: true
-      },
-      '/complete_level': {
-        target: 'http://127.0.0.1:5000',
-        changeOrigin: true
       }
     }
   }

@@ -35,7 +35,11 @@ export const GameProvider = ({ children }) => {
     const version = ++generation.current;
     try {
       const res = await api.post('/api/login', { email, password });
-      if (!res.data.success) return { success: false, message: res.data.message };
+      if (!res.data.success) return {
+        success: false,
+        message: res.data.message,
+        emailNotVerified: Boolean(res.data.email_not_verified),
+      };
       const saved = await api.get('/api/progress');
       if (version === generation.current) {
         setUser({ ...res.data.user, ...saved.data.progress });
@@ -43,7 +47,11 @@ export const GameProvider = ({ children }) => {
       }
       return { success: true };
     } catch (error) {
-      return { success: false, message: error.response?.data?.message || 'Unable to log in and load progress. Please retry.' };
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Unable to log in and load progress. Please retry.',
+        emailNotVerified: Boolean(error.response?.data?.email_not_verified),
+      };
     }
   };
 

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useGame } from "@/shared/context/GameContext";
 import { useNavigate } from "react-router-dom";
+import api from "@/shared/api/axios";
 import bgAuth from "@/assets/images/bg-auth.png";
 import "./auth.css";
 
@@ -12,18 +13,38 @@ const Login = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showResend, setShowResend] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [notice, setNotice] = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
+    setNotice("");
     setLoading(true);
     const result = await login(email, password);
     if (result.success) {
       navigate("/dashboard");
     } else {
       setError(result.message);
+      setShowResend(result.emailNotVerified);
     }
     setLoading(false);
+  };
+
+  const handleResend = async () => {
+    setError("");
+    setNotice("");
+    setResendLoading(true);
+    try {
+      const response = await api.post("/api/resend-verification", { email });
+      setNotice(response.data.message || "Check your email for a new verification link.");
+      setShowResend(false);
+    } catch (requestError) {
+      setError(requestError.response?.data?.message || "Could not resend the verification email.");
+    } finally {
+      setResendLoading(false);
+    }
   };
 
   return (
@@ -89,6 +110,12 @@ const Login = () => {
           </div>
 
           {error && <div className="auth-error">{error}</div>}
+          {notice && <div className="auth-success" role="status">{notice}</div>}
+          {showResend && (
+            <button type="button" className="auth-btn" onClick={handleResend} disabled={resendLoading || !email.trim()}>
+              {resendLoading ? "SENDING..." : "RESEND VERIFICATION EMAIL"}
+            </button>
+          )}
 
           <button type="submit" className="auth-btn" disabled={loading}>
             {loading ? (

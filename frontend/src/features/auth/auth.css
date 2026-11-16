@@ -318,6 +318,17 @@
     margin-top: 0.5rem;
 }
 
+.auth-success {
+    color: #d9c18f;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    text-align: center;
+    padding: 0.85rem;
+    border: 1px solid rgba(184, 137, 73, 0.4);
+    border-radius: 6px;
+    background: rgba(184, 137, 73, 0.1);
+}
+
 /* Bottom link */
 .auth-bottom {
     text-align: center;

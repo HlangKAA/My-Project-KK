@@ -69,7 +69,7 @@ const ForgotPassword = () => {
           </div>
 
           {error && <div className="auth-error">{error}</div>}
-          {message && <div className="auth-error" style={{ color: "#34d399" }}>{message}</div>}
+          {message && <div className="auth-success" role="status">{message}</div>}
 
           <button type="submit" className="auth-btn" disabled={loading}>
             {loading ? (

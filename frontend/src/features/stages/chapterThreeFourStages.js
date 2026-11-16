@@ -189,9 +189,12 @@ function createStage(key, stage) {
         : '';
     const scene = chapter === 3 ? 'Whispering Caverns' : 'Ash Peaks';
     const isFinalBoss = key === '4-7';
+    const hasRouteObstacles = isSimplified;
     const castPath = isFinalBoss
-        ? 'for index, color in enumerate(colors):\n    hero.cast_color(color[0], color[1], color[2])\n    if index < 2:\n        hero.move_up(1)\n        hero.move_right(3)\n        hero.move_down(1)\nhero.move_right(2)\nhero.move_down(2)'
-        : `for color in colors:\n    hero.cast_color(color[0], color[1], color[2])\n    hero.move_right(3)${stage.gate ? '\nhero.move_down(2)' : ''}`;
+        ? 'for index, color in enumerate(colors):\n    hero.cast_color(color[0], color[1], color[2])\n    if index < 2:\n        hero.move_up(2)\n        hero.move_right(3)\n        hero.move_down(2)\nhero.move_right(2)\nhero.move_down(2)'
+        : hasRouteObstacles
+            ? `for index, color in enumerate(colors):\n    hero.cast_color(color[0], color[1], color[2])\n    if index < 2:\n        # Walk around the rock, then return to the rune row.\n        hero.move_up(1)\n        hero.move_right(3)\n        hero.move_down(1)${stage.gate ? '\nhero.move_right(2)\nhero.move_down(2)' : ''}`
+            : `for color in colors:\n    hero.cast_color(color[0], color[1], color[2])\n    hero.move_right(3)${stage.gate ? '\nhero.move_down(2)' : ''}`;
     const fullCode = `def transform(pixels):\n    ${stage.code}\n\npixels = ${JSON.stringify(stage.source)}\ncolors = transform(pixels)\n${castPath}`;
     const startBody = stage.starter || 'pass  # Write the pixel filter here';
     const initialCode = fullCode.replace(`    ${stage.code}\n`, `    ${startBody}\n`);
@@ -226,7 +229,10 @@ function createStage(key, stage) {
             cols: 10, rows: 5, spawn: { x: 1, y: 2 },
             murals: [{ id: `${key}-image`, name: `${stage.title} image` }],
             colorTargets,
-            obstacles: [{ x: 3, y: 0 }, { x: 6, y: 4 }],
+            obstacles: hasRouteObstacles && !isFinalBoss
+                ? [{ x: 3, y: 2 }, { x: 6, y: 2 }]
+                : isFinalBoss ? [{ x: 3, y: 1 }, { x: 6, y: 1 }]
+                    : [{ x: 3, y: 0 }, { x: 6, y: 4 }],
             ...(stage.gate ? { gate: { x: 9, y: 4, name: stage.gate } } : {}),
             ...(isFinalBoss ? {
                 boss: { name: 'Krakk, Summus Magus Monotoniae', x: 9, y: 0 },

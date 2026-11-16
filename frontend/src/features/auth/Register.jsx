@@ -15,6 +15,8 @@ const Register = () => {
         confirmPassword: ''
     });
     const [error, setError] = useState('');
+    const [registrationMessage, setRegistrationMessage] = useState('');
+    const [registered, setRegistered] = useState(false);
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
@@ -41,7 +43,10 @@ const Register = () => {
                 password: formData.password
             });
             if (res.data.success) {
-                navigate('/login');
+                setRegistrationMessage(res.data.email_sent
+                    ? 'Your account is ready. Check your email for the verification link before signing in.'
+                    : 'Your account was created, but the verification email could not be sent. Go to login and request a new link.');
+                setRegistered(true);
             }
         } catch (err) {
             setError(err.response?.data?.message || 'The void consumed your request');
@@ -65,7 +70,14 @@ const Register = () => {
                     <p className="auth-subtitle">Inscribe your name in the ancient archives.</p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="auth-form">
+                {registered ? (
+                    <div className="auth-form" role="status">
+                        <div className="auth-success">{registrationMessage}</div>
+                        <button type="button" className="auth-btn" onClick={() => navigate('/login')}>
+                            <i className="fas fa-sign-in-alt"></i> CONTINUE TO LOGIN
+                        </button>
+                    </div>
+                ) : <form onSubmit={handleSubmit} className="auth-form">
                     <div className="auth-field">
                         <label className="auth-label">Chosen Name</label>
                         <div className="auth-input-wrap">
@@ -146,7 +158,7 @@ const Register = () => {
                             <><i className="fas fa-feather-alt"></i> CREATE YOUR LEGACY</>
                         )}
                     </button>
-                </form>
+                </form>}
 
                 <div className="auth-bottom">
                     Already have an ID?{' '}
