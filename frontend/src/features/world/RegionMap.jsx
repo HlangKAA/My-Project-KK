@@ -106,8 +106,10 @@ const RegionMap = () => {
                                 >
                                     <div className="rmap-stage-card-header">
                                         <span className="rmap-stage-number">{isThai ? 'ด่าน' : 'Stage'} {regionId}-{regionId === '3' || regionId === '4' ? index + 1 : stage.id}</span>
-                                        <span className={`rmap-stage-type ${stage.type}`}>
-                                            {stage.type === 'story' ? (isThai ? '◆ เนื้อเรื่อง' : '◆ STORY') : (isThai ? '◇ ภารกิจ' : '◇ CHALLENGE')}
+                                        <span className="rmap-stage-type">
+                                            {isThai
+                                                ? ({ lesson: 'บทเรียน', challenge: 'ภารกิจ', boss: 'ด่านสุดท้าย', story: 'เนื้อเรื่อง' }[stage.type] || 'ภารกิจ')
+                                                : ({ lesson: 'LESSON', challenge: 'CHALLENGE', boss: 'BOSS', story: 'STORY' }[stage.type] || 'CHALLENGE')}
                                         </span>
                                     </div>
                                     <h3 className="rmap-stage-name"><i className={`rmap-stage-card-icon ${stage.icon}`} aria-hidden="true" />{stage.name}</h3>

@@ -433,18 +433,9 @@
     letter-spacing: 1px;
     padding: 0.2rem 0.6rem;
     border-radius: 4px;
-}
-
-.rmap-stage-type.story {
-    color: #f59e0b;
-    background: rgba(245, 158, 11, 0.1);
-    border: 1px solid rgba(245, 158, 11, 0.2);
-}
-
-.rmap-stage-type.challenge {
-    color: var(--rmap-accent);
-    background: rgba(var(--rmap-accent-rgb), 0.1);
-    border: 1px solid rgba(var(--rmap-accent-rgb), 0.2);
+    color: #e9c986;
+    background: rgba(184, 137, 73, 0.13);
+    border: 1px solid rgba(184, 137, 73, 0.35);
 }
 
 .rmap-stage-name {
