@@ -59,7 +59,6 @@ AGENTS.md
 /.agents/
 /.codex/
 /skills/
-/docs/agents/
 /.scratch/
 /.triage/
 
@@ -74,6 +73,7 @@ AGENTS.md
 /stage_solutions.md
 /backend/PROGRESS_PERSISTENCE.md
 /documents/
+/docs/
 /backend/ngrok.exe
 /backend/test_secret.py
 /frontend/public/vite.svg
