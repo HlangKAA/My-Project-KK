@@ -81,12 +81,14 @@ export default function ProfilePage() {
     };
 
     const successfulCount = history.filter(row => row.completed_at).length;
+    const achievementCatalog = user?.achievementCatalog || [];
+    const unlockedAchievements = achievementCatalog.filter(item => item.unlocked);
 
     return (
         <main className="profile-page">
             <header className="profile-page-header">
-                <Link className="profile-back" to="/dashboard"><i className="fas fa-arrow-left" /> World Map</Link>
-                <h1>Player Profile</h1>
+                <Link className="profile-back" to="/dashboard"><i className="fas fa-arrow-left" /> {isThai ? 'แผนที่โลก' : 'World Map'}</Link>
+                <h1>{isThai ? 'โปรไฟล์ผู้เล่น' : 'Player Profile'}</h1>
             </header>
             <section className="profile-card" aria-label="Player details">
                 <div className="profile-summary">
@@ -102,9 +104,10 @@ export default function ProfilePage() {
                 </div>
                 <ProfileNameForm />
                 <div className="profile-stats">
-                    <div><strong>{successfulCount}</strong><span>Stages passed</span></div>
-                    <div><strong>{history.reduce((sum, row) => sum + row.attempts, 0)}</strong><span>Total attempts</span></div>
-                    <div><strong>{character.unlockedSpells?.length || 0}</strong><span>Spells unlocked</span></div>
+                    <div><strong>{successfulCount}</strong><span>{isThai ? 'ด่านที่ผ่าน' : 'Stages passed'}</span></div>
+                    <div><strong>{history.reduce((sum, row) => sum + row.attempts, 0)}</strong><span>{isThai ? 'จำนวนครั้งที่ส่งโค้ด' : 'Total attempts'}</span></div>
+                    <div><strong>{character.unlockedSpells?.length || 0}</strong><span>{isThai ? 'คาถาที่ปลดล็อก' : 'Spells unlocked'}</span></div>
+                    <div><strong>{unlockedAchievements.length}/{achievementCatalog.length || 6}</strong><span>{isThai ? 'ความสำเร็จ' : 'Achievements'}</span></div>
                 </div>
                 <div className="profile-account-corner">
                     <button type="button" className="profile-delete-entry" onClick={() => setShowDelete(true)}>
@@ -113,18 +116,57 @@ export default function ProfilePage() {
                 </div>
             </section>
 
+            <section className="profile-achievements" aria-labelledby="profile-achievements-title">
+                <div className="profile-section-heading">
+                    <h2 id="profile-achievements-title">
+                        <i className="fas fa-trophy" aria-hidden="true" /> {isThai ? 'ความสำเร็จ (Achievements)' : 'Achievements'}
+                    </h2>
+                    <span>{unlockedAchievements.length} / {achievementCatalog.length} {isThai ? 'ปลดล็อกแล้ว' : 'Unlocked'}</span>
+                </div>
+                {achievementCatalog.length > 0 ? (
+                    <div className="profile-achievement-grid">
+                        {achievementCatalog.map(item => (
+                            <article
+                                key={item.achievement_id}
+                                className={`profile-achievement-card ${item.unlocked ? 'unlocked' : 'locked'}`}
+                            >
+                                <div className="profile-achievement-icon" aria-hidden="true">
+                                    <i className={`fas ${item.unlocked ? 'fa-medal' : 'fa-lock'}`} />
+                                </div>
+                                <div className="profile-achievement-body">
+                                    <div className="profile-achievement-header">
+                                        <h3>{item.title}</h3>
+                                        <span className={`profile-achievement-badge ${item.unlocked ? 'unlocked' : ''}`}>
+                                            {item.unlocked
+                                                ? (isThai ? 'ปลดล็อกแล้ว' : 'Unlocked')
+                                                : `${item.completedCount ?? 0}/${item.requiredCount ?? 1}`}
+                                        </span>
+                                    </div>
+                                    <p>{item.description}</p>
+                                    {item.unlocked && item.unlockedAt && (
+                                        <small>{isThai ? 'ได้รับเมื่อ ' : 'Unlocked '}{dateLabel(item.unlockedAt)}</small>
+                                    )}
+                                </div>
+                            </article>
+                        ))}
+                    </div>
+                ) : (
+                    <p className="profile-empty-note">{isThai ? 'ผ่านด่านเพื่อปลดล็อกความสำเร็จแรกของคุณ' : 'Complete stages to unlock achievements.'}</p>
+                )}
+            </section>
+
             <section className="profile-collections" aria-label="Collected progress">
                 <article className="profile-collection-card">
-                    <h2>Unlocked spells</h2>
+                    <h2>{isThai ? 'คาถาที่ปลดล็อก (Unlocked Spells)' : 'Unlocked spells'}</h2>
                     {character.unlockedSpells?.length ? (
                         <ul>{character.unlockedSpells.map(key => <li key={key}>{SPELLS[key]?.name || key}</li>)}</ul>
-                    ) : <p>Complete stages to unlock your first spell.</p>}
+                    ) : <p>{isThai ? 'ผ่านด่านเพื่อปลดล็อกคาถาแรกของคุณ' : 'Complete stages to unlock your first spell.'}</p>}
                 </article>
                 <article className="profile-collection-card">
-                    <h2>Mastered concepts</h2>
+                    <h2>{isThai ? 'แนวคิดที่เรียนรู้แล้ว (Mastered Concepts)' : 'Mastered concepts'}</h2>
                     {character.conceptsMastered?.length
                         ? <ul>{character.conceptsMastered.map(concept => <li key={concept}>{concept}</li>)}</ul>
-                        : <p>Complete stages to master new concepts.</p>}
+                        : <p>{isThai ? 'ผ่านด่านเพื่อสะสมแนวคิดการเขียนโปรแกรมใหม่ๆ' : 'Complete stages to master new concepts.'}</p>}
                 </article>
             </section>
 

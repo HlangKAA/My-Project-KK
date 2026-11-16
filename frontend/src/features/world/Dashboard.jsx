@@ -194,10 +194,6 @@ const Dashboard = () => {
                     </div>
 
                     <div className="dash-map">
-                        <div className="dash-map-search">
-                            <input type="text" placeholder={isThai ? 'ค้นหาดินแดน...' : 'Search regions...'} />
-                        </div>
-
                         <div className="dash-map-world" style={{ backgroundImage: `url(${worldMap})`, transform: `scale(${mapZoom})` }}>
                         {/* Region Nodes */}
                         {REGIONS.map((rawRegion) => {

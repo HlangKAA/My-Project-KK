@@ -235,33 +235,6 @@
 .dash-map-help button:hover, .dash-map-help button:focus-visible { color: #e0c8ac; opacity: 1; text-decoration: underline; }
 .dash-map-help button:focus-visible { outline: 2px solid #b88949; outline-offset: 2px; }
 
-.dash-map-search {
-    position: absolute;
-    top: 1rem;
-    left: 1rem;
-    z-index: 10;
-}
-
-.dash-map-search input {
-    background: rgba(30, 29, 24, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 6px;
-    color: #a89080;
-    padding: 0.6rem 1rem;
-    font-size: 0.8rem;
-    width: 180px;
-    font-family: 'Inter', sans-serif;
-}
-
-.dash-map-search input::placeholder {
-    color: rgba(168, 144, 128, 0.5);
-}
-
-.dash-map-search input:focus {
-    outline: none;
-    border-color: rgba(184, 137, 73, 0.4);
-}
-
 /* Map Controls */
 .dash-map-controls {
     position: absolute;
