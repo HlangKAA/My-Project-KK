@@ -9,7 +9,7 @@ The React and Vite app is organized by game feature:
 | `src/features/gameplay/` | Stage screen, puzzles, spellbook, editor, and arena |
 | `src/features/character/` | Profile and character progression |
 | `src/features/stages/` | Playable stage data and supporting content |
-| `src/features/dev/` | Character and sprite demo routes |
+| `src/features/dev/` | Optional local character/sprite tools; ignored by Git and absent from fresh clones |
 | `src/shared/` | API client, game context, translations, and shared styles |
 | `src/assets/` and `public/` | Artwork and other static assets |
 
