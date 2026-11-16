@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useGame } from '@/shared/context/GameContext';
 import { REGIONS } from '@/features/stages/stageData';
 import { useLanguage } from '@/shared/i18n/useLanguage';
-import { localRegion, localStage } from '@/shared/i18n/th';
+import { localRegion, localStage } from '@/features/stages/stageThai';
 import './regionmap.css';
 
 const MAP_PARTICLES = Array.from({ length: 20 }, () => ({

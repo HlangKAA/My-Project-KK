@@ -59,7 +59,7 @@ export const CHAPTER_ONE_BASICS = {
         hint: 'Put the name variable inside braces in an f-string: f"Welcome, {name}!".',
     }),
     '1-4': forestStage({
-        title: 'The Forked Path', concept: ['comparison', 'conditionals', 'boolean-logic'], icon: 'fas fa-code-branch', xpReward: 300,
+        title: 'The Forked Path', concept: ['comparison', 'conditionals', 'boolean-logic'], icon: 'fas fa-code-branch', xpReward: 300, difficulty: 2,
         task: 'The if/else route is ready. Change the lit-path step count so you reach the gate at (7, 2).',
         arena: gate('Forked Path Gate'),
         code: '# Choose a route with a boolean condition.\nlantern_lit = True\nif lantern_lit:\n    steps = 5\nelse:\n    steps = 2\nhero.move_right(steps)\n',

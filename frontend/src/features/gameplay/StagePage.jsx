@@ -5,15 +5,15 @@ import useCharacterProgression from '@/features/character/useCharacterProgressio
 import { useGame } from '@/shared/context/GameContext';
 import { STAGE_DATA, REGIONS } from '@/features/stages/stageData';
 import { useLanguage } from '@/shared/i18n/useLanguage';
-import { localStageData, localRegion } from '@/shared/i18n/th';
+import { localStageData, localRegion } from '@/features/stages/stageThai';
 import Grimoire from './Grimoire';
 import LevelComplete from './LevelComplete';
 import HintPanel from './HintPanel';
-import GuidedStage from './GuidedStage';
-import DebugStage from './DebugStage';
-import PuzzleStage from './PuzzleStage';
 import WizardProfile from '@/features/character/WizardProfile';
-import WizardSprite from '@/features/character/WizardSprite';
+import StageStoryIntro from './StageStoryIntro';
+import StageTypeContent from './StageTypeContent';
+import { createArenaCallbacks } from './arenaActions';
+import { STORY_SPRITES } from './storyCharacters';
 import SpellBook from './SpellBook';
 import CodeCombatArena from '@/features/gameplay/CodeCombatArena/CodeCombatArena';
 import SpellFailureFeedback from './SpellFailureFeedback';
@@ -22,31 +22,6 @@ import StoryScene from '@/features/world/StoryScene';
 import './gamepage.css';
 import './stagepage.css';
 
-const STORY_SPRITES = {
-    Eldrin: 'eldrin',
-    Prisma: 'prisma',
-    'Loremaster Vane': 'vane',
-    'Rune Keeper': 'rune-keeper',
-    'Cave Warden': 'cave-warden',
-    Krakk: 'krakk',
-};
-const STORY_TITLES = {
-    Eldrin: 'Guardian of the Tower',
-    Prisma: 'Color Sage',
-    'Loremaster Vane': 'Keeper of the Chromatic Archive',
-    'Cave Warden': 'Guardian of the Caverns',
-    'Rune Keeper': 'Guardian of Ash Peaks',
-    Krakk: 'Summus Magus Monotoniae',
-};
-const STORY_ICONS = {
-    Player: 'fas fa-hat-wizard',
-    Eldrin: 'fas fa-hat-wizard',
-    Prisma: 'fas fa-palette',
-    'Loremaster Vane': 'fas fa-book-reader',
-    'Cave Warden': 'fas fa-mountain',
-    'Rune Keeper': 'fas fa-shield-alt',
-    Krakk: 'fas fa-hat-wizard',
-};
 const BOSS_TIME_LIMIT_SECONDS = 300;
 
 const StagePage = () => {
@@ -352,60 +327,20 @@ const StagePage = () => {
         setAttemptCount(prev => prev + 1);
 
         if (currentStage.arena) {
-            // Collect all step actions sequentially
-            const actions = [];
-            const pushStep = (dir) => {
-                actions.push({ type: 'move', dir, steps: 1 });
-            };
-
-            const arenaCallbacks = {
-                move_right: (n = 1) => {
-                    const count = Math.max(1, Number(n) || 1);
-                    for (let i = 0; i < count; i++) pushStep('right');
-                },
-                move_left: (n = 1) => {
-                    const count = Math.max(1, Number(n) || 1);
-                    for (let i = 0; i < count; i++) pushStep('left');
-                },
-                move_up: (n = 1) => {
-                    const count = Math.max(1, Number(n) || 1);
-                    for (let i = 0; i < count; i++) pushStep('up');
-                },
-                move_down: (n = 1) => {
-                    const count = Math.max(1, Number(n) || 1);
-                    for (let i = 0; i < count; i++) pushStep('down');
-                },
-                move_to: (x, y) => actions.push({ type: 'move_to', x: Number(x), y: Number(y) }),
-                move_to_x: (x) => actions.push({ type: 'move_to_x', targetX: Number(x) }),
-                pick_up: () => actions.push({ type: 'pick_up' }),
-                collect: () => actions.push({ type: 'pick_up' }),
-                put_in: (targetType) => actions.push({ type: 'put_in', targetType: String(targetType) }),
-                deposit: (targetType) => actions.push({ type: 'put_in', targetType: String(targetType) }),
-                cast_color: (r, g, b) => actions.push({ type: 'cast_color', args: [Number(r), Number(g), Number(b)] }),
-                say: (msg) => actions.push({ type: 'print', text: String(msg) }),
-                __onPrint: (text) => {
-                    const clean = String(text).trim();
-                    if (clean && !clean.startsWith('>') && !clean.startsWith('[')) {
-                        actions.push({ type: 'print', text: clean });
-                    }
-                },
-                __onSuccess: () => {
-                    console.log("[CodeCombat] Queuing actions to Arena:", actions);
+            const arenaCallbacks = createArenaCallbacks(actions => {
+                if (!activeAttempt.current) return;
+                if (stageKey !== '4-7') activeAttempt.current.runtime = (performance.now() - activeAttempt.current.started) / 1000;
+                if (actions.length === 0) {
+                    finishAttempt('Fail', { kind: 'noActions' });
+                    return;
+                }
+                setIsArenaExecuting(false);
+                setTimeout(() => {
                     if (!activeAttempt.current) return;
-                    if (stageKey !== '4-7') activeAttempt.current.runtime = (performance.now() - activeAttempt.current.started) / 1000;
-                    if (actions.length === 0) {
-                        finishAttempt('Fail', { kind: 'noActions' });
-                        return;
-                    }
-                    setIsArenaExecuting(false);
-                    setTimeout(() => {
-                        if (!activeAttempt.current) return;
-                        setArenaActionQueue([...actions]);
-                        setIsArenaExecuting(true);
-                    }, 50);
-                },
-                __onError: error => finishAttempt('Error', pythonFailure(error))
-            };
+                    setArenaActionQueue([...actions]);
+                    setIsArenaExecuting(true);
+                }, 50);
+            }, error => finishAttempt('Error', pythonFailure(error)));
 
             runCode(currentStage.visionChecks ? `${code}\n${currentStage.visionChecks.join('\n')}` : code, arenaCallbacks);
             return;
@@ -518,167 +453,20 @@ const StagePage = () => {
     //   RENDER: Story Intro Phase
     // ═══════════════════════════════════════════
     if (storyPhase === 'intro' && currentStage.hasStoryIntro) {
-        const story = currentStage.storyIntro;
-        const currentDialog = story.dialogues[dialogIndex];
-        const activeStoryName = STORY_SPRITES[currentDialog?.speaker]
-            ? currentDialog.speaker
-            : story.npcName;
-        const activeStoryCharacter = STORY_SPRITES[activeStoryName] || introCharacter;
-        const activeStoryTitle = STORY_TITLES[activeStoryName] || story.npcTitle;
-        const isPlayerSpeaking = currentDialog?.speaker === 'Player';
-        const playerName = user?.username?.trim() || (isThai ? 'ผู้ถูกเลือก' : 'The Chosen');
-
-        return (
-            <div className={`stage-story-page ${regionId === '1' ? 'chapter-one-noir' : ''} ${isPortraitIntro ? 'stage-story-page--portrait' : ''}`}>
-                {/* Background Scene */}
-                <div className="stage-story-bg">
-                    {/* Tower silhouette */}
-                    <div className="stage-story-tower">
-                        <div className="tower-body">
-                            <div className="tower-window"></div>
-                            <div className="tower-window w2"></div>
-                            <div className="tower-window w3"></div>
-                        </div>
-                        <div className="tower-roof"></div>
-                        <div className="tower-spire"></div>
-                        <div className="tower-glow"></div>
-                    </div>
-
-                    {/* Ambient particles */}
-                    <div className="stage-story-particles">
-                        {Array.from({ length: 30 }, (_, i) => (
-                            <div key={i} className="story-particle" style={{
-                                left: `${Math.random() * 100}%`,
-                                bottom: `${Math.random() * 40}%`,
-                                animationDelay: `${Math.random() * 5}s`,
-                                animationDuration: `${3 + Math.random() * 4}s`,
-                                width: `${2 + Math.random() * 3}px`,
-                                height: `${2 + Math.random() * 3}px`
-                            }}></div>
-                        ))}
-                    </div>
-
-                    {/* Ground fog */}
-                    <div className="stage-story-fog"></div>
-                </div>
-
-                {/* Region/Stage indicator */}
-                <div className="stage-story-indicator">
-                    <span className="stage-story-region">{region.name}</span>
-                    <span className="stage-story-divider">—</span>
-                    <span className="stage-story-stage">{currentStage.title}</span>
-                </div>
-
-                {/* The player stays in the scene while the speaking NPC changes. */}
-                <div className={`stage-story-actors ${npcVisible ? 'visible' : ''}`}>
-                    <div className={`stage-story-actor stage-story-actor--hero ${isPlayerSpeaking ? 'is-speaking' : ''}`}>
-                        <div className="stage-story-actor-sprite">
-                            <WizardSprite state="idle" size="lg" character="hero" showParticles={false} showShadow showGlow />
-                        </div>
-                        <div className="stage-npc-name-tag">
-                            <span className="stage-npc-name">{playerName}</span>
-                            <span className="stage-npc-title">{isThai ? 'ผู้ถือครองตำรา' : 'Grimoire Bearer'}</span>
-                        </div>
-                    </div>
-                    <div className={`stage-story-actor stage-story-actor--npc ${!isPlayerSpeaking ? 'is-speaking' : ''}`}>
-                        <div className="stage-story-actor-sprite" key={activeStoryCharacter}>
-                            <WizardSprite state="idle" size="lg" character={activeStoryCharacter} showParticles={false} showShadow showGlow />
-                        </div>
-                        <div className="stage-npc-name-tag">
-                            <span className="stage-npc-name">{activeStoryName}</span>
-                            <span className="stage-npc-title">{activeStoryTitle}</span>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Dialog Box */}
-                <div className="stage-dialog-area" onClick={handleDialogClick}>
-                    {dialogIndex < story.dialogues.length && (
-                        <div className={`stage-dialog-box ${currentDialog?.emotion || ''}`}>
-                            <div className="stage-dialog-speaker">
-                                <i className={STORY_ICONS[currentDialog?.speaker] || story.npcIcon}></i>
-                                <span>{isPlayerSpeaking ? playerName : currentDialog?.speaker}</span>
-                            </div>
-                            <p className="stage-dialog-text">{displayedText}</p>
-                            {!isTyping && (
-                                <div className="stage-dialog-next">
-                                    {dialogIndex < story.dialogues.length - 1 ? (
-                                        <span>Click to continue <i className="fas fa-chevron-right"></i></span>
-                                    ) : (
-                                        <span>Click to proceed <i className="fas fa-chevron-right"></i></span>
-                                    )}
-                                </div>
-                            )}
-                            {isTyping && (
-                                <div className="stage-dialog-typing">
-                                    <span className="typing-dot"></span>
-                                    <span className="typing-dot"></span>
-                                    <span className="typing-dot"></span>
-                                </div>
-                            )}
-                        </div>
-                    )}
-
-                    {/* Enter Tower Button */}
-                    {showEnterButton && (
-                        <button className="stage-enter-btn" onClick={(e) => { e.stopPropagation(); handleEnterTower(); }}>
-                            <i className={story.enterButtonIcon}></i>
-                            <span>{story.enterButtonText}</span>
-                            <div className="stage-enter-btn-glow"></div>
-                        </button>
-                    )}
-                </div>
-
-                {/* Skip button */}
-                <button className="stage-skip-btn" onClick={handleEnterTower}>
-                    Skip <i className="fas fa-forward"></i>
-                </button>
-            </div>
-        );
+        return <StageStoryIntro
+            currentStage={currentStage} region={region} regionId={regionId}
+            introCharacter={introCharacter} isPortraitIntro={isPortraitIntro}
+            dialogIndex={dialogIndex} displayedText={displayedText} isTyping={isTyping}
+            showEnterButton={showEnterButton} npcVisible={npcVisible}
+            user={user} isThai={isThai} onDialogClick={handleDialogClick} onEnterTower={handleEnterTower}
+        />;
     }
 
     // ═══════════════════════════════════════════
     //   RENDER: IDE Phase (with stage type routing)
     // ═══════════════════════════════════════════
 
-    // Render specialized stage types in the scene panel area
-    const renderStageTypeContent = () => {
-        switch (stageType) {
-            case 'guided':
-                return (
-                    <GuidedStage
-                        data={currentStage}
-                        key={stageKey}
-                        onAttempt={handleSpecialAttempt}
-                        runCode={runCode}
-                    />
-                );
-            case 'debug':
-                return (
-                    <DebugStage
-                        data={currentStage}
-                        key={stageKey}
-                        onAttempt={handleSpecialAttempt}
-                        runCode={runCode}
-                        output={output}
-                        clearOutput={clearOutput}
-                    />
-                );
-            case 'puzzle':
-                return (
-                    <PuzzleStage
-                        data={currentStage}
-                        key={stageKey}
-                        onAttempt={handleSpecialAttempt}
-                    />
-                );
-            default:
-                // lesson, challenge, boss — use the standard IDE layout
-                return null;
-        }
-    };
-
-    const specialContent = renderStageTypeContent();
+    const isSpecialStage = ['guided', 'debug', 'puzzle'].includes(stageType);
 
     return (
         <div className={`stage-game-page ${ideSliding ? 'ide-slide-in' : ''} ${regionId === '1' ? 'chapter-one-noir' : ''}`}>
@@ -736,12 +524,12 @@ const StagePage = () => {
                 }}>{isThai ? 'ลองบันทึกอีกครั้ง' : 'Retry save'}</button>
             </div>}
             <div className="game-main">
-                {specialContent ? (
+                {isSpecialStage ? (
                     /* ─── Specialized Stage Types (Guided / Debug / Puzzle) ─── */
                     <div className="game-scene" style={{ flex: 1 }}>
                         <div className="game-scene-view" style={{ padding: 0, overflow: 'auto' }}>
                             <fieldset disabled={saving || !!saveError} style={{ border: 0, margin: 0, padding: 0 }}>
-                                {specialContent}
+                                <StageTypeContent stageType={stageType} currentStage={currentStage} stageKey={stageKey} onAttempt={handleSpecialAttempt} runCode={runCode} output={output} clearOutput={clearOutput} />
                             </fieldset>
                         </div>
                     </div>
@@ -939,7 +727,7 @@ const StagePage = () => {
             </div>
 
             {/* ─── Bottom Bar (only for IDE stages) ─── */}
-            {!specialContent && (
+            {!isSpecialStage && (
                 <div className="game-bottom-bar">
                     <button className="game-btn-reset" onClick={handleReset} disabled={isRunning || isArenaExecuting || saving || !!saveError}>
                         <i className="fas fa-redo"></i> {isThai ? 'เริ่มใหม่' : 'RESET'}

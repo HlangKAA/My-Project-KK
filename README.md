@@ -37,48 +37,41 @@ Write real Python code to restore color to a grayscale world!
 
 ## 🏗️ Architecture
 
-```
+```text
 My-Project-KK/
-├── backend/                              # Flask API and Supabase persistence
+├── backend/                       Flask API and database persistence
 │   ├── app/
-│   │   ├── __init__.py                   # Flask app factory and blueprint setup
-│   │   ├── db.py                         # PostgreSQL/Supabase connection
-│   │   ├── auth/
-│   │   │   └── routes.py                 # Login, registration, and profile routes
-│   │   ├── game/
-│   │   │   ├── routes.py                 # Game, progress, and submission endpoints
-│   │   │   ├── progress.py               # Progress and submission persistence
-│   │   │   ├── levels.py                 # Level definitions
-│   │   │   └── catalog.json              # Stage catalog used by the API
-│   │   ├── main/
-│   │   │   └── routes.py                 # Main and dashboard routes
-│   │   ├── templates/                    # Jinja2 auth, game, and dashboard pages
-│   │   └── static/                       # Backend CSS and image assets
-│   ├── tests/                            # Backend progress and profile tests
-│   │   ├── test_progress.py
-│   │   └── test_profile.py
-│   ├── PROGRESS_PERSISTENCE.md            # Progress persistence setup and behavior
-│   ├── seed_game_catalog.sql              # SQL for loading the game catalog
-│   ├── requirements.txt
-│   └── run.py                            # Flask entry point
-├── frontend/                             # React + Vite single-page app
+│   │   ├── auth/                  Login, email, profile and account routes
+│   │   ├── game/                  Progress, submissions and leaderboard
+│   │   ├── main/                  API root and Swagger routes
+│   │   └── templates/             Active verification and Swagger pages
+│   ├── seed_game_catalog.sql      Generated stage data, not schema setup
+│   └── run.py
+├── frontend/
 │   ├── src/
-│   │   ├── App.jsx                       # Client routes
-│   │   ├── api/axios.js                   # Shared API client
-│   │   ├── pages/                        # Game, stage, map, dashboard, auth, and profile pages
-│   │   ├── components/                   # Game UI, editor, visualizer, spell book, and profile controls
-│   │   ├── hooks/                        # Game world, progression, and Python interpreter
-│   │   ├── context/GameContext.jsx       # Game session and progress state
-│   │   └── data/                         # Stage, region, quest, and character data
-│   ├── public/                           # Public static assets
-│   └── package.json
-├── scripts/
-│   └── export-game-catalog.mjs           # Exports the game catalog
-├── PROJECT_STATUS.md                     # Current project status
-├── implementation_plan.md                # Implementation plan
-├── start.bat                             # Starts the app locally
+│   │   ├── App.jsx                Client routes and compatibility redirects
+│   │   ├── features/
+│   │   │   ├── auth/              Account screens
+│   │   │   ├── world/             Dashboard, map and onboarding story
+│   │   │   ├── gameplay/          Stage screen, story, puzzles and arena
+│   │   │   ├── stages/            Playable catalog and lesson content
+│   │   │   └── character/         Profile, XP display and sprites
+│   │   ├── shared/                API client, session and translations
+│   │   └── assets/                Bundled artwork
+│   └── public/                    Character sprite sheets and static assets
+├── scripts/export-game-catalog.mjs Frontend-to-backend catalog exporter
+├── start.bat                       Starts configured local servers
 └── README.md
 ```
+
+The playable stage list is `REGIONS` in `frontend/src/features/stages/stageData.js`.
+After changing stages, run `node scripts/export-game-catalog.mjs` from the
+repository root. Saved stage keys, submissions and progress must be preserved.
+The exporter does not update the live database.
+
+See [frontend/README.md](frontend/README.md) and [backend/README.md](backend/README.md)
+for feature and route maps. Old URLs remain as redirects; the old Flask pages
+and level definitions are no longer part of the game.
 
 ## 🛠️ Tech Stack
 
@@ -97,9 +90,9 @@ My-Project-KK/
 | Tool | Version | Download |
 |------|---------|----------|
 | **Python** | 3.10+ | [python.org](https://www.python.org/downloads/) *(tick "Add to PATH")* |
-| **Node.js** | 18+ LTS | [nodejs.org](https://nodejs.org/) |
+| **Node.js** | 22.12+ or 20.19+ | [nodejs.org](https://nodejs.org/) |
 
-> **Note:** No local database installation required — the project uses **Supabase** (Cloud PostgreSQL).
+> **Note:** The project uses **Supabase** (Cloud PostgreSQL). A new database needs the current schema before loading `backend/seed_game_catalog.sql`; that seed file does not create tables.
 
 ## 🚀 Getting Started
 

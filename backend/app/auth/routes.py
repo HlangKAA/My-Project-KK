@@ -1,137 +1,13 @@
-from flask import Blueprint, render_template, request, jsonify, session, redirect, url_for, current_app
-from html import escape
-from psycopg2.errors import UniqueViolation
-from flask_mail import Message
+from flask import render_template, request, jsonify, session, redirect, url_for, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from psycopg2 import Error
 from datetime import datetime, timedelta
 import secrets
-from app import mail
 from app.db import get_db_connection
 from app.game.progress import CATALOG
 from app.auth.password_policy import password_error
-
-auth_bp = Blueprint('auth', __name__)
-
-def send_verification_email(email, token, username):
-    """Send verification email to user"""
-    try:
-        verification_url = url_for('auth.verify_email', token=token, _external=True)
-        
-        msg = Message(
-            'Verify Your Email - Lost Spectrum',
-            recipients=[email]
-        )
-        
-        safe_username = escape(username)
-        msg.html = f"""
-        <!DOCTYPE html>
-        <html>
-        <body style="font-family: Georgia, serif; background-color: #15130f; margin: 0; padding: 0;">
-            <div style="width: 100%; padding: 40px 0; background-color: #15130f;">
-                <div style="max-width: 600px; margin: 0 auto; background-color: #1e1d18; border: 1px solid rgba(184,137,73,0.4); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);">
-                    
-                    <!-- Header -->
-                    <div style="background: linear-gradient(90deg, #1e1d18, #30291e); padding: 30px; text-align: center; border-bottom: 1px solid rgba(184,137,73,0.2);">
-                        <h1 style="margin: 0; font-size: 24px; color: #f3e7d0; text-transform: uppercase; letter-spacing: 2px;">
-                            The Lost <span style="color: #b88949;">Spectrum</span>
-                        </h1>
-                    </div>
-
-                    <!-- Content -->
-                    <div style="padding: 40px 30px; text-align: center;">
-                        <h2 style="color: #f3e7d0; margin-top: 0; font-size: 20px;">Verify Your Arcane Mail</h2>
-                        <p style="color: #c2b49e; font-size: 16px; line-height: 1.6; margin-bottom: 30px;">
-                            Welcome, Explorer <strong>{safe_username}</strong>.<br>
-                            Confirm your address to enter the realm.
-                        </p>
-
-                        <a href="{verification_url}" style="background-color: #b88949; border: 1px solid #d0a55f; color: #1e1d18; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; display: inline-block; text-transform: uppercase; letter-spacing: 1px;">
-                            Verify Email
-                        </a>
-
-                        <p style="color: #a89080; font-size: 14px; margin-top: 30px;">
-                            Or paste this link into your browser:<br>
-                            <a href="{verification_url}" style="color: #d0a55f; text-decoration: none; word-break: break-all;">{verification_url}</a>
-                        </p>
-                    </div>
-
-                    <!-- Footer -->
-                    <div style="background-color: #15130f; padding: 20px; text-align: center; font-size: 12px; color: #8f806c;">
-                        <p style="margin: 0;">Link expires in 24 hours.</p>
-                        <p style="margin: 5px 0 0;">&copy; The Lost Spectrum</p>
-                    </div>
-                </div>
-            </div>
-        </body>
-        </html>
-        """
-        
-        mail.send(msg)
-        return True
-    except Exception as e:
-        print(f"Error sending email: {e}")
-        return False
-
-def send_password_reset_email(email, token, username):
-    """Send password reset email to user"""
-    try:
-        reset_url = f"{current_app.config['FRONTEND_URL']}/reset-password/{token}"
-        safe_username = escape(username)
-        
-        msg = Message(
-            'Reset Your Password - Lost Spectrum',
-            recipients=[email]
-        )
-        
-        msg.html = f"""
-        <!DOCTYPE html>
-        <html>
-        <body style="font-family: Georgia, serif; background-color: #15130f; margin: 0; padding: 0;">
-            <div style="width: 100%; padding: 40px 0; background-color: #15130f;">
-                <div style="max-width: 600px; margin: 0 auto; background-color: #1e1d18; border: 1px solid rgba(184,137,73,0.4); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);">
-                    
-                    <!-- Header -->
-                    <div style="background: linear-gradient(90deg, #1e1d18, #30291e); padding: 30px; text-align: center; border-bottom: 1px solid rgba(184,137,73,0.2);">
-                        <h1 style="margin: 0; font-size: 24px; color: #f3e7d0; text-transform: uppercase; letter-spacing: 2px;">
-                            The Lost <span style="color: #b88949;">Spectrum</span>
-                        </h1>
-                    </div>
-
-                    <!-- Content -->
-                    <div style="padding: 40px 30px; text-align: center;">
-                        <h2 style="color: #f3e7d0; margin-top: 0; font-size: 20px;">Forge a New Incantation</h2>
-                        <p style="color: #c2b49e; font-size: 16px; line-height: 1.6; margin-bottom: 30px;">
-                            Hello, Explorer <strong>{safe_username}</strong>.<br>
-                            A request to reset your access key has been received.
-                        </p>
-
-                        <a href="{reset_url}" style="background-color: #b88949; border: 1px solid #d0a55f; color: #1e1d18; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; display: inline-block; text-transform: uppercase; letter-spacing: 1px;">
-                            Reset Password
-                        </a>
-
-                        <p style="color: #a89080; font-size: 14px; margin-top: 30px;">
-                            Or paste this link into your browser:<br>
-                            <a href="{reset_url}" style="color: #d0a55f; text-decoration: none; word-break: break-all;">{reset_url}</a>
-                        </p>
-                    </div>
-
-                    <!-- Footer -->
-                    <div style="background-color: #15130f; padding: 20px; text-align: center; font-size: 12px; color: #8f806c;">
-                        <p style="margin: 0;">Link expires in 1 hour.</p>
-                        <p style="margin: 5px 0 0;">If you didn't request this, ignore this message.</p>
-                    </div>
-                </div>
-            </div>
-        </body>
-        </html>
-        """
-        
-        mail.send(msg)
-        return True
-    except Exception as e:
-        print(f"Error sending email: {e}")
-        return False
+from app.auth.email import send_verification_email, send_password_reset_email
+from app.auth.blueprint import auth_bp
 
 @auth_bp.route('/login')
 def login_page():
@@ -255,9 +131,7 @@ def resend_verification():
                 'message': 'Email not found'
             }), 404
         
-        # Legacy signups could be marked verified while retaining an unused token.
-        # Keep those accounts pending until the token is consumed.
-        if user['is_verified'] and not user['verification_token']:
+        if user['is_verified']:
             return jsonify({
                 'success': False,
                 'message': 'Email is already verified'
@@ -455,7 +329,7 @@ def login():
                 'message': 'Invalid email or password'
             }), 401
         
-        if not user['is_verified'] or user['verification_token']:
+        if not user['is_verified']:
             cursor.close()
             connection.close()
             return jsonify({
@@ -658,132 +532,3 @@ def logout():
         'success': True,
         'message': 'Logged out successfully'
     }), 200
-
-@auth_bp.route('/api/user', methods=['GET'])
-def get_user():
-    """Get current user info"""
-    if 'player_id' not in session:
-        return jsonify({
-            'success': False,
-            'message': 'Not logged in'
-        }), 401
-    
-    connection = get_db_connection()
-    if connection is None:
-        return jsonify(message='Database connection failed'), 503
-    try:
-        with connection:
-            with connection.cursor() as cursor:
-                cursor.execute('SELECT player_id, username, email, onboarding_step FROM public.players WHERE player_id = %s',
-                               (session['player_id'],))
-                user = cursor.fetchone()
-        if not user:
-            return jsonify(message='Please log in again.'), 401
-        return jsonify(success=True, user=dict(user))
-    except Exception:
-        current_app.logger.exception('Unable to load profile')
-        return jsonify(message='Unable to load profile. Please retry.'), 503
-    finally:
-        connection.close()
-
-
-@auth_bp.route('/api/onboarding', methods=['PATCH'])
-def advance_onboarding():
-    if 'player_id' not in session:
-        return jsonify(message='Not logged in'), 401
-    data = request.get_json(silent=True)
-    step = data.get('step') if isinstance(data, dict) else None
-    if type(step) is not int or step not in (1, 2):
-        return jsonify(message='Onboarding step must be 1 or 2.'), 400
-    connection = get_db_connection()
-    if connection is None:
-        return jsonify(message='Database connection failed. Please retry.'), 503
-    try:
-        with connection:
-            with connection.cursor() as cursor:
-                cursor.execute('''UPDATE public.players
-                                  SET onboarding_step = GREATEST(onboarding_step, %s)
-                                  WHERE player_id = %s
-                                  RETURNING onboarding_step''',
-                               (step, session['player_id']))
-                row = cursor.fetchone()
-        if not row:
-            return jsonify(message='Please log in again.'), 401
-        return jsonify(success=True, onboarding_step=row['onboarding_step'])
-    except Exception:
-        current_app.logger.exception('Unable to save onboarding progress')
-        return jsonify(message='Unable to save the introduction. Please retry.'), 503
-    finally:
-        connection.close()
-
-
-@auth_bp.route('/api/profile', methods=['PATCH'])
-def update_profile():
-    if 'player_id' not in session:
-        return jsonify(message='Not logged in'), 401
-    data = request.get_json(silent=True)
-    name = data.get('username') if isinstance(data, dict) else None
-    if not isinstance(name, str) or not 1 <= len(name.strip()) <= 50 or not name.strip().isprintable():
-        return jsonify(message='Enter a player name of 1–50 printable characters.'), 400
-    name = name.strip()
-    connection = get_db_connection()
-    if connection is None:
-        return jsonify(message='Database connection failed. Please retry.'), 503
-    try:
-        with connection:
-            with connection.cursor() as cursor:
-                cursor.execute('SELECT player_id FROM public.players WHERE username = %s AND player_id <> %s',
-                               (name, session['player_id']))
-                if cursor.fetchone():
-                    return jsonify(message='This player name is already taken.'), 409
-                cursor.execute('UPDATE public.players SET username = %s WHERE player_id = %s RETURNING player_id, username, email',
-                               (name, session['player_id']))
-                user = cursor.fetchone()
-                if not user:
-                    return jsonify(message='Please log in again.'), 401
-        session['username'] = user['username']
-        return jsonify(success=True, user=dict(user))
-    except UniqueViolation:
-        return jsonify(message='This player name is already taken.'), 409
-    except Exception:
-        current_app.logger.exception('Unable to update profile')
-        return jsonify(message='Unable to save your name. Please retry.'), 503
-    finally:
-        connection.close()
-
-
-@auth_bp.route('/api/account', methods=['DELETE'])
-def delete_account():
-    player_id = session.get('player_id')
-    if player_id is None:
-        return jsonify(message='Not logged in'), 401
-    data = request.get_json(silent=True)
-    password = data.get('password') if isinstance(data, dict) else None
-    if not isinstance(password, str) or not password:
-        return jsonify(message='Enter your current password.'), 400
-
-    connection = get_db_connection()
-    if connection is None:
-        return jsonify(message='Database connection failed. Please retry.'), 503
-    try:
-        with connection:
-            with connection.cursor() as cursor:
-                cursor.execute('SELECT password FROM public.players WHERE player_id = %s FOR UPDATE', (player_id,))
-                player = cursor.fetchone()
-                if not player:
-                    return jsonify(message='Please log in again.'), 401
-                if not check_password_hash(player['password'], password):
-                    return jsonify(message='Current password is incorrect.'), 403
-
-                # Other player-owned rows cascade. Logs have a restrictive foreign key.
-                cursor.execute('DELETE FROM public.game_logs WHERE player_id = %s', (player_id,))
-                cursor.execute('DELETE FROM public.players WHERE player_id = %s RETURNING player_id', (player_id,))
-                if not cursor.fetchone():
-                    raise RuntimeError('Player disappeared while deleting account')
-        session.clear()
-        return jsonify(success=True)
-    except Exception:
-        current_app.logger.exception('Unable to delete account')
-        return jsonify(message='Could not delete your account. Please retry.'), 503
-    finally:
-        connection.close()

@@ -6,7 +6,7 @@ import { REGIONS as PLAYABLE_REGIONS, STAGE_DATA } from '@/features/stages/stage
 import { CONCEPT_MAP } from '@/features/stages/conceptMap';
 import api from '@/shared/api/axios';
 import { useLanguage } from '@/shared/i18n/useLanguage';
-import { localRegion, localStage } from '@/shared/i18n/th';
+import { localRegion, localStage } from '@/features/stages/stageThai';
 import WizardProfile from '@/features/character/WizardProfile';
 import StoryScene from './StoryScene';
 import GameplayWalkthrough from './GameplayWalkthrough';

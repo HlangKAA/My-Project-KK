@@ -26,6 +26,7 @@ mail = Mail(app)
 
 # Register Blueprints
 from app.auth.routes import auth_bp
+from app.auth import account_routes as _account_routes  # Register profile and account endpoints.
 from app.main.routes import main_bp
 from app.game.routes import game_bp
 

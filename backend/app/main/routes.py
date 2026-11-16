@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, redirect, render_template, session, url_for
+from flask import Blueprint, current_app, jsonify, redirect, render_template, url_for
 from app.api_docs import OPENAPI_SPEC
 
 main_bp = Blueprint('main', __name__)
@@ -32,12 +32,5 @@ def docs_redirect():
 
 @main_bp.route('/dashboard')
 def dashboard():
-    """Dashboard Data API"""
-    if 'player_id' not in session:
-        return jsonify({"error": "Unauthorized"}), 401
-    
-    return jsonify({
-        "username": session.get('username'),
-        "role": "Apprentice", # Placeholder
-        "message": "Welcome back, wizard!"
-    })
+    """Keep old dashboard bookmarks working with the React page."""
+    return redirect(f"{current_app.config['FRONTEND_URL']}/dashboard")

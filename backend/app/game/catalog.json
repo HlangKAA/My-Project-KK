@@ -232,7 +232,7 @@
       "description": "Use booleans and if/else to choose a route.",
       "objective": "The if/else route is ready. Change the lit-path step count so you reach the gate at (7, 2).",
       "starter_code": "# Choose a route using if and else.\nlantern_lit = True\nif lantern_lit:\n    steps = 0  # Change this for the lit path.\nelse:\n    steps = 2\nhero.move_right(steps)\n",
-      "difficulty": "Easy",
+      "difficulty": "Medium",
       "map_data": {
         "catalog": "spectrum_stages_v1",
         "stage_key": "1-4",
