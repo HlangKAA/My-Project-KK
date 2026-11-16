@@ -187,8 +187,14 @@ def verify_email(token):
             SET is_verified = TRUE, 
                 verification_token = NULL, 
                 token_expiry = NULL 
-            WHERE player_id = %s
-        """, (user['player_id'],))
+            WHERE player_id = %s AND verification_token = %s
+        """, (user['player_id'], token))
+
+        if cursor.rowcount != 1:
+            connection.rollback()
+            return render_template('auth/verification_result.html',
+                                 success=False,
+                                 message='This verification link is no longer valid. Please request a new one.')
         
         connection.commit()
         
@@ -249,7 +255,9 @@ def resend_verification():
                 'message': 'Email not found'
             }), 404
         
-        if user['is_verified']:
+        # Legacy signups could be marked verified while retaining an unused token.
+        # Keep those accounts pending until the token is consumed.
+        if user['is_verified'] and not user['verification_token']:
             return jsonify({
                 'success': False,
                 'message': 'Email is already verified'
@@ -447,7 +455,7 @@ def login():
                 'message': 'Invalid email or password'
             }), 401
         
-        if not user['is_verified']:
+        if not user['is_verified'] or user['verification_token']:
             cursor.close()
             connection.close()
             return jsonify({

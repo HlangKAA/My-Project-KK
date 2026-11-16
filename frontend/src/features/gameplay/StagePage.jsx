@@ -699,6 +699,8 @@ const StagePage = () => {
                             ))}
                         </span>
                     )}
+                    
+
                 </div>
 
                 <div className="game-nav-links">
