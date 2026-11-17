@@ -240,7 +240,7 @@ function createStage(key, stage) {
             } : {}),
         },
         objective: isFinalBoss
-            ? `${stage.task} Avoid the marked shadow tiles, restore all three seals, and reach the gate. <span class="highlight">Five minutes of active execution time.</span>`
+            ? `${stage.task} Avoid the marked shadow tiles, restore all three seals, and reach the gate. <span class="highlight">5-minute time limit.</span>`
             : `${stage.task} <span class="highlight">${stage.concept}</span>${isSimplified ? ' Complete the marked line; the casting path is ready.' : ''}`,
         initialCode, visionChecks,
         completeMessage: isFinalBoss ? 'Krakk is defeated. The stolen colors return to the kingdom!' : `The image at ${stage.title} shines again!`,

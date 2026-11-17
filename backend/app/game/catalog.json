@@ -1806,7 +1806,7 @@
       "chapter": 4,
       "level_name": "The Light Convergence",
       "description": "Restore the final image by choosing colors with if/else.",
-      "objective": "Make red below 85 white. Add 50 blue when red is above 150. Otherwise keep the pixel. Avoid the marked shadow tiles, restore all three seals, and reach the gate. <span class=\"highlight\">Five minutes of active execution time.</span>",
+      "objective": "Make red below 85 white. Add 50 blue when red is above 150. Otherwise keep the pixel. Avoid the marked shadow tiles, restore all three seals, and reach the gate. <span class=\"highlight\">5-minute time limit.</span>",
       "starter_code": "def transform(pixels):\n    result = []\n    for r, g, b in pixels:\n        if r < 85:\n            result.append([255, 255, 255])\n        elif False:  # Is red above 150?\n            result.append([r, g, min(255, b + 50)])\n        else:\n            result.append([r, g, b])\n    return result\n\npixels = [[20,30,40],[200,40,30],[120,180,90]]\ncolors = transform(pixels)\nfor index, color in enumerate(colors):\n    hero.cast_color(color[0], color[1], color[2])\n    if index < 2:\n        hero.move_up(2)\n        hero.move_right(3)\n        hero.move_down(2)\nhero.move_right(2)\nhero.move_down(2)",
       "difficulty": "Medium",
       "map_data": {
