@@ -171,8 +171,8 @@ def save_submission(cursor, player_id, data):
     first_attempt = first_clear and prior['attempts'] == 0
     no_hints = first_clear and data.get('hints_used') == 0
     base_xp = stages[data['stage_key']]['map_data']['xp_reward']
-    earned_xp = (base_xp * (3 if first_attempt else 2) * (13 if no_hints else 10) // 20) if first_clear else 0
     applied_bonuses = _applied_bonuses(base_xp, first_attempt, no_hints)
+    earned_xp = (base_xp + sum(bonus['bonusXP'] for bonus in applied_bonuses)) if first_clear else 0
     cursor.execute('''INSERT INTO public.code_submissions (player_id, level_id, code, result, runtime, submitted_at)
                       VALUES (%s, %s, %s, %s, %s, %s) RETURNING submission_id''',
                    (player_id, level_id, data['code'], data['result'], data['runtime'], data['submitted_at']))

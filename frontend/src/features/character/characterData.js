@@ -299,21 +299,23 @@ export const getLevelProgress = (totalXP) => {
  * Calculate earned XP with multipliers
  */
 export const calculateXP = (baseXP, modifiers = {}) => {
-    let totalMultiplier = 1;
+    let totalBonus = 0;
     const appliedBonuses = [];
 
     Object.entries(modifiers).forEach(([key, active]) => {
         if (active && XP_MULTIPLIERS[key]) {
-            totalMultiplier *= XP_MULTIPLIERS[key].multiplier;
+            const bonusXP = Math.floor(baseXP * (XP_MULTIPLIERS[key].multiplier - 1));
+            totalBonus += bonusXP;
             appliedBonuses.push({
                 ...XP_MULTIPLIERS[key],
                 key,
-                bonusXP: Math.floor(baseXP * (XP_MULTIPLIERS[key].multiplier - 1))
+                bonusXP
             });
         }
     });
 
-    const earnedXP = Math.floor(baseXP * totalMultiplier);
+    const earnedXP = baseXP + totalBonus;
+    const totalMultiplier = baseXP > 0 ? earnedXP / baseXP : 1;
 
     return { earnedXP, baseXP, totalMultiplier, appliedBonuses };
 };
