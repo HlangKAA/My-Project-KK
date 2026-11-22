@@ -91,14 +91,14 @@
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 0 32px rgba(87, 150, 214, 0.13);
 }
 
-.cca-theme-peaks .cca-color-target:not(.matched),
-.cca-theme-cavern .cca-color-target:not(.matched) {
+.cca-theme-peaks .cca-color-target:not(.matched) .cca-target-svg,
+.cca-theme-cavern .cca-color-target:not(.matched) .cca-target-svg {
     filter: grayscale(0.9) brightness(0.65);
 }
 
-.cca-theme-peaks .cca-color-target.matched,
-.cca-theme-cavern .cca-color-target.matched {
-    color: color-mix(in srgb, var(--target-color) 72%, white);
+.cca-theme-peaks .cca-color-target.matched .cca-target-svg,
+.cca-theme-cavern .cca-color-target.matched .cca-target-svg {
+    filter: drop-shadow(0 0 8px rgba(240, 230, 200, 0.65)) drop-shadow(0 0 10px var(--target-color));
     animation: cca-rune-light 1.8s ease-in-out infinite alternate;
 }
 
@@ -476,7 +476,7 @@
     top: 50%;
     transform-origin: center center;
     border-radius: 10px;
-    overflow: hidden;
+    overflow: visible;
     box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55), inset 0 0 24px rgba(0, 0, 0, 0.5);
     border: 2px solid var(--theme-border, rgba(255, 255, 255, 0.16));
     background: #090d16;
@@ -485,6 +485,8 @@
 .cca-ambient-overlay {
     position: absolute;
     inset: 0;
+    border-radius: 8px;
+    overflow: hidden;
     pointer-events: none;
     z-index: 1;
     background:
@@ -520,6 +522,8 @@
     left: 0;
     width: 100%;
     height: 100%;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 .cca-cell {
@@ -664,12 +668,19 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    z-index: 5;
+    z-index: 6;
+    line-height: 1;
+    overflow: visible;
     transition: all 0.3s ease;
 }
 
 .cca-flask-icon-wrapper {
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    flex-shrink: 0;
     font-size: 1.5rem;
     filter: drop-shadow(0 0 8px var(--flask-theme));
     animation: floatSlow 3s ease-in-out infinite;
@@ -680,35 +691,40 @@
 }
 
 .cca-flask-tag {
-    font-size: 0.52rem;
+    flex-shrink: 0;
+    font-size: 0.54rem;
     font-weight: 700;
-    color: #fff;
-    background: rgba(0, 0, 0, 0.78);
-    padding: 0 3px;
+    line-height: 1.25;
+    color: #ffffff;
+    background: rgba(0, 0, 0, 0.82);
+    padding: 0 4px;
     border-radius: 3px;
     border: 1px solid var(--flask-theme);
-    margin-top: -3px;
-    max-width: 44px;
+    margin-top: 0;
+    max-width: 72px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    z-index: 2;
 }
 
 .cca-flask-content-badge {
     position: absolute;
-    bottom: -10px;
+    bottom: -11px;
+    flex-shrink: 0;
     font-size: 0.5rem;
     font-weight: 700;
+    line-height: 1.2;
     color: #10b981;
     background: rgba(0, 0, 0, 0.9);
     padding: 0 4px;
     border-radius: 3px;
-    max-width: 46px;
+    max-width: 78px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     border: 1px solid #10b981;
-    z-index: 6;
+    z-index: 8;
     animation: popIn 0.3s ease;
 }
 
@@ -723,30 +739,40 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    z-index: 4;
+    z-index: 5;
+    line-height: 1;
+    overflow: visible;
 }
 
 .cca-item-crystal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    flex-shrink: 0;
     font-size: 1.15rem;
     filter: drop-shadow(0 0 10px var(--item-color));
     animation: floatBob 2.5s ease-in-out infinite;
 }
 
 .cca-item-badge {
-    font-size: 0.5rem;
+    flex-shrink: 0;
+    font-size: 0.54rem;
     font-family: 'JetBrains Mono', monospace;
     font-weight: 700;
-    color: #fff;
+    line-height: 1.25;
+    color: #ffffff;
     background: rgba(0, 0, 0, 0.85);
     border: 1px solid var(--item-color);
-    padding: 0 3px;
+    padding: 0 4px;
     border-radius: 3px;
-    margin-top: -2px;
-    max-width: 46px;
+    margin-top: 0;
+    max-width: 82px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
+    z-index: 2;
 }
 
 /* ─── Altar Object ─── */
@@ -758,7 +784,9 @@
     justify-content: center;
     font-size: 1.4rem;
     color: #94a3b8;
-    z-index: 4;
+    z-index: 5;
+    line-height: 1;
+    overflow: visible;
 }
 
 .cca-altar-obj.activated {
@@ -767,16 +795,20 @@
 }
 
 .cca-altar-label {
-    font-size: 0.48rem;
-    color: #e2e8f0;
-    background: rgba(0, 0, 0, 0.82);
-    padding: 0 3px;
+    flex-shrink: 0;
+    font-size: 0.52rem;
+    font-weight: 600;
+    line-height: 1.25;
+    color: #f8fafc;
+    background: rgba(0, 0, 0, 0.85);
+    padding: 0 4px;
     border-radius: 3px;
-    margin-top: -2px;
-    max-width: 48px;
+    margin-top: 0;
+    max-width: 86px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    z-index: 2;
 }
 
 /* ─── Brazier Object ─── */
@@ -787,7 +819,9 @@
     align-items: center;
     justify-content: center;
     font-size: 1.3rem;
-    z-index: 4;
+    z-index: 5;
+    line-height: 1;
+    overflow: visible;
 }
 
 .cca-brazier-obj.lit {
@@ -795,18 +829,26 @@
 }
 
 .cca-brazier-name {
-    font-size: 0.55rem;
-    color: #94a3b8;
-    margin-top: 2px;
+    flex-shrink: 0;
+    font-size: 0.52rem;
+    line-height: 1.2;
+    color: #f1f5f9;
+    background: rgba(0, 0, 0, 0.82);
+    padding: 0 4px;
+    border-radius: 3px;
+    margin-top: 1px;
 }
 
 .cca-color-target {
     position: absolute;
-    z-index: 4;
+    z-index: 5;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 1px;
+    line-height: 1;
+    overflow: visible;
     color: var(--target-color);
     transition: color 0.25s ease, filter 0.25s ease;
 }
@@ -815,16 +857,16 @@
     font-size: 1.35rem;
 }
 
-.cca-color-target.matched {
+.cca-color-target.matched .cca-target-svg {
     filter: drop-shadow(0 0 12px var(--target-color));
 }
 
-.cca-theme-archive .cca-color-target:not(.matched) {
+.cca-theme-archive .cca-color-target:not(.matched) .cca-target-svg {
     filter: grayscale(0.85) brightness(0.7);
 }
-.cca-theme-archive .cca-color-target.matched {
-    color: color-mix(in srgb, var(--target-color) 72%, white);
+.cca-theme-archive .cca-color-target.matched .cca-target-svg {
     filter: drop-shadow(0 0 10px var(--target-color));
+    animation: ccaRestoredIcon .85s ease-out both;
 }
 .cca-theme-archive .cca-color-target.matched > i {
     font-size: 1.75rem;
@@ -836,25 +878,38 @@
     to { opacity: 1; transform: scale(1) rotate(0); }
 }
 @media (prefers-reduced-motion: reduce) {
+    .cca-theme-archive .cca-color-target.matched .cca-target-svg,
     .cca-theme-archive .cca-color-target.matched > i { animation: none; }
 }
 
 .cca-color-target-name,
 .cca-color-target-rgb {
-    max-width: 90px;
+    flex-shrink: 0;
+    max-width: 86px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     border-radius: 3px;
-    background: rgba(0, 0, 0, 0.8);
-    padding: 0 3px;
-    font-size: 0.5rem;
+    background: rgba(6, 10, 20, 0.88);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    padding: 0 4px;
     line-height: 1.2;
     text-align: center;
+    z-index: 2;
+}
+
+.cca-color-target-name {
+    color: #f8fafc;
+    font-weight: 700;
+    font-size: 0.5rem;
 }
 
 .cca-color-target-rgb {
-    color: #e2e8f0;
+    color: #cbd5e1;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    font-size: 0.45rem;
+    line-height: 1.15;
 }
 
 /* ─── Hero Character ─── */
@@ -894,10 +949,37 @@
 
 .cca-svg-sprite,
 .cca-sprite-external-img {
+    display: block;
+    flex-shrink: 0;
     width: 36px;
     height: 36px;
     pointer-events: none;
     filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.65));
+}
+
+.cca-flask-svg {
+    width: 30px;
+    height: 30px;
+}
+
+.cca-crystal-svg {
+    width: 29px;
+    height: 29px;
+}
+
+.cca-altar-svg {
+    width: 30px;
+    height: 30px;
+}
+
+.cca-target-svg {
+    width: 25px;
+    height: 25px;
+}
+
+.cca-gate-svg {
+    width: 30px;
+    height: 30px;
 }
 
 .cca-obstacle-svg {
@@ -1100,6 +1182,8 @@
     align-items: center;
     justify-content: center;
     z-index: 6;
+    line-height: 1;
+    overflow: visible;
     color: #e0e7ff;
     transition: all 0.4s ease;
 }
@@ -1118,20 +1202,24 @@
 }
 
 .cca-gate-label {
-    position: absolute;
-    bottom: -10px;
-    font-size: 0.48rem;
+    position: relative;
+    bottom: auto;
+    flex-shrink: 0;
+    font-size: 0.52rem;
     font-family: 'JetBrains Mono', monospace;
     font-weight: 700;
-    color: #e9d5ff;
-    background: rgba(0, 0, 0, 0.82);
-    padding: 0 3px;
+    line-height: 1.25;
+    color: #f3e8ff;
+    background: rgba(0, 0, 0, 0.84);
+    padding: 0 4px;
     border-radius: 3px;
-    max-width: 48px;
+    margin-top: 0;
+    max-width: 86px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+    z-index: 2;
 }
 
 /* ─── Dimensional Floor Portal Traps ─── */
@@ -1142,12 +1230,14 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    line-height: 1;
+    overflow: visible;
     pointer-events: none;
 }
 
 .cca-portal-svg {
-    width: 42px;
-    height: 42px;
+    width: 32px;
+    height: 32px;
     filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.7));
 }
 
@@ -1167,17 +1257,21 @@
 }
 
 .cca-portal-label {
-    position: absolute;
-    bottom: 0;
-    font-size: 0.42rem;
+    position: relative;
+    bottom: auto;
+    margin-top: -1px;
+    flex-shrink: 0;
+    font-size: 0.46rem;
     font-family: 'JetBrains Mono', monospace;
     font-weight: 700;
     color: #f0abfc;
     background: rgba(30, 10, 48, 0.88);
     border: 1px solid rgba(192, 132, 252, 0.55);
     border-radius: 3px;
-    padding: 0 3px;
-    line-height: 1.15;
+    padding: 0 4px;
+    line-height: 1.2;
+    white-space: nowrap;
+    z-index: 2;
 }
 
 .cca-hero.portal-warping .cca-hero-sprite-wrap {
