@@ -3,6 +3,7 @@ import unittest
 from unittest.mock import MagicMock, patch
 
 from app import app
+from app.game.progress import _applied_bonuses
 from werkzeug.security import generate_password_hash
 
 
@@ -66,6 +67,20 @@ class AuthenticationContractTests(unittest.TestCase):
             with self.subTest(path=path):
                 response = getattr(self.client, method)(path)
                 self.assertEqual(response.status_code, 401)
+
+    def test_tiered_hint_xp_bonuses_scale_and_hide_when_exhausted(self):
+        b0 = _applied_bonuses(150, first_attempt=True, first_clear=True, hints_used=0)
+        b1 = _applied_bonuses(150, first_attempt=True, first_clear=True, hints_used=1)
+        b2 = _applied_bonuses(150, first_attempt=True, first_clear=True, hints_used=2)
+        b3 = _applied_bonuses(150, first_attempt=True, first_clear=True, hints_used=3)
+
+        self.assertEqual([item['bonusXP'] for item in b0], [75, 45])
+        self.assertEqual(b0[1]['label'], 'No Hints Used')
+        self.assertEqual([item['bonusXP'] for item in b1], [75, 30])
+        self.assertEqual(b1[1]['label'], 'Hint Bonus (1/3 Hints Used)')
+        self.assertEqual([item['bonusXP'] for item in b2], [75, 15])
+        self.assertEqual(b2[1]['label'], 'Hint Bonus (2/3 Hints Used)')
+        self.assertEqual([item['bonusXP'] for item in b3], [75])
 
 
 if __name__ == '__main__':

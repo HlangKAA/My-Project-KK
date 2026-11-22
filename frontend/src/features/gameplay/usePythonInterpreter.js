@@ -163,6 +163,7 @@ const usePythonInterpreter = () => {
     isRunning,
     runCode,
     clearOutput,
+    log,
     wizardMessage,
   };
 };

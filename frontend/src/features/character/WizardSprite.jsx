@@ -58,15 +58,28 @@ const STATE_CONFIG = {
     animClass: 'ws-anim-confused',
     glowColor: 'rgba(255, 200, 50, 0.3)',
   },
+  hurt: {
+    poses: ['alert', 'confused'],
+    animClass: 'ws-anim-hurt',
+    glowColor: 'rgba(239, 68, 68, 0.55)',
+    cycleSpeed: 260,
+  },
+  victory: {
+    poses: ['celebrate', 'victory'],
+    animClass: 'ws-anim-success',
+    glowColor: 'rgba(100, 255, 100, 0.45)',
+    cycleSpeed: 450,
+  },
   holdstaff: {
     poses: ['hold-staff'],
     animClass: 'ws-anim-staff',
     glowColor: 'rgba(200, 80, 50, 0.3)',
   },
   walking: {
-    poses: ['idle'],
+    poses: ['idle', 'hold-staff', 'point', 'hold-staff'],
     animClass: 'ws-anim-walking',
-    glowColor: 'rgba(100, 160, 255, 0.2)',
+    glowColor: 'rgba(100, 160, 255, 0.32)',
+    cycleSpeed: 120,
   },
 };
 
@@ -100,6 +113,8 @@ export default function WizardSprite({
   state = 'idle',
   size = 'md',
   character = 'hero',
+  direction = 'down',
+  walkStep = 0,
   showParticles = true,
   showShadow = true,
   showGlow = true,
@@ -167,9 +182,11 @@ export default function WizardSprite({
 
   const spriteStyle = getSpriteStyle();
 
+  const strideClass = walkStep % 2 === 0 ? 'ws-stride-left' : 'ws-stride-right';
+
   return (
     <div
-      className={`wizard-sprite-container ws-size-${size} ${config.animClass} ${className}`}
+      className={`wizard-sprite-container ws-size-${size} ${config.animClass} ws-dir-${direction} ${state === 'walking' ? strideClass : ''} ${className}`}
       style={{
         width: sizeConfig.containerW,
         height: sizeConfig.containerH,
@@ -183,19 +200,51 @@ export default function WizardSprite({
         />
       )}
 
+      {/* Arcane Casting Circle at Feet */}
+      {state === 'casting' && (
+        <div className="ws-cast-circle" aria-hidden="true">
+          <div className="ws-cast-circle-inner" />
+        </div>
+      )}
+
+      {/* Billowing Cape Hem (active during walking & casting) */}
+      {(state === 'walking' || state === 'casting') && (
+        <div className={`ws-cape-hem ws-cape-${state}`} aria-hidden="true" />
+      )}
+
       {/* The actual sprite */}
       <div
         className={`ws-sprite ${npcSprite ? 'ws-sprite-npc' : ''} ${isTransitioning ? 'ws-transitioning' : ''}`}
         style={spriteStyle}
       />
 
+      {/* Animated Staff Swing / Raised Staff Flare */}
+      {(state === 'walking' || state === 'casting') && (
+        <div className={`ws-staff-rig ws-staff-${state}`} aria-hidden="true">
+          <span className="ws-staff-orb" />
+        </div>
+      )}
+
+      {/* Alternating Stride Boots & Footstep Dust during Walking */}
+      {state === 'walking' && (
+        <div className="ws-walk-feet" aria-hidden="true">
+          <span className="ws-foot ws-foot-left" />
+          <span className="ws-foot ws-foot-right" />
+          <span key={walkStep} className="ws-step-dust">
+            <i className="ws-dust-puff puff-1" />
+            <i className="ws-dust-puff puff-2" />
+            <i className="ws-dust-spark" />
+          </span>
+        </div>
+      )}
+
       {/* Magic particles */}
-      {showParticles && (state === 'casting' || state === 'success') && (
+      {showParticles && (state === 'casting' || state === 'success' || state === 'victory') && (
         <div className="ws-particles">
           {Array.from({ length: 8 }, (_, i) => (
             <div
               key={i}
-              className={`ws-particle ws-particle-${state}`}
+              className={`ws-particle ws-particle-${state === 'victory' ? 'success' : state}`}
               style={{
                 left: `${20 + ((i * 37) % 61)}%`,
                 animationDelay: `${i * 0.2}s`,

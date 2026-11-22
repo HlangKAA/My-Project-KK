@@ -15,98 +15,90 @@ const H = 'Player';
 
 export const STAGE_STORIES = {
     '1-1': scene(E, [
-        say(E, 'Krakk drained the color from this shrine. Your grimoire brought you here because its spells can wake the altar.', 'แคร็กก์ขโมยสีไปจากศาลเจ้านี้ ตำราพาเธอมาที่นี่เพราะคาถาของเธอปลุกแท่นบูชาได้'),
-        say(H, 'Then let us give this place its first spark.', 'งั้นมาเริ่มคืนแสงแรกให้ที่นี่กัน'),
-        say(E, "Use hero.move_right(n) to reach the altar at (6, 2), then say its name with print('Lumina').", "ใช้ hero.move_right(n) ไปที่แท่นบูชา (6, 2) แล้วใช้ print('Lumina') เรียกชื่อมัน", 'teaching'),
+        say(E, 'Krakk drained the color from this shrine and shattered the stone pillars to block the straight road.', 'แคร็กก์ขโมยสีไปจากศาลเจ้านี้และทำลายเสาหินขวางเส้นทางตรงไว้'),
+        say(H, 'Then let us weave around the ruins and give this place its first spark.', 'งั้นมาเดินอ้อมซากเสาหินแล้วคืนแสงแรกให้ที่นี่กัน'),
+        say(E, "Wind around the fallen pillars to reach the altar at (6, 1), then chant its name with print('Lumina').", "เดินอ้อมเสาหินที่ขวางทางไปยังแท่นบูชาที่ (6, 1) แล้วใช้ print('Lumina') เรียกชื่อมัน", 'teaching'),
     ]),
     '1-2': scene(E, [
-        say(E, 'The altar lit four crystals, but their colors are trapped in the wrong vessels. One crystal bears a tiny mark from Krakk.', 'แท่นบูชาปลุกผลึกสี่ชิ้นขึ้นมา แต่สีของมันยังถูกขังอยู่ผิดขวด หนึ่งในนั้นมีรอยของแคร็กก์'),
-        say(E, "Use hero.pick_up() and hero.put_in('type') to sort each value into its str, int, float, or bool flask.", "ใช้ hero.pick_up() และ hero.put_in('type') แยกแต่ละค่าใส่ขวด str, int, float หรือ bool ให้ตรงชนิด", 'teaching'),
+        say(E, 'The altar lit four crystals inside alcoves, but their colors are trapped in the wrong vessels.', 'แท่นบูชาปลุกผลึกสี่ชิ้นในซอกหิน แต่สีของมันยังถูกขังอยู่ผิดขวด'),
+        say(E, "Walk around the divider walls using hero.pick_up() and hero.put_in('type') to sort each crystal into str, int, float, or bool.", "เดินอ้อมผนังกั้นแล้วใช้ hero.pick_up() กับ hero.put_in('type') แยกแต่ละค่าลงขวด str, int, float หรือ bool", 'teaching'),
     ]),
     '1-3': scene(E, [
-        say(E, 'The crystals revealed a rune that listens for a name. A greeting made from a variable will wake it and warn us of the path ahead.', 'ผลึกเผยรูนที่รอฟังชื่ออยู่ คำทักทายที่สร้างจากตัวแปรจะปลุกมันและบอกทางข้างหน้า'),
-        say(E, 'Use an f-string to greet me, reach the rune at (5, 2), and print the greeting there.', 'ใช้ f-string ทักทายฉัน เดินไปที่รูน (5, 2) แล้วใช้ print() พูดคำทักทายนั้น', 'teaching'),
+        say(E, 'A scattered Rune Shard holds my true name among the ruins.', 'เศษรูนที่ตกอยู่กลางซากหินเก็บชื่อจริงของฉันไว้'),
+        say(E, 'Use hero.pick_up() on "ELDRIN" at (6, 1), store it in the [str] pedestal at (3, 3) with hero.put_in("str"), then wind to the altar (1, 1) and chant f"Welcome, {name}!".', 'ใช้ hero.pick_up() เก็บ "ELDRIN" ที่ (6, 1) วางลงแท่น [str] ที่ (3, 3) ด้วย hero.put_in("str") แล้วเดินอ้อมไปแท่น (1, 1) ร่าย f"Welcome, {name}!"', 'teaching'),
     ]),
     '1-4': scene(E, [
-        say(E, 'The rune warned us: Krakk split the road with a false shadow. The lantern reveals which route is safe.', 'รูนเตือนว่าแคร็กก์แยกทางด้วยเงาลวง โคมไฟจะบอกว่าทางไหนปลอดภัย'),
-        say(E, 'Use if/else: take five steps when the lantern is lit and two when it is dark. Reach the gate at (7, 2).', 'ใช้ if/else เดินห้าก้าวเมื่อโคมสว่าง หรือสองก้าวเมื่อมืด แล้วไปให้ถึงประตู (7, 2)', 'teaching'),
+        say(E, 'Krakk darkened the crossroads and knocked loose the Lantern Spark.', 'แคร็กก์ปิดเส้นทางแยกด้วยเงามืดและทำให้ประกายตะเกียงหลุดออกมา'),
+        say(E, 'Pick up the True spark at (1, 1), place it in the [bool] brazier at (2, 2), and use if/else to choose the steps around the pillars to (6, 4).', 'เก็บประกาย True ที่ (1, 1) ใส่เตา [bool] ที่ (2, 2) แล้วใช้ if/else เลือกจำนวนก้าวอ้อมเสาหินไปยังประตู (6, 4)', 'teaching'),
     ]),
     '1-5': scene(E, [
-        say(E, 'Echo Grove repeats every footstep. The echoes hide the number of steps to the next gate.', 'Echo Grove สะท้อนเสียงฝีเท้าซ้ำไปมา ในเสียงนั้นมีจำนวนก้าวไปสู่ประตูถัดไปซ่อนอยู่'),
-        say(E, 'Add the steps in the list with a for loop, then walk the total distance.', 'ใช้ for loop รวมจำนวนก้าวในลิสต์ แล้วเดินตามผลรวมที่ได้', 'teaching'),
+        say(E, 'Echo Grove repeats every footstep while an Echo Stone rests across the grove.', 'Echo Grove สะท้อนเสียงฝีเท้าซ้ำไปมาและมีศิลาเสียงสะท้อนตกอยู่อีกฝั่ง'),
+        say(E, 'Sum steps into total with a for loop, pick up 15 at (6, 1), put it in [int] at (6, 4), and walk back left to the gate (1, 4).', 'ใช้ for loop รวมจำนวนก้าวใน total เก็บศิลา 15 ที่ (6, 1) ใส่โถ [int] ที่ (6, 4) แล้วเดินกลับซ้ายไปยังประตู (1, 4)', 'teaching'),
     ]),
     '1-6': scene(E, [
-        say(E, 'The grove led us to an old workshop. Its gate responds to the same spell with different step counts.', 'ทางจากป่าพามาถึงโรงฝึกเก่า ประตูที่นี่ตอบรับคาถาเดิมแม้จำนวนก้าวจะต่างกัน'),
-        say(E, 'Make a function that doubles the step count, then use its result to reach the gate.', 'สร้างฟังก์ชันคูณจำนวนก้าวเป็นสองเท่า แล้วใช้ผลลัพธ์ไปถึงประตู', 'teaching'),
+        say(E, 'Inside the ruined Spell Workshop, the Mana Core fell far from its conduit.', 'ในโรงฝึกคาถาที่พังทลาย แกนมานาตกอยู่ห่างจากแท่นส่งพลัง'),
+        say(E, 'Finish double_steps(steps), pick up 42 at (2, 4), place it in [int] at (1, 2), and navigate around the center pillar to the gate (6, 1).', 'เติมฟังก์ชัน double_steps(steps) เก็บแกน 42 ที่ (2, 4) ใส่ช่อง [int] ที่ (1, 2) แล้วเดินอ้อมเสากลางไปยังประตู (6, 1)', 'teaching'),
     ]),
     '1-7': scene(E, [
         say(E, "Beyond this gate lies THE SCHOLAR'S ARCHIVE. Its keeper may know where Krakk carried the stolen color.", 'หลังประตูนี้คือ THE SCHOLAR\'S ARCHIVE ผู้ดูแลที่นั่นอาจรู้ว่าแคร็กก์พาสีที่ขโมยไปไว้ไหน'),
-        say(H, 'I will open it. There is still a trail to follow.', 'ฉันจะเปิดมัน เรายังตามรอยต่อได้'),
-        say(E, 'Collect the string key, place it in the Lock Flask, then speak the opening words with an f-string at the gate.', 'เก็บกุญแจชนิด str ใส่ Lock Flask แล้วใช้ f-string พูดคำเปิดประตูที่หน้าประตู', 'teaching'),
+        say(H, 'I will open it. Let us weave past the last ruins and unlock the way.', 'ฉันจะเปิดมัน มาเดินอ้อมซากหินสุดท้ายแล้วเปิดทางกัน'),
+        say(E, 'Wind around the pillars, store the string key in the Lock Flask, and speak the opening f-string at the gate.', 'เดินอ้อมเสาหิน เก็บกุญแจ str ใส่ Lock Flask แล้วใช้ f-string พูดคำเปิดประตู', 'teaching'),
     ]),
     '2-1': scene(V, [
-        say(V, 'Krakk drained the ink from this manuscript, yet its pages remember a set of RGB lenses.', 'แคร็กก์ดูดสีหมึกจากต้นฉบับนี้ แต่หน้ากระดาษยังจำเลนส์ RGB ได้'),
-        say(H, 'If we restore the ink, perhaps it will show where the lenses lead.', 'ถ้าเราคืนสีหมึกได้ อาจเห็นว่าเลนส์พาไปที่ไหน'),
-        say(V, 'Add 40 to each channel of (80, 55, 30), move beside the manuscript, and cast the new color.', 'เพิ่มค่าแต่ละช่องของ (80, 55, 30) อีก 40 เดินไปข้างต้นฉบับแล้วร่ายสีใหม่', 'teaching'),
+        say(V, 'Krakk drained this Chronicle Tome and scattered unstable dimensional portals across the marble floor—stepping on one warps you right back to spawn!', 'แคร็กก์ดูดสีจากตำรานี้และวางประตูมิติบนพื้นหินอ่อนไว้ หากเผลอเดินเหยียบจะถูกดูดกลับจุดเริ่มต้นทันที!'),
+        say(H, 'I will watch my footing and recover the fallen volume safely.', 'ฉันจะระวังฝีเท้าและเก็บตำราที่ตกอยู่ขึ้นมาวางแท่นให้เรียบร้อย'),
+        say(V, 'Dodge the floor portals, pick up "CHRONICLE_I" at (1, 1), shelve it on the Book Stand at (3, 0) with put_in("str"), and brighten the Chronicle ink at (6, 2) by +40 RGB.', 'หลบประตูมิติ เก็บ "CHRONICLE_I" ที่ (1, 1) วางแท่น (3, 0) ด้วย put_in("str") แล้วเพิ่มแสงหมึก +40 ทุกช่องสีที่ (6, 2)', 'teaching'),
     ]),
     '2-2': scene(P, [
-        say(P, 'A manuscript points to two lenses. They reveal a hidden Mirror Gallery only when each tint is right.', 'ต้นฉบับชี้มาที่เลนส์สองอัน เลนส์จะเผย Mirror Gallery เมื่อปรับสีถูกต้อง'),
-        say(P, 'Add 50 red to the first lens and 80 blue to the second; leave the other channels as they are.', 'เพิ่มสีแดง 50 ให้เลนส์แรก และสีน้ำเงิน 80 ให้เลนส์ที่สอง ช่องสีอื่นคงเดิม', 'teaching'),
+        say(P, 'Two reading lenses and the dropped "OPTICS_TOME" are separated by dimensional portal traps.', 'เลนส์อ่านหนังสือสองอันกับตำรา "OPTICS_TOME" ถูกขวางด้วยกับดักประตูมิติ'),
+        say(P, 'Add 50 red to the warm lens, pick up and shelve "OPTICS_TOME" on [str], then add 80 blue to the cool lens without stepping into a portal.', 'เติมสีแดง 50 ให้เลนส์แรก เก็บตำรา "OPTICS_TOME" วางแท่น [str] แล้วเติมสีน้ำเงิน 80 ให้เลนส์สองโดยไม่เหยียบประตูมิติ', 'teaching'),
     ]),
     '2-3': scene(V, [
-        say(V, 'The gallery shows two memories backward. Krakk hid a trail inside their inverted colors.', 'กระจกสองบานฉายความทรงจำกลับด้าน แคร็กก์ซ่อนร่องรอยไว้ในสีที่กลับกัน'),
-        say(P, 'Invert each RGB channel with 255 minus its value, then restore both reflections.', 'กลับสีแต่ละช่อง RGB ด้วย 255 ลบค่าของช่องนั้น แล้วคืนภาพสะท้อนทั้งสอง', 'teaching'),
+        say(V, 'The Mirror Gallery inverted two illuminated folios and dropped "MIRROR_CODEX" beside a floor portal.', 'ห้องกระจกกลับสีหน้าหนังสือภาพสองหน้าและทำตำรา "MIRROR_CODEX" ตกไว้ใกล้ประตูมิติ'),
+        say(P, 'Invert both folios with 255 minus each RGB channel and shelve "MIRROR_CODEX" on the Codex Stand at (5, 0).', 'กลับสีหน้าหนังสือทั้งสองด้วย 255 ลบค่าสีแต่ละช่อง และเก็บ "MIRROR_CODEX" วางบนแท่นที่ (5, 0)', 'teaching'),
     ]),
     '2-4': scene(V, [
-        say(V, 'Beyond the mirrors are three memories washed pale. Their shapes may reveal the mark we seek.', 'หลังกระจกมีภาพความทรงจำสามช่องที่ซีดจาง รูปร่างในภาพอาจเผยรอยที่เราตามหา'),
-        say(P, 'For each panel, average its RGB values with // 3 and use that value in all three channels.', 'แต่ละช่องภาพ ให้หาค่าเฉลี่ย RGB ด้วย // 3 แล้วใช้ค่านั้นกับทั้งสามช่องสี', 'teaching'),
+        say(V, 'Past the gallery lie the Memory Book plates, guarded by portal traps on the library floor.', 'ถัดจากห้องกระจกคือแผ่นภาพหนังสือความทรงจำซึ่งมีกับดักประตูมิติขวางอยู่บนพื้นห้องสมุด'),
+        say(P, 'Steer safely around the floor portals and compute the integer grayscale average (// 3) for Chapter Plate II.', 'เดินหลบประตูมิติอย่างปลอดภัย แล้วคำนวณค่าเฉลี่ยสีเทาด้วย // 3 ให้แผ่นภาพบทที่สอง', 'teaching'),
     ]),
     '2-5': scene(V, [
-        say(V, 'A vault stands behind the memory panels. Krakk used a different color trick on each of its three locks.', 'หลังภาพความทรงจำมีห้องนิรภัย แคร็กก์ใช้วิธีเปลี่ยนสีต่างกันกับแม่กุญแจทั้งสามชิ้น'),
-        say(P, 'Open them in order: brighten by 40, invert the colors, then turn the last image grayscale.', 'เปิดตามลำดับ: เพิ่มความสว่าง 40 กลับสี แล้วแปลงภาพสุดท้ายเป็นสีเทา', 'teaching'),
+        say(V, 'The Grimoire Vault seals locked two volumes behind portal traps. Only grayscale math releases the Silver Grimoire Seal.', 'ห้องนิรภัยคัมภีร์ล็อกตำราไว้หลังประตูมิติ มีเพียงค่าเฉลี่ยสีเทาเท่านั้นที่เปิดผนึกสีเงินได้'),
+        say(P, 'Keep away from the row-2 and row-4 portals while calculating shade with (gray_r + gray_g + gray_b) // 3.', 'ระวังประตูมิติในแถวที่ 2 และ 4 แล้วคำนวณตัวแปร shade ด้วย (gray_r + gray_g + gray_b) // 3', 'teaching'),
     ]),
     '2-6': scene(P, [
-        say(P, 'Two dull relics in the vault point toward the next clue. Their colors are waiting to be mixed.', 'วัตถุซีดสองชิ้นในห้องนิรภัยชี้ไปยังเบาะแสต่อไป สีของมันรอให้เราผสมคืน'),
-        say(P, 'Restore yellow with red and green, and magenta with red and blue.', 'คืนสีเหลืองด้วยแดงกับเขียว และสีม่วงแดงด้วยแดงกับน้ำเงิน', 'teaching'),
+        say(P, 'The Gilded Compendium cover sits right between two crackling floor portals!', 'ปกตำรา Gilded Compendium วางอยู่ตรงกลางระหว่างประตูมิติสองแห่ง!'),
+        say(P, 'Walk straight down the safe center tile and set blue to 0 to mix pure yellow (255, 255, 0).', 'เดินตรงผ่านช่องกลางที่ปลอดภัยแล้วตั้งค่า blue เป็น 0 เพื่อผสมแสงสีเหลืองทอง (255, 255, 0)', 'teaching'),
     ]),
     '2-7': scene(P, [
-        say(P, 'A narrow trail made of pixels leads to the Atlas. Each one must glow before the path appears.', 'ทางแคบที่สร้างจากพิกเซลทอดไปยัง Atlas ทุกจุดต้องสว่างก่อนเส้นทางจะปรากฏ'),
-        say(P, 'Use a function and a loop to add 30 red to every pixel, then cast each restored color along the trail.', 'ใช้ฟังก์ชันกับลูปเพิ่มสีแดง 30 ให้ทุกพิกเซล แล้วร่ายสีที่ได้ไปตามทาง', 'teaching'),
+        say(P, 'The Almanac Corridor flickers with floor portals blocking the direct path between its book seals.', 'ระเบียงตำรา Almanac มีประตูมิติขวางทางตรงระหว่างตราประทับทั้งสอง'),
+        say(P, 'Boost the red channel of every seal pixel by 30 inside the loop while the hero walks safely around the portals.', 'เพิ่มช่องสีแดงอีก 30 ให้พิกเซลตรา Almanac ทุกจุดในลูปขณะที่ผู้กล้าเดินอ้อมประตูมิติ', 'teaching'),
     ]),
     '2-8': scene(V, [
-        say(V, 'The Living Atlas holds the route Krakk took. Three damaged pages keep that route hidden.', 'The Living Atlas เก็บเส้นทางที่แคร็กก์ใช้ไว้ แต่หน้ากระดาษเสียหายสามหน้าบังมันอยู่'),
-        say(H, 'His trail is still here. We can bring it back into view.', 'รอยของเขายังอยู่ เราจะทำให้มันมองเห็นอีกครั้ง'),
-        say(V, 'Brighten the first page by 50, invert the second, and turn the third grayscale. Then reach the Atlas Gate.', 'เพิ่มความสว่างหน้าแรก 50 กลับสีหน้าที่สอง ทำหน้าที่สามเป็นสีเทา แล้วไปที่ Atlas Gate', 'teaching'),
+        say(V, 'The Living Atlas holds the route into Whispering Caverns, but "ATLAS_INDEX" lies near a floor portal.', 'The Living Atlas เก็บเส้นทางสู่ถ้ำเสียงกระซิบไว้ และดัชนี "ATLAS_INDEX" ตกอยู่ใกล้ประตูมิติ'),
+        say(H, 'I will shelve the index, restore both folios, and avoid every portal trap.', 'ฉันจะเก็บดัชนีวางแท่น คืนสีให้หน้าหนังสือทั้งสอง แล้วเปิดประตูโดยไม่ชนประตูมิติ'),
+        say(V, 'Pick up "ATLAS_INDEX", put it in [str], solve the Silver Folio grayscale shade, and walk safely to the Atlas Gate.', 'เก็บ "ATLAS_INDEX" วางลงแท่น [str] คำนวณ shade ของหน้าสีเงิน แล้วเดินไปเปิด Atlas Gate', 'teaching'),
     ]),
     '3-1': scene(C, [
-        say(C, 'The Atlas brought you to these runes. Each pixel in their row marks part of Krakk\'s route through the caverns.', 'Atlas พาเธอมาถึงรูนเหล่านี้ พิกเซลแต่ละจุดในแถวบอกทางที่แคร็กก์ผ่านในถ้ำ'),
-        say(H, 'Then I will read the image one pixel at a time.', 'งั้นฉันจะอ่านภาพทีละพิกเซล'),
-        say(C, 'Return the three RGB pixels as a list in their original order.', 'คืนพิกเซล RGB ทั้งสามเป็นลิสต์ตามลำดับเดิม', 'teaching'),
+        say(C, 'You reached Whispering Caverns! Krakk rigged the dark passages with winding stalagmites and floor portals.', 'เธอมาถึงถ้ำเสียงกระซิบแล้ว! แคร็กก์วางหินงอกและประตูมิติขวางทางเดินในความมืดไว้'),
+        say(H, 'I will read the runes pixel by pixel and wind past every trap.', 'ฉันจะอ่านรูนทีละพิกเซลและเดินอ้อมกับดักทั้งหมดเอง'),
+        say(C, 'Return [pixels[0], pixels[1], pixels[2]] as your path winds safely around stalagmites and portals.', 'คืนลิสต์ [pixels[0], pixels[1], pixels[2]] พร้อมเดินอ้อมหินงอกและประตูมิติ', 'teaching'),
     ]),
     '3-2': scene(C, [
-        say(C, 'Krakk swapped the first and last runes to make the route point the wrong way.', 'แคร็กก์สลับรูนตัวแรกกับตัวสุดท้ายเพื่อให้เส้นทางชี้ผิดทาง'),
-        say(C, 'Use their list positions to put the pixels back in the right order.', 'ใช้ตำแหน่งในลิสต์เรียงพิกเซลให้กลับมาถูกลำดับ', 'teaching'),
-    ]),
-    '3-3': scene(C, [
-        say(C, 'One rune still carries a trace of stolen red. The strongest red pixel marks the next fragment.', 'รูนหนึ่งตัวยังมีรอยสีแดงที่ถูกขโมย พิกเซลสีแดงที่เด่นที่สุดบอกตำแหน่งชิ้นส่วนถัดไป'),
-        say(C, 'Find it with max() and .index(), then turn only that pixel gold.', 'หาให้เจอด้วย max() และ .index() แล้วเปลี่ยนแค่พิกเซลนั้นเป็นสีทอง', 'teaching'),
+        say(C, 'Krakk swapped the outer runes and left dimensional portals along the cavern ridges.', 'แคร็กก์สลับรูนริมสองฝั่งและวางประตูมิติไว้ตามแนวสันถ้ำ'),
+        say(C, 'Use list indexing to reorder [pixels[2], pixels[1], pixels[0]] while weaving safely through the rocks.', 'ใช้ดัชนีลิสต์เรียง [pixels[2], pixels[1], pixels[0]] กลับคืนขณะเดินหลบแนวหินและประตูมิติ', 'teaching'),
     ]),
     '3-4': scene(C, [
-        say(C, 'A fragment catches the light on a row of faded runes. Brightening every pixel will show the next passage.', 'ชิ้นส่วนรับแสงบนรูนซีดทั้งแถว เพิ่มความสว่างทุกพิกเซลแล้วทางต่อไปจะปรากฏ'),
-        say(C, 'Use a for loop to add 30 to every channel, without letting any value exceed 255.', 'ใช้ for loop เพิ่มทุกช่องสีอีก 30 โดยไม่ให้ค่าเกิน 255', 'teaching'),
+        say(C, 'Tall stalagmites force deep detours between these dim rune stones and floor portals.', 'เสาหินงอกสูงขวางให้ต้องเดินอ้อมไกลระหว่างแผ่นรูนซีดและประตูมิติ'),
+        say(C, 'Use a for loop to add 30 to every channel (capped at 255) as you weave around each portal.', 'ใช้ for loop เพิ่มทุกช่องสีอีก 30 (ไม่เกิน 255) ขณะเดินอ้อมหินงอกและประตูมิติ', 'teaching'),
     ]),
     '3-5': scene(C, [
-        say(C, 'This passage is covered by a corrupted image. A broken spell has mixed up its color channels.', 'ทางนี้ถูกภาพที่เสียหายบังไว้ คาถาที่ผิดพลาดสลับช่องสีของภาพ'),
-        say(C, 'Fix the loop so it adds 20 to red only, caps it at 255, and keeps green and blue unchanged.', 'แก้ลูปให้เพิ่มเฉพาะสีแดง 20 ไม่เกิน 255 และคงสีเขียวกับน้ำเงินไว้', 'teaching'),
-    ]),
-    '3-6': scene(C, [
-        say(C, 'This image repeats the same color at both ends. The matching pair hides a signal.', 'ภาพนี้มีสีเดียวกันอยู่สองข้าง คู่สีที่ตรงกันซ่อนสัญญาณไว้'),
-        say(C, 'If the outer pixels match, turn the center gold; otherwise leave the row unchanged.', 'ถ้าพิกเซลริมทั้งสองตรงกัน ให้เปลี่ยนตรงกลางเป็นสีทอง ถ้าไม่ตรงให้คงแถวเดิม', 'teaching'),
+        say(C, 'A corrupted loop scrambled these cavern channels right beside dual floor portals.', 'ลูปที่เสียหายสลับช่องสีภาพในถ้ำข้างประตูมิติทั้งสองบาน'),
+        say(C, 'Fix the loop to add 20 to pixel[0] only (capped at 255) while winding safely around the portals.', 'แก้ลูปให้เพิ่มเฉพาะ pixel[0] อีก 20 ไม่เกิน 255 ขณะเดินอ้อมประตูมิติ', 'teaching'),
     ]),
     '3-7': scene(C, [
-        say(C, 'The cavern wall points upward to ASH PEAKS. Red runes mark the last passage.', 'ผนังถ้ำชี้ขึ้นไปยัง ASH PEAKS รูนสีแดงบอกทางออกสุดท้าย'),
-        say(H, 'Krakk is close now. I can feel the color waiting beyond the peaks.', 'แคร็กก์อยู่ใกล้แล้ว ฉันรู้สึกได้ว่าสียังรออยู่หลังยอดเขา'),
-        say(C, 'Turn pixels with red above 100 gold. Keep the others unchanged.', 'เปลี่ยนพิกเซลที่มีค่าสีแดงมากกว่า 100 เป็นสีทอง ที่เหลือคงเดิม', 'teaching'),
+        say(C, 'The final cavern passage is a dense portal maze guarding the ascent to ASH PEAKS.', 'ทางออกถ้ำสุดท้ายคือเขาวงกตประตูมิติและหินงอกที่ขวางทางขึ้น ASH PEAKS'),
+        say(H, 'One wrong step onto a portal sends me back to the cavern mouth. I must stay sharp.', 'ก้าวพลาดไปเหยียบประตูมิติแม้แต่ก้าวเดียวจะถูกดูดกลับปากถ้ำทันที ต้องระวังให้ดี'),
+        say(C, 'Turn pixels with pixel[0] > 100 gold to guide the winding route past every portal to the Cavern Gate.', 'เปลี่ยนพิกเซลที่ pixel[0] > 100 เป็นสีทองเพื่อนำทางฝ่าเขาวงกตประตูมิติไปสู่ Cavern Gate', 'teaching'),
     ]),
     '4-1': scene(R, [
         say(R, 'Krakk split the road across ASH PEAKS into light and shadow. The red runes reveal the path.', 'แคร็กก์แยกทางบน ASH PEAKS เป็นแสงกับเงา รูนสีแดงบอกทางที่ถูกต้อง'),
@@ -120,14 +112,6 @@ export const STAGE_STORIES = {
     '4-3': scene(R, [
         say(R, 'Krakk planted decoy runes among the real ones. Their red color reveals the truth.', 'แคร็กก์วางรูนลวงปนกับของจริง ค่าสีแดงช่วยบอกว่ารูนไหนเป็นของจริง'),
         say(R, 'Keep pixels with red above 100; turn all others black.', 'เก็บพิกเซลที่มีค่าสีแดงมากกว่า 100 ที่เหลือเปลี่ยนเป็นสีดำ', 'teaching'),
-    ]),
-    '4-4': scene(R, [
-        say(R, 'A broken mask hides the bridge. It selects the shadows instead of the stones.', 'หน้ากากภาพที่เสียทำให้สะพานหายไป มันเลือกเงาแทนหิน'),
-        say(R, 'Repair the comparison: keep pixels with average brightness at least 100, and black out the rest.', 'แก้การเปรียบเทียบให้เก็บพิกเซลที่สว่างเฉลี่ยตั้งแต่ 100 ขึ้นไป ที่เหลือทำเป็นสีดำ', 'teaching'),
-    ]),
-    '4-5': scene(R, [
-        say(R, 'The bridge ends at a wall of red shadows. Their sharp boundaries reveal where Krakk placed his traps.', 'ปลายสะพานมีเงาสีแดงกั้นอยู่ ขอบที่เปลี่ยนฉับพลันบอกตำแหน่งกับดักของแคร็กก์'),
-        say(R, 'Compare each red value with the previous pixel. Mark differences of 80 or more in gold.', 'เทียบค่าสีแดงกับพิกเซลก่อนหน้า ถ้าต่างกันตั้งแต่ 80 ให้ทำเครื่องหมายสีทอง', 'teaching'),
     ]),
     '4-6': scene(R, [
         say(R, 'Past the traps lies the final seal. Its low-red runes carry the key.', 'หลังกับดักคือผนึกสุดท้าย รูนที่มีค่าสีแดงน้อยเก็บกุญแจไว้'),

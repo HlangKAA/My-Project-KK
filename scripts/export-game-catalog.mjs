@@ -19,6 +19,7 @@ const achievements = [
   { title: 'Lost Spectrum Restored', description: `Complete all ${levels.length} stages of the current adventure.`, unlock_condition: `${catalog}:all` },
 ];
 writeFileSync(new URL('../backend/app/game/catalog.json', import.meta.url), JSON.stringify({ catalog, levels, achievements }, null, 2) + '\n');
+const activeKeys = levels.map(l => `'${l.map_data.stage_key.replaceAll("'", "''")}'`).join(', ');
 const quote = value => `'${JSON.stringify(value).replaceAll("'", "''")}'::jsonb`;
 const sql = `-- Data only. Existing level IDs, submissions, and player achievements are preserved.
 BEGIN;
@@ -34,6 +35,16 @@ INSERT INTO public.levels (chapter, level_name, description, objective, starter_
 SELECT x.chapter, x.level_name, x.description, x.objective, x.starter_code, x.difficulty, x.map_data
 FROM jsonb_to_recordset(${quote(levels)}) AS x(chapter int, level_name text, description text, objective text, starter_code text, difficulty text, map_data jsonb)
 WHERE NOT EXISTS (SELECT 1 FROM public.levels l WHERE l.map_data->>'catalog' = x.map_data->>'catalog' AND l.map_data->>'stage_key' = x.map_data->>'stage_key');
+DELETE FROM public.levels AS l
+WHERE l.map_data->>'catalog' = '${catalog}'
+  AND l.map_data->>'stage_key' NOT IN (${activeKeys})
+  AND NOT EXISTS (SELECT 1 FROM public.code_submissions s WHERE s.level_id = l.level_id)
+  AND NOT EXISTS (SELECT 1 FROM public.player_stats ps WHERE ps.level_id = l.level_id)
+  AND NOT EXISTS (SELECT 1 FROM public.game_progress gp WHERE gp.level_id = l.level_id);
+UPDATE public.levels AS l
+SET map_data = jsonb_set(COALESCE(l.map_data, '{}'::jsonb), '{catalog}', '"spectrum_stages_legacy_v0"'::jsonb)
+WHERE l.map_data->>'catalog' = '${catalog}'
+  AND l.map_data->>'stage_key' NOT IN (${activeKeys});
 UPDATE public.achievements AS a
 SET title = x.title, description = x.description
 FROM jsonb_to_recordset(${quote(achievements)}) AS x(title text, description text, unlock_condition text)

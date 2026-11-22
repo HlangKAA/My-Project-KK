@@ -2,7 +2,7 @@ from datetime import timezone
 from flask import Blueprint, session, request, jsonify, current_app
 from app.db import get_db_connection
 from app.game.leaderboard import read_leaderboard
-from app.game.progress import CATALOG, read_progress, save_submission, validate_submission
+from app.game.progress import CATALOG, _stage_catalog, read_progress, save_submission, validate_submission
 
 game_bp = Blueprint('game', __name__)
 
@@ -64,10 +64,12 @@ def profile_history():
                            COALESCE(ROUND(AVG(s.runtime)::numeric, 1), 0)::float AS average_runtime
                     FROM public.code_submissions s
                     JOIN public.levels l ON l.level_id = s.level_id
-                    WHERE s.player_id = %s AND l.map_data->>'catalog' = %s
+                    WHERE s.player_id = %s
+                      AND l.map_data->>'catalog' = %s
+                      AND l.map_data->>'stage_key' = ANY(%s)
                     GROUP BY l.map_data->>'stage_key', l.level_name
                     ORDER BY l.map_data->>'stage_key'
-                ''', (session['player_id'], CATALOG))
+                ''', (session['player_id'], CATALOG, list(_stage_catalog())))
                 history = [dict(row) for row in cursor.fetchall()]
         for row in history:
             for key in ('first_attempt_at', 'last_attempt_at', 'completed_at'):

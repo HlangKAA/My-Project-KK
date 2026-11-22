@@ -3,74 +3,85 @@ import { useLanguage } from '@/shared/i18n/useLanguage';
 import '@/shared/styles/stagetypes.css';
 
 /**
- * HintPanel — Progressive hint system
- * แสดง hint ที่ค่อยๆ เปิดเผยมากขึ้นตามจำนวน attempt
+ * HintPanel — Progressive hint system (3 levels)
+ * Tracks exact number of hints revealed (0 -> 1 -> 2 -> 3) and reduces hint XP bonus accordingly.
  */
-const HintPanel = ({ hints = [], attemptCount = 0, onRequestHint }) => {
+const HintPanel = ({ hints = [], hintsUsed = 0, onRequestHint, defaultExpanded = false }) => {
     const { isThai } = useLanguage();
-    const [maxRevealedLevel, setMaxRevealedLevel] = useState(0);
-    const [isExpanded, setIsExpanded] = useState(false);
-
-    // Auto-reveal hints based on attempts
-    const currentLevel = Math.min(
-        Math.max(maxRevealedLevel, Math.floor(attemptCount / 2)),
-        hints.length - 1
-    );
-
-    // Auto-expand if a new hint level is revealed
-    React.useEffect(() => {
-        if (currentLevel > 0) {
-            setIsExpanded(true);
-        }
-    }, [currentLevel]);
-
-    const handleRequestMore = (e) => {
-        e.stopPropagation(); // prevent toggling accordion
-        if (currentLevel < hints.length - 1) {
-            const nextLevel = currentLevel + 1;
-            setMaxRevealedLevel(nextLevel);
-            setIsExpanded(true);
-            if (onRequestHint) onRequestHint(nextLevel);
-        }
-    };
+    const [revealedCount, setRevealedCount] = useState(hintsUsed);
+    const [isExpanded, setIsExpanded] = useState(defaultExpanded);
 
     if (!hints || hints.length === 0) return null;
 
+    const totalHints = hints.length;
+    const effectiveRevealed = Math.min(Math.max(revealedCount, hintsUsed), totalHints);
+    const remainingBonusPct = Math.max(0, (totalHints - effectiveRevealed) * 10);
+
+    const handleRevealNext = (e) => {
+        e.stopPropagation();
+        if (effectiveRevealed < totalHints) {
+            const nextCount = effectiveRevealed + 1;
+            setRevealedCount(nextCount);
+            setIsExpanded(true);
+            if (onRequestHint) onRequestHint(nextCount);
+        }
+    };
+
+    const handleHeaderClick = () => {
+        if (effectiveRevealed === 0) {
+            setRevealedCount(1);
+            setIsExpanded(true);
+            if (onRequestHint) onRequestHint(1);
+            return;
+        }
+        setIsExpanded(!isExpanded);
+    };
+
     return (
         <div className={`hint-panel ${isExpanded ? 'expanded' : 'collapsed'}`}>
-            <div className="hint-panel-header" onClick={() => setIsExpanded(!isExpanded)}>
+            <div className="hint-panel-header" onClick={handleHeaderClick}>
                 <div className="hint-panel-icon">
                     <i className="fas fa-lightbulb"></i>
                 </div>
                 <span className="hint-panel-title">
-                    {isThai ? 'คำใบ้' : 'Hint'} {currentLevel + 1} / {hints.length}
+                    {effectiveRevealed === 0
+                        ? (isThai ? `คำใบ้ (0 / ${totalHints})` : `Hints (0 / ${totalHints})`)
+                        : (isThai ? `เปิดใช้คำใบ้แล้ว ${effectiveRevealed} / ${totalHints}` : `Hint ${effectiveRevealed} / ${totalHints} Used`)}
                 </span>
-                {maxRevealedLevel > 0 && (
-                    <span className="hint-panel-warning">
-                        <i className="fas fa-exclamation-triangle"></i>
-                        {isThai ? 'ใช้คำใบ้แล้วโบนัส XP จะลดลง' : 'Using hints reduces XP bonus'}
-                    </span>
-                )}
+                <span className="hint-panel-warning">
+                    <i className={`fas ${effectiveRevealed >= totalHints ? 'fa-times-circle' : effectiveRevealed > 0 ? 'fa-exclamation-triangle' : 'fa-brain'}`}></i>
+                    {effectiveRevealed === 0
+                        ? (isThai ? 'โบนัสไม่ใช้คำใบ้ +30% XP (กดเพื่อดูคำใบ้ที่ 1)' : 'No-Hint Bonus +30% XP (Click to reveal Hint 1)')
+                        : effectiveRevealed < totalHints
+                            ? (isThai ? `โบนัสคำใบ้ลดเหลือ +${remainingBonusPct}% XP` : `Hint XP bonus reduced to +${remainingBonusPct}%`)
+                            : (isThai ? 'ใช้คำใบ้ครบ 3 ครั้ง (ไม่ได้รับโบนัสคำใบ้)' : 'All 3 hints used (No hint XP bonus)')}
+                </span>
                 <div className="hint-panel-toggle">
                     <i className={`fas fa-chevron-${isExpanded ? 'up' : 'down'}`}></i>
                 </div>
             </div>
 
-            {isExpanded && (
+            {isExpanded && effectiveRevealed > 0 && (
                 <>
                     <div className="hint-panel-body">
-                        {hints.slice(0, currentLevel + 1).map((hint, i) => (
-                            <div key={i} className={`hint-item ${i === currentLevel ? 'current' : 'previous'}`}>
-                                <span className="hint-level-badge">{isThai ? 'คำใบ้' : 'Hint'} {i + 1}</span>
+                        {hints.slice(0, effectiveRevealed).map((hint, i) => (
+                            <div key={i} className={`hint-item ${i === effectiveRevealed - 1 ? 'current' : 'previous'}`}>
+                                <span className="hint-level-badge">
+                                    {isThai
+                                        ? (i === totalHints - 1 ? `คำใบ้ ${i + 1} (แนวทางเฉลย)` : `คำใบ้ ${i + 1}`)
+                                        : (i === totalHints - 1 ? `Hint ${i + 1} (Solution)` : `Hint ${i + 1}`)}
+                                </span>
                                 <p className="hint-text">{hint.text}</p>
                             </div>
                         ))}
                     </div>
 
-                    {currentLevel < hints.length - 1 && (
-                        <button className="hint-panel-more-btn" onClick={handleRequestMore}>
+                    {effectiveRevealed < totalHints && (
+                        <button type="button" className="hint-panel-more-btn" onClick={handleRevealNext}>
                             <i className="fas fa-question-circle"></i>
-                            {isThai ? `อยากได้คำใบ้เพิ่มไหม? (เหลือ ${hints.length - currentLevel - 1})` : `Need more help? (${hints.length - currentLevel - 1} more available)`}
+                            {isThai
+                                ? `เปิดคำใบ้ที่ ${effectiveRevealed + 1}/${totalHints} (${effectiveRevealed + 1 >= totalHints ? 'จะไม่ได้รับโบนัสคำใบ้' : `โบนัสจะเหลือ +${Math.max(0, (totalHints - effectiveRevealed - 1) * 10)}%`})`
+                                : `Reveal Hint ${effectiveRevealed + 1}/${totalHints} (${effectiveRevealed + 1 >= totalHints ? '0% hint bonus' : `+${Math.max(0, (totalHints - effectiveRevealed - 1) * 10)}% hint bonus left`})`}
                         </button>
                     )}
                 </>

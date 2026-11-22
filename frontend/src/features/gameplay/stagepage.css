@@ -781,3 +781,371 @@
 .game-boss-clock { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; margin-bottom: 10px; padding: 8px 11px; border: 1px solid #a88163; border-radius: 8px; background: #29212a; color: #ffe2af; font-weight: 800; font-variant-numeric: tabular-nums; }
 .game-boss-clock small { margin-left: auto; color: #d3c4b6; font-size: .7rem; font-weight: 500; }
 .game-boss-clock.urgent { border-color: #e17c73; color: #ffd2c8; box-shadow: 0 0 12px #aa3e4340; }
+
+/* ═══════════════════════════════════════════════════
+   COMPACT PEDAGOGICAL STRIP + TABBED GUIDE / HINTS VIEWS
+   ═══════════════════════════════════════════════════ */
+.game-pedagogy-strip {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px 8px;
+    padding: 6px 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.72rem;
+}
+
+.game-pedagogy-strip.is-lesson {
+    background: linear-gradient(90deg, rgba(16, 185, 129, 0.14) 0%, rgba(15, 23, 42, 0.92) 100%);
+    border-bottom-color: rgba(52, 211, 153, 0.3);
+}
+
+.game-pedagogy-strip.is-challenge {
+    background: linear-gradient(90deg, rgba(59, 130, 246, 0.14) 0%, rgba(15, 23, 42, 0.92) 100%);
+    border-bottom-color: rgba(96, 165, 250, 0.3);
+}
+
+.game-pedagogy-strip.is-boss {
+    background: linear-gradient(90deg, rgba(245, 158, 11, 0.16) 0%, rgba(28, 18, 30, 0.95) 100%);
+    border-bottom-color: rgba(251, 191, 36, 0.35);
+}
+
+.pedagogy-inline-steps,
+.pedagogy-applied-inline {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.pedagogy-mini-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 7px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(15, 23, 42, 0.72);
+    color: #cbd5e1;
+    font-size: 0.66rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pedagogy-mini-pill.done {
+    background: rgba(16, 185, 129, 0.2);
+    border-color: rgba(52, 211, 153, 0.6);
+    color: #a7f3d0;
+}
+
+.pedagogy-mini-pill.done i {
+    color: #34d399;
+}
+
+.pedagogy-applied-chip-sm {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 6px;
+    border-radius: 5px;
+    background: rgba(59, 130, 246, 0.16);
+    border: 1px solid rgba(147, 197, 253, 0.35);
+    color: #93c5fd;
+    font-size: 0.65rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+}
+
+.game-pedagogy-strip.is-boss .pedagogy-applied-chip-sm {
+    background: rgba(245, 158, 11, 0.16);
+    border-color: rgba(251, 191, 36, 0.42);
+    color: #fde68a;
+}
+
+.game-editor-hint-tab {
+    margin-left: auto;
+}
+
+.tab-xp-pill {
+    margin-left: 4px;
+    padding: 1px 5px;
+    border-radius: 999px;
+    background: rgba(250, 204, 21, 0.18);
+    border: 1px solid rgba(250, 204, 21, 0.42);
+    color: #fde047;
+    font-size: 0.64rem;
+    font-weight: 700;
+}
+
+.game-guide-tab-view,
+.game-hints-tab-view {
+    flex: 1 1 auto;
+    width: 100%;
+    padding: 14px 16px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-sizing: border-box;
+    background: rgba(12, 16, 20, 0.92);
+}
+
+.pedagogy-lesson-tab-card,
+.pedagogy-challenge-tab-card {
+    background: rgba(15, 23, 42, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 12px 14px;
+}
+
+.pedagogy-readme-meta {
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(0, 0, 0, 0.3);
+    color: #cbd5e1;
+    font-size: 0.78rem;
+}
+
+.pedagogy-readme-meta p {
+    margin: 6px 0 0;
+    color: #94a3b8;
+    line-height: 1.5;
+}
+
+.pedagogy-return-btn {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 7px;
+    background: rgba(184, 137, 73, 0.22);
+    border: 1px solid rgba(184, 137, 73, 0.55);
+    color: #fde68a;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pedagogy-return-btn:hover {
+    background: rgba(184, 137, 73, 0.38);
+    color: #ffffff;
+}
+
+.pedagogy-mode-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.pedagogy-mode-badge.badge-lesson {
+    background: rgba(16, 185, 129, 0.22);
+    border: 1px solid rgba(52, 211, 153, 0.55);
+    color: #a7f3d0;
+}
+
+.pedagogy-mode-badge.badge-challenge {
+    background: rgba(59, 130, 246, 0.22);
+    border: 1px solid rgba(96, 165, 250, 0.55);
+    color: #bfdbfe;
+}
+
+.pedagogy-mode-badge.badge-boss {
+    background: rgba(245, 158, 11, 0.24);
+    border: 1px solid rgba(251, 191, 36, 0.6);
+    color: #fde68a;
+}
+
+.pedagogy-concept-title {
+    color: #f8fafc;
+    font-size: 0.78rem;
+}
+
+.pedagogy-toggle-btn {
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    color: #cbd5e1;
+    border-radius: 5px;
+    padding: 2px 8px;
+    font-size: 0.68rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.pedagogy-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.14);
+    color: #ffffff;
+}
+
+.pedagogy-lesson-body {
+    margin-top: 7px;
+    padding-top: 7px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.pedagogy-concept-desc {
+    margin: 0 0 7px;
+    color: #e2e8f0;
+    font-size: 0.73rem;
+}
+
+.pedagogy-grid-2col {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.pedagogy-syntax-box,
+.pedagogy-walkthrough-box {
+    background: rgba(0, 0, 0, 0.36);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 6px;
+    padding: 6px 8px;
+}
+
+.pedagogy-sub-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.66rem;
+    font-weight: 700;
+    color: #6ee7b7;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.pedagogy-syntax-box pre {
+    margin: 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    color: #fde68a;
+    white-space: pre-wrap;
+    overflow-x: auto;
+}
+
+.pedagogy-walkthrough-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.pedagogy-walkthrough-list li {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    font-size: 0.68rem;
+    color: #cbd5e1;
+}
+
+.pedagogy-walkthrough-list li code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.66rem;
+    color: #93c5fd;
+}
+
+.pedagogy-checklist {
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.pedagogy-checklist-title {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #a7f3d0;
+    margin-bottom: 5px;
+}
+
+.pedagogy-steps-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.pedagogy-step-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    text-align: left;
+    padding: 4px 8px;
+    border-radius: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(15, 23, 42, 0.65);
+    color: #cbd5e1;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pedagogy-step-chip.done {
+    background: rgba(16, 185, 129, 0.18);
+    border-color: rgba(52, 211, 153, 0.55);
+    color: #ecfdf5;
+}
+
+.pedagogy-step-chip.done i {
+    color: #34d399;
+}
+
+.pedagogy-applied-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #cbd5e1;
+}
+
+.pedagogy-applied-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin: 6px 0;
+}
+
+.pedagogy-applied-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgba(15, 23, 42, 0.75);
+    border: 1px solid rgba(147, 197, 253, 0.35);
+    color: #e2e8f0;
+    font-size: 0.68rem;
+}
+
+.pedagogy-applied-chip strong {
+    color: #93c5fd;
+}
+
+.game-pedagogy-strip.is-boss .pedagogy-applied-chip {
+    border-color: rgba(251, 191, 36, 0.42);
+}
+
+.game-pedagogy-strip.is-boss .pedagogy-applied-chip strong {
+    color: #fde68a;
+}
+
+.pedagogy-challenge-brief {
+    margin: 4px 0 0;
+    color: #cbd5e1;
+    font-size: 0.72rem;
+}

@@ -301,18 +301,31 @@ export const getLevelProgress = (totalXP) => {
 export const calculateXP = (baseXP, modifiers = {}) => {
     let totalBonus = 0;
     const appliedBonuses = [];
+    const hintsUsed = Math.min(Math.max(Number(modifiers.hintsUsed ?? (modifiers.noHints === false ? 3 : 0)), 0), 3);
 
-    Object.entries(modifiers).forEach(([key, active]) => {
-        if (active && XP_MULTIPLIERS[key]) {
-            const bonusXP = Math.floor(baseXP * (XP_MULTIPLIERS[key].multiplier - 1));
+    if (modifiers.firstAttempt && XP_MULTIPLIERS.firstAttempt) {
+        const bonusXP = Math.floor(baseXP * (XP_MULTIPLIERS.firstAttempt.multiplier - 1));
+        totalBonus += bonusXP;
+        appliedBonuses.push({
+            ...XP_MULTIPLIERS.firstAttempt,
+            key: 'firstAttempt',
+            bonusXP
+        });
+    }
+
+    if (hintsUsed < 3) {
+        const tierTenths = 3 - hintsUsed;
+        const bonusXP = Math.floor((baseXP * tierTenths) / 10);
+        if (bonusXP > 0) {
             totalBonus += bonusXP;
             appliedBonuses.push({
-                ...XP_MULTIPLIERS[key],
-                key,
+                ...XP_MULTIPLIERS.noHints,
+                key: 'noHints',
+                label: hintsUsed === 0 ? 'No Hints Used' : `Hint Bonus (${hintsUsed}/3 Hints Used)`,
                 bonusXP
             });
         }
-    });
+    }
 
     const earnedXP = baseXP + totalBonus;
     const totalMultiplier = baseXP > 0 ? earnedXP / baseXP : 1;

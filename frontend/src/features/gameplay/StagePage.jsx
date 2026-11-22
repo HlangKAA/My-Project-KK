@@ -4,6 +4,7 @@ import usePythonInterpreter from './usePythonInterpreter';
 import useCharacterProgression from '@/features/character/useCharacterProgression';
 import { useGame } from '@/shared/context/GameContext';
 import { STAGE_DATA, REGIONS } from '@/features/stages/stageData';
+import { STAGE_PEDAGOGY } from '@/features/stages/stageGuides';
 import { useLanguage } from '@/shared/i18n/useLanguage';
 import { localStageData, localRegion } from '@/features/stages/stageThai';
 import Grimoire from './Grimoire';
@@ -11,13 +12,13 @@ import LevelComplete from './LevelComplete';
 import HintPanel from './HintPanel';
 import WizardProfile from '@/features/character/WizardProfile';
 import StageStoryIntro from './StageStoryIntro';
-import StageTypeContent from './StageTypeContent';
 import { createArenaCallbacks } from './arenaActions';
 import { STORY_SPRITES } from './storyCharacters';
 import SpellBook from './SpellBook';
 import CodeCombatArena from '@/features/gameplay/CodeCombatArena/CodeCombatArena';
 import SpellFailureFeedback from './SpellFailureFeedback';
 import { pythonFailure } from './spellFeedback';
+import { validateStageCode } from './codeValidator';
 import StoryScene from '@/features/world/StoryScene';
 import './gamepage.css';
 import './stagepage.css';
@@ -29,11 +30,10 @@ const StagePage = () => {
     const { isThai } = useLanguage();
     const navigate = useNavigate();
     const { saveAttempt, user } = useGame();
-    const { runCode, output, isRunning, wizardMessage, clearOutput } = usePythonInterpreter();
+    const { runCode, output, isRunning, wizardMessage, clearOutput, log } = usePythonInterpreter();
     const { character, levelProgress, awardXP, masterConcept } = useCharacterProgression();
 
     const stageKey = `${regionId}-${stageId}`;
-    const isLaterStage = Number(stageId) >= 4;
     const introNpcName = STAGE_DATA[stageKey]?.storyIntro?.npcName;
     const introCharacter = STORY_SPRITES[introNpcName] || 'hero';
     const isPortraitIntro = introCharacter !== 'hero';
@@ -64,6 +64,9 @@ const StagePage = () => {
     // Progressive hints state
     const [attemptCount, setAttemptCount] = useState(0);
     const [hintsUsed, setHintsUsed] = useState(0);
+    const hintsUsedRef = useRef(0);
+    const [checkedSteps, setCheckedSteps] = useState({});
+    const pedagogy = STAGE_PEDAGOGY[stageKey] || null;
 
     // CodeCombat 2D Arena state
     const [arenaActionQueue, setArenaActionQueue] = useState([]);
@@ -127,6 +130,8 @@ const StagePage = () => {
         setWizardState('idle');
         setAttemptCount(0);
         setHintsUsed(0);
+        hintsUsedRef.current = 0;
+        setCheckedSteps({});
         setCompletionResult(null);
         setArenaActionQueue([]);
         setIsArenaExecuting(false);
@@ -223,11 +228,12 @@ const StagePage = () => {
         setWizardState('success');
 
         // Award XP with multipliers
+        const actualHintsUsed = extraModifiers.hintsUsed ?? hintsUsedRef.current;
         const modifiers = {
             firstAttempt: (extraModifiers.attempts ?? attemptCount) === 1,
-            noHints: (extraModifiers.hintsUsed ?? hintsUsed) === 0,
+            noHints: actualHintsUsed === 0,
             attempts: extraModifiers.attempts ?? attemptCount,
-            hintsUsed: extraModifiers.hintsUsed ?? hintsUsed,
+            hintsUsed: actualHintsUsed,
         };
 
         const result = awardXP(stageKey, currentStage.xpReward || 200, modifiers, {
@@ -255,12 +261,13 @@ const StagePage = () => {
         setSaving(true);
         setSaveError('');
         try {
+            const currentHints = modifiers.hintsUsed ?? hintsUsedRef.current;
             const saved = await saveAttempt({
                 ...payload,
-                hints_used: modifiers.hintsUsed ?? hintsUsed,
+                hints_used: currentHints,
             });
             pendingSave.current = null;
-            if (payload.result === 'Success') handleLevelComplete(saved, modifiers);
+            if (payload.result === 'Success') handleLevelComplete(saved, { ...modifiers, hintsUsed: currentHints });
             return true;
         } catch (error) {
             setSaveError(error.response?.data?.message || 'Could not save. Check your connection and retry.');
@@ -304,7 +311,7 @@ const StagePage = () => {
             stage_key: stageKey, code: attempt.code, result: finalResult,
             runtime: stageKey === '4-7' ? (performance.now() - attempt.started) / 1000 : (attempt.runtime ?? (performance.now() - attempt.started) / 1000),
             submitted_at: attempt.submitted_at,
-        }, { attempts: attempt.number, hintsUsed });
+        }, { attempts: attempt.number, hintsUsed: hintsUsedRef.current });
     };
     finishAttemptRef.current = finishAttempt;
 
@@ -333,8 +340,6 @@ const StagePage = () => {
         return () => clearInterval(timer);
     }, [stageKey, bossClockActive]);
 
-    const handleSpecialAttempt = (payload, modifiers) => persistAttempt({ ...payload, stage_key: stageKey }, modifiers);
-
     const handleRun = () => {
         const bossExpired = stageKey === '4-7' && (
             bossTimeLeft <= 0 ||
@@ -359,6 +364,11 @@ const StagePage = () => {
                 if (stageKey !== '4-7') activeAttempt.current.runtime = (performance.now() - activeAttempt.current.started) / 1000;
                 if (actions.length === 0) {
                     finishAttempt('Fail', { kind: 'noActions' });
+                    return;
+                }
+                const structureCheck = validateStageCode(stageKey, code);
+                if (!structureCheck.valid) {
+                    finishAttempt('Fail', structureCheck.failure);
                     return;
                 }
                 setIsArenaExecuting(false);
@@ -443,8 +453,12 @@ const StagePage = () => {
         }
     };
 
-    const handleHintRequest = () => {
-        setHintsUsed(prev => prev + 1);
+    const handleHintRequest = (nextCount) => {
+        setHintsUsed(prev => {
+            const updated = typeof nextCount === 'number' ? Math.max(prev, nextCount) : prev + 1;
+            hintsUsedRef.current = updated;
+            return updated;
+        });
     };
 
     // ─── Guard ───
@@ -454,6 +468,7 @@ const StagePage = () => {
 
     const lineCount = code.split('\n').length;
     const stageType = currentStage.stageType || 'challenge';
+    const remainingHintBonusPct = Math.max(0, (3 - Math.min(hintsUsed, 3)) * 10);
 
     // ─── Level Complete Screen ───
     if (showComplete) {
@@ -486,10 +501,8 @@ const StagePage = () => {
     }
 
     // ═══════════════════════════════════════════
-    //   RENDER: IDE Phase (with stage type routing)
+    //   RENDER: IDE Phase
     // ═══════════════════════════════════════════
-
-    const isSpecialStage = ['guided', 'debug', 'puzzle'].includes(stageType);
 
     return (
         <div className={`stage-game-page ${ideSliding ? 'ide-slide-in' : ''} ${regionId === '1' ? 'chapter-one-noir' : ''}`}>
@@ -547,217 +560,358 @@ const StagePage = () => {
                 }}>{isThai ? 'ลองบันทึกอีกครั้ง' : 'Retry save'}</button>
             </div>}
             <div className="game-main">
-                {isSpecialStage ? (
-                    /* ─── Specialized Stage Types (Guided / Debug / Puzzle) ─── */
-                    <div className="game-scene" style={{ flex: 1 }}>
-                        <div className="game-scene-view" style={{ padding: 0, overflow: 'auto' }}>
-                            <fieldset disabled={saving || !!saveError} style={{ border: 0, margin: 0, padding: 0 }}>
-                                <StageTypeContent stageType={stageType} currentStage={currentStage} stageKey={stageKey} onAttempt={handleSpecialAttempt} runCode={runCode} output={output} clearOutput={clearOutput} />
-                            </fieldset>
+                {/* ─── Scene Panel ─── */}
+                {currentStage.arena ? (
+                    <div className="game-scene game-arena-scene">
+                        <div className="game-scene-view game-arena-scene-view">
+                            <div className="game-objective game-arena-objective">
+                                {stageKey === '4-7' && <div className={`game-boss-clock ${bossTimeLeft <= 30 ? 'urgent' : ''}`} role="timer" aria-live={bossTimeLeft <= 10 ? 'assertive' : 'off'}>
+                                    <i className="fas fa-hourglass-half" /> {isThai ? 'เวลาที่เหลือ' : 'Time left'}: {Math.floor(bossTimeLeft / 60)}:{String(bossTimeLeft % 60).padStart(2, '0')}
+                                    {bossTimeLeft === 0 && <small>{isThai ? 'หมดเวลา กดรีเซ็ตเพื่อเริ่มใหม่' : 'Time up. Reset to retry.'}</small>}
+                                </div>}
+                                <div className="game-objective-badge">
+                                    <div className="game-objective-dot"></div>
+                                    <span className="game-objective-label">
+                                        {stageType === 'boss' ? '⚔️ BOSS TRIAL' :
+                                         stageType === 'lesson' ? '📖 CODE-DRIVEN LESSON' : '🎯 2D ARENA OBJECTIVE'}
+                                    </span>
+                                </div>
+                                <div
+                                    className="game-objective-text"
+                                    dangerouslySetInnerHTML={{ __html: currentStage.objective }}
+                                />
+                            </div>
+
+                            <CodeCombatArena
+                                key={stageKey}
+                                arenaConfig={currentStage.arena}
+                                isThai={isThai}
+                                actionQueue={arenaActionQueue}
+                                isExecuting={isArenaExecuting}
+                                onLog={log}
+                                onExecutionFinish={handleArenaExecutionFinish}
+                                onReset={() => {
+                                    if (activeAttempt.current) finishAttempt('Fail');
+                                    setSpellFailure(null);
+                                    setArenaActionQueue([]);
+                                    setIsArenaExecuting(false);
+                                    if (stageKey === '4-7') startBossClock();
+                                }}
+                            />
                         </div>
                     </div>
                 ) : (
-                    /* ─── Standard IDE Layout (Lesson / Challenge / Boss) ─── */
-                    <>
-                        {/* ─── Scene Panel ─── */}
-                        {currentStage.arena ? (
-                            <div className="game-scene game-arena-scene">
-                                <div className="game-scene-view game-arena-scene-view">
-                                    <div className="game-objective game-arena-objective">
-                                        {stageKey === '4-7' && <div className={`game-boss-clock ${bossTimeLeft <= 30 ? 'urgent' : ''}`} role="timer" aria-live={bossTimeLeft <= 10 ? 'assertive' : 'off'}>
-                                            <i className="fas fa-hourglass-half" /> {isThai ? 'เวลาที่เหลือ' : 'Time left'}: {Math.floor(bossTimeLeft / 60)}:{String(bossTimeLeft % 60).padStart(2, '0')}
-                                            {bossTimeLeft === 0 && <small>{isThai ? 'หมดเวลา กดรีเซ็ตเพื่อเริ่มใหม่' : 'Time up. Reset to retry.'}</small>}
-                                        </div>}
-                                        <div className="game-objective-badge">
-                                            <div className="game-objective-dot"></div>
-                                            <span className="game-objective-label">
-                                                {stageType === 'boss' ? '⚔️ BOSS TRIAL' :
-                                                 stageType === 'lesson' ? '📖 CODE-DRIVEN LESSON' : '🎯 2D ARENA OBJECTIVE'}
-                                            </span>
-                                        </div>
-                                        <div
-                                            className="game-objective-text"
-                                            dangerouslySetInnerHTML={{ __html: currentStage.objective }}
-                                        />
-                                    </div>
-
-                                    <CodeCombatArena
-                                        key={stageKey}
-                                        arenaConfig={currentStage.arena}
-                                        isThai={isThai}
-                                        actionQueue={arenaActionQueue}
-                                        isExecuting={isArenaExecuting}
-                                        onExecutionFinish={handleArenaExecutionFinish}
-                                        onReset={() => {
-                                            if (activeAttempt.current) finishAttempt('Fail');
-                                            setSpellFailure(null);
-                                            setArenaActionQueue([]);
-                                            setIsArenaExecuting(false);
-                                            if (stageKey === '4-7') startBossClock();
-                                        }}
-                                    />
+                    <div className="game-scene">
+                        <div className="game-scene-view">
+                            {wizardMessage && (
+                                <div className="game-speech">
+                                    "{wizardMessage}"
                                 </div>
+                            )}
+
+                            <div className="game-objective">
+                                <div className="game-objective-badge">
+                                    <div className="game-objective-dot"></div>
+                                    <span className="game-objective-label">
+                                        {stageType === 'boss' ? '⚔️ BOSS CHALLENGE' :
+                                         stageType === 'lesson' ? '📖 LESSON' : 'Current Objective'}
+                                    </span>
+                                </div>
+                                <div
+                                    className="game-objective-text"
+                                    dangerouslySetInnerHTML={{ __html: currentStage.objective }}
+                                />
                             </div>
-                        ) : (
-                            <div className="game-scene">
-                                <div className="game-scene-view">
-                                    {wizardMessage && (
-                                        <div className="game-speech">
-                                            "{wizardMessage}"
-                                        </div>
-                                    )}
 
-                                    <div className="game-objective">
-                                        <div className="game-objective-badge">
-                                            <div className="game-objective-dot"></div>
-                                            <span className="game-objective-label">
-                                                {stageType === 'boss' ? '⚔️ BOSS CHALLENGE' :
-                                                 stageType === 'lesson' ? '📖 LESSON' : 'Current Objective'}
-                                            </span>
-                                        </div>
-                                        <div
-                                            className="game-objective-text"
-                                            dangerouslySetInnerHTML={{ __html: currentStage.objective }}
-                                        />
-                                    </div>
+                            {/* Character with real sprite animations */}
+                            <div className="game-character">
+                                <WizardSprite
+                                    state={wizardState}
+                                    size="md"
+                                    showParticles={true}
+                                    showShadow={true}
+                                    showGlow={true}
+                                />
+                            </div>
 
-                                    {/* Character with real sprite animations */}
-                                    <div className="game-character">
-                                        <WizardSprite
-                                            state={wizardState}
-                                            size="md"
-                                            showParticles={true}
-                                            showShadow={true}
-                                            showGlow={true}
-                                        />
-                                    </div>
+                            {/* Color display */}
+                            {visualState.color && (
+                                <div className="game-color-slots">
+                                    <div className="game-color-slot filled" style={{ backgroundColor: visualState.color, width: 60, height: 60, borderRadius: 8 }}></div>
+                                </div>
+                            )}
 
-                                    {/* Color display */}
-                                    {visualState.color && (
-                                        <div className="game-color-slots">
-                                            <div className="game-color-slot filled" style={{ backgroundColor: visualState.color, width: 60, height: 60, borderRadius: 8 }}></div>
-                                        </div>
-                                    )}
+                            <div className="game-scene-controls">
+                                <button className="game-scene-ctrl-btn"><i className="fas fa-volume-up"></i></button>
+                                <button className="game-scene-ctrl-btn" onClick={() => openGrimoire(0)}>
+                                    <i className="fas fa-question"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
-                                    {/* Matrix display (Stage 3-3) */}
-                                    {stageKey === '3-3' && (
-                                        <div style={{
-                                            position: 'absolute', bottom: '25%', right: '8%',
-                                            display: 'flex', gap: 8, zIndex: 4
-                                        }}>
-                                            {[10, 25, 46, 80].map((val, idx) => (
-                                                <div key={val} style={{
-                                                    width: 44, height: 44,
-                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                    border: `2px solid ${visualState.foundIndex === idx ? '#b88949' : 'rgba(255,255,255,0.15)'}`,
-                                                    borderRadius: 6,
-                                                    background: visualState.foundIndex === idx ? 'rgba(220,38,38,0.2)' : 'rgba(0,0,0,0.4)',
-                                                    color: '#fff', fontSize: '0.8rem',
-                                                    fontFamily: "'JetBrains Mono', monospace"
-                                                }}>
-                                                    {val}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-
-                                    <div className="game-scene-controls">
-                                        <button className="game-scene-ctrl-btn"><i className="fas fa-volume-up"></i></button>
-                                        <button className="game-scene-ctrl-btn" onClick={() => openGrimoire(0)}>
-                                            <i className="fas fa-question"></i>
+                {/* ─── Code Panel ─── */}
+                <div className="game-code-panel">
+                    {/* ─── Compact 1-Line Pedagogical Strip (does not crowd the code editor) ─── */}
+                    {pedagogy && pedagogy.mode === 'lesson' && (
+                        <div className="game-pedagogy-strip is-lesson">
+                            <span className="pedagogy-mode-badge badge-lesson">
+                                <i className="fas fa-graduation-cap" /> {isThai ? 'บทเรียนจับมือทำ' : 'GUIDED LESSON'}
+                            </span>
+                            <div className="pedagogy-inline-steps">
+                                {pedagogy.steps.map(step => {
+                                    const autoDone = typeof step.test === 'function' ? step.test(code, attemptCount) : false;
+                                    const isDone = autoDone || Boolean(checkedSteps[step.id]);
+                                    return (
+                                        <button
+                                            key={step.id}
+                                            type="button"
+                                            className={`pedagogy-mini-pill ${isDone ? 'done' : ''}`}
+                                            title={isThai ? step.th : step.en}
+                                            onClick={() => setCheckedSteps(prev => ({ ...prev, [step.id]: !prev[step.id] }))}
+                                        >
+                                            <i className={isDone ? 'fas fa-check-circle' : 'far fa-circle'} />
+                                            <span>{isThai ? `ขั้น ${step.id}` : `Step ${step.id}`}</span>
                                         </button>
-                                    </div>
-                                </div>
+                                    );
+                                })}
                             </div>
+                            <button
+                                type="button"
+                                className="pedagogy-toggle-btn"
+                                onClick={() => setActiveTab(activeTab === 'guide' ? 'spell' : 'guide')}
+                            >
+                                <i className={`fas ${activeTab === 'guide' ? 'fa-code' : 'fa-book-open'}`} />
+                                {activeTab === 'guide'
+                                    ? (isThai ? 'กลับหน้าเขียนโค้ด' : 'Back to Code')
+                                    : (isThai ? 'คู่มือทีละบรรทัด' : 'Walkthrough')}
+                            </button>
+                        </div>
+                    )}
+
+                    {pedagogy && (pedagogy.mode === 'challenge' || pedagogy.mode === 'boss') && (
+                        <div className={`game-pedagogy-strip is-${pedagogy.mode}`}>
+                            <span className={`pedagogy-mode-badge badge-${pedagogy.mode}`}>
+                                <i className={pedagogy.mode === 'boss' ? 'fas fa-crown' : 'fas fa-bolt'} />
+                                {pedagogy.mode === 'boss'
+                                    ? (isThai ? 'บอสประยุกต์ความรู้' : 'BOSS SYNTHESIS')
+                                    : (isThai ? 'ด่านท้าทาย' : 'APPLIED CHALLENGE')}
+                            </span>
+                            <div className="pedagogy-applied-inline">
+                                <span className="pedagogy-applied-label">
+                                    {isThai ? 'ประยุกต์จาก:' : 'Applied:'}
+                                </span>
+                                {pedagogy.appliedFrom.map(ref => (
+                                    <span key={ref.stageKey} className="pedagogy-applied-chip-sm" title={isThai ? ref.conceptTh : ref.conceptEn}>
+                                        {ref.stageKey}
+                                    </span>
+                                ))}
+                            </div>
+                            <button
+                                type="button"
+                                className="pedagogy-toggle-btn"
+                                onClick={() => setActiveTab(activeTab === 'guide' ? 'spell' : 'guide')}
+                            >
+                                <i className={`fas ${activeTab === 'guide' ? 'fa-code' : 'fa-info-circle'}`} />
+                                {activeTab === 'guide'
+                                    ? (isThai ? 'กลับหน้าเขียนโค้ด' : 'Back to Code')
+                                    : (isThai ? 'แนวคิดที่ต้องใช้' : 'Stage Brief')}
+                            </button>
+                        </div>
+                    )}
+
+                    <div className="game-editor-tabs">
+                        <button
+                            className={`game-editor-tab ${activeTab === 'spell' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('spell')}
+                        >
+                            <i className="fas fa-code"></i> spell_cast.py
+                        </button>
+                        <button
+                            className={`game-editor-tab ${activeTab === 'guide' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('guide')}
+                        >
+                            <i className="fas fa-book"></i> {isThai ? 'lesson_guide.md' : 'lesson_guide.md'}
+                        </button>
+                        {currentStage.hints && !completedRef.current && (
+                            <button
+                                className={`game-editor-tab game-editor-hint-tab ${activeTab === 'hints' ? 'active' : ''}`}
+                                onClick={() => setActiveTab('hints')}
+                            >
+                                <i className="fas fa-lightbulb"></i>
+                                <span>{isThai ? `คำใบ้ (${hintsUsed}/3)` : `Hints (${hintsUsed}/3)`}</span>
+                                <span className="tab-xp-pill">+{remainingHintBonusPct}%</span>
+                            </button>
                         )}
+                    </div>
 
-                        {/* ─── Code Panel ─── */}
-                        <div className="game-code-panel">
-                            <div className="game-editor-tabs">
-                                <button
-                                    className={`game-editor-tab ${activeTab === 'spell' ? 'active' : ''}`}
-                                    onClick={() => setActiveTab('spell')}
-                                >
-                                    <i className="fas fa-code"></i> spell_cast.py
-                                </button>
-                                <button
-                                    className={`game-editor-tab ${activeTab === 'readme' ? 'active' : ''}`}
-                                    onClick={() => setActiveTab('readme')}
-                                >
-                                    <i className="fas fa-file-alt"></i> readme.md
-                                </button>
-                                <span className="game-editor-dots">⋯</span>
-                            </div>
-
-                            <div className="game-code-area">
+                    <div className="game-code-area">
+                        {activeTab === 'spell' && (
+                            <>
                                 <div className="game-line-numbers">
-                                    {Array.from({ length: Math.max(lineCount, 15) }, (_, i) => (
+                                    {Array.from({ length: Math.max(lineCount, 18) }, (_, i) => (
                                         <span key={i}>{i + 1}</span>
                                     ))}
                                 </div>
                                 <textarea
                                     className="game-code-textarea"
-                                    value={activeTab === 'spell' ? code : `# ${currentStage.title}\n# ${currentStage.chapter}\n# Location: ${currentStage.location}\n\n## Objective\n# ${currentStage.objective.replace(/<[^>]+>/g, '')}\n\n## Hint\n# ${currentStage.hints?.[0]?.text || 'No hint available'}`}
+                                    value={code}
                                     onChange={handleCodeChange}
                                     spellCheck="false"
-                                    readOnly={activeTab !== 'spell' || isRunning || isArenaExecuting || saving || !!saveError}
+                                    readOnly={isRunning || isArenaExecuting || saving || !!saveError}
                                     placeholder="# Enter your Python spell here..."
                                 />
-                            </div>
+                            </>
+                        )}
 
-                            {/* Later stages offer the first hint before a failed attempt. */}
-                            {(attemptCount > 0 || isLaterStage) && currentStage.hints && !completedRef.current && (
-                                <div style={{ padding: '0 0.5rem 0.5rem' }}>
-                                    <HintPanel
-                                        key={stageKey}
-                                        hints={currentStage.hints}
-                                        attemptCount={attemptCount}
-                                        onRequestHint={handleHintRequest}
-                                    />
-                                </div>
-                            )}
-
-                            <div className="game-console">
-                                <div className="game-console-header">
-                                    <span className="game-console-title">
-                                        <i className="fas fa-terminal"></i> SYSTEM CONSOLE
-                                    </span>
-                                    <button className="game-console-clear" onClick={clearOutput}>Clear</button>
-                                </div>
-                                <div className="game-console-body">
-                                    <div className="game-console-line system">System initialized.</div>
-                                    <div className="game-console-line system">Connected to Spectrum Core.</div>
-                                    {output.map((line, i) => (
-                                        <div key={i} className={`game-console-line ${line.startsWith('[ERROR]') ? 'error' : ''}`}>
-                                            {line}
+                        {activeTab === 'guide' && (
+                            <div className="game-guide-tab-view">
+                                {pedagogy && pedagogy.mode === 'lesson' ? (
+                                    <div className="pedagogy-lesson-tab-card">
+                                        <h4 className="pedagogy-concept-title">
+                                            <i className="fas fa-graduation-cap" /> {isThai ? pedagogy.conceptTitle.th : pedagogy.conceptTitle.en}
+                                        </h4>
+                                        <p className="pedagogy-concept-desc">
+                                            {isThai ? pedagogy.conceptBreakdown.th : pedagogy.conceptBreakdown.en}
+                                        </p>
+                                        <div className="pedagogy-grid-2col">
+                                            <div className="pedagogy-syntax-box">
+                                                <span className="pedagogy-sub-label">
+                                                    <i className="fas fa-terminal" /> {isThai ? 'โครงสร้างไวยากรณ์ (Syntax)' : 'Syntax Structure'}
+                                                </span>
+                                                <pre><code>{pedagogy.syntaxStructure}</code></pre>
+                                            </div>
+                                            <div className="pedagogy-walkthrough-box">
+                                                <span className="pedagogy-sub-label">
+                                                    <i className="fas fa-list-ol" /> {isThai ? 'คำอธิบายโค้ดทีละบรรทัด' : 'Line-by-Line Walkthrough'}
+                                                </span>
+                                                <ul className="pedagogy-walkthrough-list">
+                                                    {pedagogy.lineWalkthrough.map((item, idx) => (
+                                                        <li key={idx}>
+                                                            <code>{item.code}</code>
+                                                            <span>{isThai ? item.th : item.en}</span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
                                         </div>
-                                    ))}
-                                    {output.length === 0 && (
-                                        <div className="game-console-line waiting">Waiting for input...</div>
-                                    )}
+                                        <div className="pedagogy-checklist">
+                                            <span className="pedagogy-checklist-title">
+                                                <i className="fas fa-tasks" /> {isThai ? 'รายการฝึกปฏิบัติทีละขั้น:' : 'Interactive Tutorial Checklist:'}
+                                            </span>
+                                            <div className="pedagogy-steps-list">
+                                                {pedagogy.steps.map(step => {
+                                                    const autoDone = typeof step.test === 'function' ? step.test(code, attemptCount) : false;
+                                                    const isDone = autoDone || Boolean(checkedSteps[step.id]);
+                                                    return (
+                                                        <button
+                                                            key={step.id}
+                                                            type="button"
+                                                            className={`pedagogy-step-chip ${isDone ? 'done' : ''}`}
+                                                            onClick={() => setCheckedSteps(prev => ({ ...prev, [step.id]: !prev[step.id] }))}
+                                                        >
+                                                            <i className={isDone ? 'fas fa-check-circle' : 'far fa-circle'} />
+                                                            <span>{isThai ? step.th : step.en}</span>
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : pedagogy ? (
+                                    <div className="pedagogy-challenge-tab-card">
+                                        <h4 className="pedagogy-concept-title">
+                                            <i className="fas fa-bolt" /> {currentStage.title} — {isThai ? 'ความรู้ที่ต้องประยุกต์ใช้' : 'Applied Knowledge Brief'}
+                                        </h4>
+                                        <div className="pedagogy-applied-chips">
+                                            {pedagogy.appliedFrom.map(ref => (
+                                                <span key={ref.stageKey} className="pedagogy-applied-chip">
+                                                    <strong>{isThai ? `ด่าน ${ref.stageKey} (${ref.titleTh})` : `Stage ${ref.stageKey} (${ref.titleEn})`}</strong>
+                                                    <span>· {isThai ? ref.conceptTh : ref.conceptEn}</span>
+                                                </span>
+                                            ))}
+                                        </div>
+                                        <p className="pedagogy-challenge-brief" style={{ marginTop: '0.6rem', fontSize: '0.82rem' }}>
+                                            {isThai ? pedagogy.challengeBrief.th : pedagogy.challengeBrief.en}
+                                        </p>
+                                    </div>
+                                ) : null}
+
+                                <div className="pedagogy-readme-meta">
+                                    <strong>{currentStage.chapter}</strong> · {currentStage.location}
+                                    <p>{currentStage.objective.replace(/<[^>]+>/g, '')}</p>
                                 </div>
+                                <button
+                                    type="button"
+                                    className="pedagogy-return-btn"
+                                    onClick={() => setActiveTab('spell')}
+                                >
+                                    <i className="fas fa-code" /> {isThai ? 'กลับไปหน้าเขียนโค้ด (spell_cast.py)' : 'Return to Code Editor (spell_cast.py)'}
+                                </button>
                             </div>
-                            <SpellFailureFeedback failure={spellFailure} isThai={isThai} />
+                        )}
+
+                        {activeTab === 'hints' && currentStage.hints && !completedRef.current && (
+                            <div className="game-hints-tab-view">
+                                <HintPanel
+                                    key={stageKey}
+                                    hints={currentStage.hints}
+                                    hintsUsed={hintsUsed}
+                                    defaultExpanded={true}
+                                    onRequestHint={handleHintRequest}
+                                />
+                                <button
+                                    type="button"
+                                    className="pedagogy-return-btn"
+                                    onClick={() => setActiveTab('spell')}
+                                >
+                                    <i className="fas fa-code" /> {isThai ? 'กลับไปหน้าเขียนโค้ด (spell_cast.py)' : 'Return to Code Editor (spell_cast.py)'}
+                                </button>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="game-console">
+                        <div className="game-console-header">
+                            <span className="game-console-title">
+                                <i className="fas fa-terminal"></i> SYSTEM CONSOLE
+                            </span>
+                            <button className="game-console-clear" onClick={clearOutput}>Clear</button>
                         </div>
-                    </>
-                )}
+                        <div className="game-console-body">
+                            <div className="game-console-line system">System initialized.</div>
+                            <div className="game-console-line system">Connected to Spectrum Core.</div>
+                            {output.map((line, i) => (
+                                <div
+                                    key={i}
+                                    className={`game-console-line ${line.includes('[ERROR]') ? 'error' : line.includes('[PORTAL]') ? 'portal' : ''}`}
+                                >
+                                    {line}
+                                </div>
+                            ))}
+                            {output.length === 0 && (
+                                <div className="game-console-line waiting">Waiting for input...</div>
+                            )}
+                        </div>
+                    </div>
+                    <SpellFailureFeedback failure={spellFailure} isThai={isThai} />
+                </div>
             </div>
 
-            {/* ─── Bottom Bar (only for IDE stages) ─── */}
-            {!isSpecialStage && (
-                <div className="game-bottom-bar">
-                    <button className="game-btn-reset" onClick={handleReset} disabled={isRunning || isArenaExecuting || saving || !!saveError}>
-                        <i className="fas fa-redo"></i> {isThai ? 'เริ่มใหม่' : 'RESET'}
-                    </button>
-                    <button className="game-btn-run" onClick={handleRun} disabled={isRunning || isArenaExecuting || saving || !!saveError || (stageKey === '4-7' && bossTimeLeft === 0)}>
-                        {isRunning ? (
-                            <><i className="fas fa-spinner fa-spin"></i> {isThai ? 'กำลังร่ายคาถา...' : 'CASTING...'}</>
-                        ) : (
-                            <><i className="fas fa-play"></i> {isThai ? 'รันโค้ดคาถา' : 'RUN SPELL CODE'}</>
-                        )}
-                    </button>
-                </div>
-            )}
+            {/* ─── Bottom Bar ─── */}
+            <div className="game-bottom-bar">
+                <button className="game-btn-reset" onClick={handleReset} disabled={isRunning || isArenaExecuting || saving || !!saveError}>
+                    <i className="fas fa-redo"></i> {isThai ? 'เริ่มใหม่' : 'RESET'}
+                </button>
+                <button className="game-btn-run" onClick={handleRun} disabled={isRunning || isArenaExecuting || saving || !!saveError || (stageKey === '4-7' && bossTimeLeft === 0)}>
+                    {isRunning ? (
+                        <><i className="fas fa-spinner fa-spin"></i> {isThai ? 'กำลังร่ายคาถา...' : 'CASTING...'}</>
+                    ) : (
+                        <><i className="fas fa-play"></i> {isThai ? 'รันโค้ดคาถา' : 'RUN SPELL CODE'}</>
+                    )}
+                </button>
+            </div>
 
             {/* ─── Grimoire Modal ─── */}
             {showGrimoire && (

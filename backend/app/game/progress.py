@@ -169,9 +169,9 @@ def save_submission(cursor, player_id, data):
     prior = cursor.fetchone()
     first_clear = data['result'] == 'Success' and prior['wins'] == 0
     first_attempt = first_clear and prior['attempts'] == 0
-    no_hints = first_clear and data.get('hints_used') == 0
+    hints_used = min(max(int(data.get('hints_used') or 0), 0), 3)
     base_xp = stages[data['stage_key']]['map_data']['xp_reward']
-    applied_bonuses = _applied_bonuses(base_xp, first_attempt, no_hints)
+    applied_bonuses = _applied_bonuses(base_xp, first_attempt, first_clear, hints_used)
     earned_xp = (base_xp + sum(bonus['bonusXP'] for bonus in applied_bonuses)) if first_clear else 0
     cursor.execute('''INSERT INTO public.code_submissions (player_id, level_id, code, result, runtime, submitted_at)
                       VALUES (%s, %s, %s, %s, %s, %s) RETURNING submission_id''',
@@ -213,14 +213,18 @@ def _update_player_stats(cursor, player_id, level_id):
                           VALUES (%s, %s, NOW())''', (player_id, level_id))
 
 
-def _applied_bonuses(base_xp, first_attempt, no_hints):
+def _applied_bonuses(base_xp, first_attempt, first_clear=False, hints_used=0):
     bonuses = []
     if first_attempt:
         bonuses.append({'key': 'firstAttempt', 'label': 'First Attempt Bonus',
                         'icon': 'fas fa-bolt', 'bonusXP': base_xp // 2})
-    if no_hints:
-        bonuses.append({'key': 'noHints', 'label': 'No Hints Used',
-                        'icon': 'fas fa-brain', 'bonusXP': base_xp * 3 // 10})
+    if first_clear and hints_used < 3:
+        tier_tenths = 3 - hints_used
+        bonus_xp = base_xp * tier_tenths // 10
+        label = 'No Hints Used' if hints_used == 0 else f'Hint Bonus ({hints_used}/3 Hints Used)'
+        if bonus_xp > 0:
+            bonuses.append({'key': 'noHints', 'label': label,
+                            'icon': 'fas fa-brain', 'bonusXP': bonus_xp})
     return bonuses
 
 

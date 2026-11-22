@@ -103,11 +103,13 @@ const BASE_STAGE_DATA = {
             cols: 8,
             rows: 5,
             theme: 'forest',
-            spawn: { x: 1, y: 2 },
-            altar: { x: 6, y: 2, name: 'Awakening Altar', keyword: 'Lumina' },
+            blockMovement: true,
+            spawn: { x: 1, y: 4 },
+            altar: { x: 6, y: 1, name: 'Awakening Altar', keyword: 'Lumina' },
             obstacles: [
-                { x: 3, y: 0 }, { x: 4, y: 0 },
-                { x: 3, y: 4 }, { x: 4, y: 4 },
+                { x: 2, y: 4 }, { x: 2, y: 3 },
+                { x: 4, y: 1 }, { x: 4, y: 2 },
+                { x: 0, y: 0 }, { x: 7, y: 4 },
             ],
         },
 
@@ -124,12 +126,12 @@ const BASE_STAGE_DATA = {
                 },
                 {
                     speaker: "Eldrin",
-                    text: "Use hero.move_right(n) to walk forward along the stone tiles.",
+                    text: "Use hero.move_up(n) and hero.move_right(n) to navigate around the forest trees along the stone tiles.",
                     emotion: "encouraging"
                 },
                 {
                     speaker: "Eldrin",
-                    text: "Reach The Awakening Altar at tile (6, 2) and chant the sacred name: print('Lumina') to awaken the shrine!",
+                    text: "Reach The Awakening Altar at tile (6, 1) and chant the sacred name: print('Lumina') to awaken the shrine!",
                     emotion: "pointing"
                 }
             ],
@@ -137,19 +139,26 @@ const BASE_STAGE_DATA = {
             enterButtonIcon: "fas fa-play"
         },
 
-        objective: "Command the wizard to walk to the <span class='highlight'>Awakening Altar</span> at (6, 2) and chant <span class='highlight'>print('Lumina')</span>!",
-        initialCode: `# Move your hero to the Awakening Altar at (6, 2)
-# and speak the sacred name: "Lumina" using print()
+        objective: "Command the wizard to wind around the forest obstacles from (1, 4) to the <span class='highlight'>Awakening Altar</span> at (6, 1) and chant <span class='highlight'>print('Lumina')</span>!",
+        initialCode: `# ═══ LESSON 1-1: Winding Movement & print() ═══
+# [STEP 1] Walk up 2 tiles from (1, 4) to clear the first crimson trees:
+hero.move_up(2)
 
-hero.move_right(5)
+# [STEP 2] Zigzag around the ruined pillars to reach the altar at (6, 1):
+hero.move_right(2)
+hero.move_down(1)
+hero.move_right(3)
+hero.move_up(2)
+
+# [STEP 3] Speak the sacred word "Lumina" aloud with print():
 print("Lumina")
 `,
         completeMessage: "The shrine awakens with golden light! The first incantation has been mastered.",
 
         hints: [
-            { level: 1, text: "The wizard starts at (1, 2). The altar is at (6, 2). That is 5 steps right!" },
-            { level: 2, text: "Use: hero.move_right(5)" },
-            { level: 3, text: "hero.move_right(5)\nprint('Lumina')" }
+            { level: 1, text: "The wizard starts at (1, 4) and trees block straight paths! Wind around them in an S-curve to reach (6, 1)." },
+            { level: 2, text: "Path: move_up(2) -> move_right(2) -> move_down(1) -> move_right(3) -> move_up(2)" },
+            { level: 3, text: "hero.move_up(2)\nhero.move_right(2)\nhero.move_down(1)\nhero.move_right(3)\nhero.move_up(2)\nprint('Lumina')" }
         ],
 
         grimoire: [
@@ -201,7 +210,8 @@ print("Lumina")
             cols: 10,
             rows: 7,
             theme: 'lab',
-            spawn: { x: 1, y: 2 },
+            blockMovement: true,
+            spawn: { x: 1, y: 5 },
             flasks: [
                 { id: 'str', type: 'str', label: '[str] String', name: 'Flask of Strings', x: 2, y: 1, color: '#ec4899', icon: 'fas fa-quote-right' },
                 { id: 'int', type: 'int', label: '[int] Integer', name: 'Flask of Integers', x: 4, y: 1, color: '#06b6d4', icon: 'fas fa-hashtag' },
@@ -209,14 +219,16 @@ print("Lumina")
                 { id: 'bool', type: 'bool', label: '[bool] Boolean', name: 'Flask of Booleans', x: 8, y: 1, color: '#f59e0b', icon: 'fas fa-toggle-on' },
             ],
             items: [
-                { id: 'val-1', value: 'Lumina', display: '"Lumina"', type: 'str', x: 2, y: 3, icon: 'fas fa-gem', color: '#ec4899' },
+                { id: 'val-1', value: 'Lumina', display: '"Lumina"', type: 'str', x: 2, y: 4, icon: 'fas fa-gem', color: '#ec4899' },
                 { id: 'val-2', value: 255, display: '255', type: 'int', x: 4, y: 3, icon: 'fas fa-dice-d20', color: '#06b6d4' },
-                { id: 'val-3', value: 3.14, display: '3.14', type: 'float', x: 6, y: 3, icon: 'fas fa-atom', color: '#10b981' },
+                { id: 'val-3', value: 3.14, display: '3.14', type: 'float', x: 6, y: 4, icon: 'fas fa-atom', color: '#10b981' },
                 { id: 'val-4', value: true, display: 'True', type: 'bool', x: 8, y: 3, icon: 'fas fa-bolt', color: '#f59e0b' },
             ],
             obstacles: [
                 { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 3, y: 0 }, { x: 4, y: 0 },
                 { x: 5, y: 0 }, { x: 6, y: 0 }, { x: 7, y: 0 }, { x: 8, y: 0 }, { x: 9, y: 0 },
+                { x: 3, y: 3 }, { x: 3, y: 4 }, { x: 5, y: 3 }, { x: 5, y: 4 }, { x: 7, y: 3 }, { x: 7, y: 4 },
+                { x: 0, y: 6 }, { x: 5, y: 5 }, { x: 9, y: 6 },
             ]
         },
 
@@ -247,34 +259,42 @@ print("Lumina")
         },
 
         objective: "Sort all 4 value crystals into their matching Data Type flasks: <span class='highlight'>'str'</span>, <span class='highlight'>'int'</span>, <span class='highlight'>'float'</span>, and <span class='highlight'>'bool'</span>!",
-        initialCode: `# The Alchemist's Flasks — Variable Types Sorting
-# Available commands:
-#   hero.move_right(n), hero.move_left(n), hero.move_up(n), hero.move_down(n)
-#   hero.pick_up()
-#   hero.put_in("str" | "int" | "float" | "bool")
-
-# Step 1: Pick up "Lumina" (String) and place in [str] flask
+        initialCode: `# ═══ LESSON 1-2: Python Data Types (str, int, float, bool) ═══
+# [EXAMPLE 1 - str] Pick up "Lumina" at (2, 4) -> deposit into [str] flask at (2, 1)
 hero.move_right(1)
+hero.move_up(1)
+hero.pick_up()
+hero.move_up(2)
+hero.put_in("str")
+
+# [EXAMPLE 2 - int] Pick up 255 at (4, 3) -> deposit into [int] flask at (4, 1)
+hero.move_right(2)
 hero.move_down(1)
 hero.pick_up()
 hero.move_up(1)
-hero.put_in("str")
+hero.put_in("int")
 
-# Step 2: Pick up 255 (Integer at 4, 3) and put in "int" flask at (4, 1)
+# [EXAMPLE 3 - float] Pick up 3.14 at (6, 4) -> deposit into [float] flask at (6, 1)
+hero.move_right(2)
+hero.move_down(2)
+hero.pick_up()
+hero.move_up(2)
+hero.put_in("float")
 
-
-# Step 3: Pick up 3.14 (Float at 6, 3) and put in "float" flask at (6, 1)
-
-
-# Step 4: Pick up True (Boolean at 8, 3) and put in "bool" flask at (8, 1)
+# [YOUR TURN - bool] Walk to True at (8, 3), pick it up, and deposit into "bool":
+hero.move_right(2)
+hero.move_down(1)
+hero.pick_up()
+hero.move_up(1)
+# Call hero.put_in(...) with the boolean type name below:
 
 `,
         completeMessage: "Brilliant! Every value has been categorized into its proper container without a single type mismatch!",
 
         hints: [
-            { level: 1, text: "For each item: walk to its tile -> hero.pick_up() -> walk adjacent to the flask -> hero.put_in('flask_name')" },
+            { level: 1, text: "For each item: walk to its tile -> hero.pick_up() -> walk adjacent to the flask at row y=2 -> hero.put_in('flask_name')" },
             { level: 2, text: "255 is at (4, 3). From (2, 2) walk: hero.move_right(2) -> hero.move_down(1) -> hero.pick_up() -> hero.move_up(1) -> hero.put_in('int')" },
-            { level: 3, text: "Flask IDs match their types: 'str', 'int', 'float', 'bool'. Do them one by one!" }
+            { level: 3, text: "hero.move_right(1)\nhero.move_up(1)\nhero.pick_up()\nhero.move_up(2)\nhero.put_in('str')\nhero.move_right(2)\nhero.move_down(1)\nhero.pick_up()\nhero.move_up(1)\nhero.put_in('int')\nhero.move_right(2)\nhero.move_down(2)\nhero.pick_up()\nhero.move_up(2)\nhero.put_in('float')\nhero.move_right(2)\nhero.move_down(1)\nhero.pick_up()\nhero.move_up(1)\nhero.put_in('bool')" }
         ],
 
         grimoire: [

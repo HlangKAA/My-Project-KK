@@ -630,7 +630,8 @@
 
 /* Code Area */
 .game-code-area {
-    flex: 1;
+    flex: 1 1 auto;
+    min-height: 260px;
     position: relative;
     display: flex;
     overflow: hidden;
@@ -677,11 +678,12 @@
 /* Console */
 .game-console {
     border-top: 1px solid rgba(255, 255, 255, 0.06);
-    background: rgba(10, 3, 3, 0.9);
-    height: 160px;
+    background: rgba(10, 3, 3, 0.92);
+    height: 108px;
+    max-height: 115px;
     display: flex;
     flex-direction: column;
-    flex-shrink: 0;
+    flex: 0 0 auto;
 }
 
 .game-console-header {
@@ -746,6 +748,11 @@
 
 .game-console-line.error {
     color: #f87171;
+}
+
+.game-console-line.portal {
+    color: #fb923c;
+    font-weight: 700;
 }
 
 .game-console-line.waiting {

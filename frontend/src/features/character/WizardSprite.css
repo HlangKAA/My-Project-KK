@@ -320,12 +320,288 @@
   50% { transform: translateX(-50%) scale(1.3); opacity: 0.7; }
 }
 
-/* --- Walking Animation (for GameWorld movement) --- */
+/* --- Hurt / Blocked Recoil State --- */
+.ws-anim-hurt .ws-sprite {
+  animation: wsHurtRecoil 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) infinite;
+  filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.75)) brightness(1.1);
+}
+
+@keyframes wsHurtRecoil {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  20% { transform: translate(-5px, -3px) rotate(-6deg); }
+  45% { transform: translate(4px, -1px) rotate(5deg); }
+  70% { transform: translate(-3px, -2px) rotate(-3deg); }
+}
+
+/* --- Arcane Casting Circle --- */
+.ws-cast-circle {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  width: 54px;
+  height: 20px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  border: 2px dashed rgba(251, 191, 36, 0.85);
+  box-shadow: 0 0 14px rgba(251, 146, 60, 0.65), inset 0 0 8px rgba(251, 191, 36, 0.45);
+  z-index: 1;
+  pointer-events: none;
+  animation: wsCastCirclePulse 0.7s ease-in-out infinite alternate;
+}
+
+.ws-cast-circle-inner {
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  border: 1px solid rgba(56, 189, 248, 0.75);
+}
+
+@keyframes wsCastCirclePulse {
+  from { transform: translateX(-50%) scale(0.9); opacity: 0.75; }
+  to { transform: translateX(-50%) scale(1.15); opacity: 1; }
+}
+
+/* --- Full Walking Cycle (Alternating Stride, Body Bob, Cape Flutter, Staff Swing, Step Dust) --- */
 .ws-anim-walking .ws-sprite {
-  animation: wsWalkBob 0.3s ease-in-out infinite;
+  animation: wsWalkBob 0.24s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  transform-origin: 50% 85%;
+}
+
+.ws-anim-walking.ws-stride-left .ws-sprite {
+  animation-name: wsWalkStrideLeft;
+}
+
+.ws-anim-walking.ws-stride-right .ws-sprite {
+  animation-name: wsWalkStrideRight;
 }
 
 @keyframes wsWalkBob {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
+  0%, 100% { transform: translateY(0) rotate(0deg) scaleY(1); }
+  25% { transform: translateY(-6px) rotate(4deg) scaleY(1.03); }
+  50% { transform: translateY(-1px) rotate(0deg) scaleY(0.97); }
+  75% { transform: translateY(-6px) rotate(-4deg) scaleY(1.03); }
+}
+
+@keyframes wsWalkStrideLeft {
+  0% { transform: translateY(0) rotate(0deg) scale(1); }
+  45% { transform: translateY(-6px) translateX(2px) rotate(5deg) scale(1.03, 1.04); }
+  100% { transform: translateY(-1px) rotate(1deg) scale(1, 0.98); }
+}
+
+@keyframes wsWalkStrideRight {
+  0% { transform: translateY(0) rotate(0deg) scale(1); }
+  45% { transform: translateY(-6px) translateX(2px) rotate(-5deg) scale(1.03, 1.04); }
+  100% { transform: translateY(-1px) rotate(-1deg) scale(1, 0.98); }
+}
+
+/* Directional posture cues for Up/Down movement */
+.ws-anim-walking.ws-dir-up .ws-sprite {
+  filter: brightness(0.95) drop-shadow(0 3px 6px rgba(56, 189, 248, 0.35));
+}
+
+.ws-anim-walking.ws-dir-down .ws-sprite {
+  filter: brightness(1.05) drop-shadow(0 3px 6px rgba(129, 140, 248, 0.35));
+}
+
+/* --- Billowing Cape Hem --- */
+.ws-cape-hem {
+  position: absolute;
+  bottom: 14px;
+  left: 34%;
+  width: 24px;
+  height: 16px;
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.85), rgba(127, 29, 29, 0.9));
+  border-radius: 40% 20% 70% 30%;
+  z-index: 1;
+  pointer-events: none;
+  transform-origin: top right;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+}
+
+.ws-cape-walking {
+  animation: wsCapeBillow 0.22s ease-in-out infinite alternate;
+}
+
+.ws-cape-casting {
+  animation: wsCapeFlare 0.35s ease-in-out infinite alternate;
+}
+
+@keyframes wsCapeBillow {
+  from { transform: rotate(8deg) scaleX(0.9) skewX(-6deg); }
+  to { transform: rotate(-18deg) scaleX(1.22) skewX(-16deg) translate(-4px, -2px); }
+}
+
+@keyframes wsCapeFlare {
+  from { transform: rotate(-10deg) scale(1.05); }
+  to { transform: rotate(-25deg) scale(1.3) translate(-3px, -4px); }
+}
+
+/* --- Swinging Staff Rig --- */
+.ws-staff-rig {
+  position: absolute;
+  right: 16%;
+  top: 26%;
+  width: 4px;
+  height: 36px;
+  background: linear-gradient(to bottom, #fde047, #92400e 45%, #451a03);
+  border-radius: 3px;
+  z-index: 3;
+  pointer-events: none;
+  transform-origin: 50% 75%;
+}
+
+.ws-staff-orb {
+  position: absolute;
+  top: -6px;
+  left: -4px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff 10%, #38bdf8 60%, #6366f1 100%);
+  box-shadow: 0 0 10px #38bdf8, 0 0 16px #818cf8;
+}
+
+.ws-staff-walking {
+  animation: wsStaffSwing 0.24s ease-in-out infinite alternate;
+}
+
+.ws-stride-left .ws-staff-walking {
+  transform: rotate(18deg) translateY(-2px);
+}
+
+.ws-stride-right .ws-staff-walking {
+  transform: rotate(-16deg) translateY(1px);
+}
+
+.ws-staff-casting {
+  animation: wsStaffRaise 0.35s ease-in-out infinite alternate;
+}
+
+.ws-staff-casting .ws-staff-orb {
+  background: radial-gradient(circle, #ffffff 15%, #fbbf24 55%, #f97316 100%);
+  box-shadow: 0 0 14px #fbbf24, 0 0 24px #f97316;
+  transform: scale(1.3);
+}
+
+@keyframes wsStaffSwing {
+  from { transform: rotate(-16deg) translateY(1px); }
+  to { transform: rotate(18deg) translateY(-3px); }
+}
+
+@keyframes wsStaffRaise {
+  from { transform: translateY(-8px) rotate(12deg) scale(1.05); }
+  to { transform: translateY(-14px) rotate(22deg) scale(1.12); }
+}
+
+/* --- Alternating Stride Boots & Step Dust --- */
+.ws-walk-feet {
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  width: 30px;
+  height: 14px;
+  transform: translateX(-50%);
+  z-index: 3;
+  pointer-events: none;
+}
+
+.ws-foot {
+  position: absolute;
+  bottom: 2px;
+  width: 11px;
+  height: 6px;
+  background: linear-gradient(135deg, #78350f, #451a03);
+  border: 1px solid #d97706;
+  border-radius: 4px 6px 3px 3px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.65);
+  transition: transform 0.14s ease;
+}
+
+.ws-foot-left {
+  left: 3px;
+  animation: wsFootLeftCycle 0.24s ease-in-out infinite alternate;
+}
+
+.ws-foot-right {
+  right: 3px;
+  animation: wsFootRightCycle 0.24s ease-in-out infinite alternate;
+}
+
+.ws-stride-left .ws-foot-left {
+  transform: translate(6px, -4px) rotate(-14deg);
+}
+
+.ws-stride-left .ws-foot-right {
+  transform: translate(-5px, 1px) rotate(12deg);
+}
+
+.ws-stride-right .ws-foot-left {
+  transform: translate(-5px, 1px) rotate(12deg);
+}
+
+.ws-stride-right .ws-foot-right {
+  transform: translate(6px, -4px) rotate(-14deg);
+}
+
+@keyframes wsFootLeftCycle {
+  from { transform: translate(-4px, 1px) rotate(10deg); }
+  to { transform: translate(6px, -4px) rotate(-14deg); }
+}
+
+@keyframes wsFootRightCycle {
+  from { transform: translate(6px, -4px) rotate(-14deg); }
+  to { transform: translate(-4px, 1px) rotate(10deg); }
+}
+
+.ws-step-dust {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 36px;
+  height: 14px;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.ws-dust-puff {
+  position: absolute;
+  bottom: 1px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(226, 232, 240, 0.8) 0%, rgba(148, 163, 184, 0.2) 70%, transparent 100%);
+  animation: wsDustPuff 0.32s ease-out forwards;
+}
+
+.ws-dust-puff.puff-1 {
+  left: 2px;
+  --dust-x: -9px;
+}
+
+.ws-dust-puff.puff-2 {
+  right: 4px;
+  --dust-x: -5px;
+  animation-delay: 0.04s;
+}
+
+.ws-dust-spark {
+  position: absolute;
+  bottom: 3px;
+  left: 45%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 6px #38bdf8, 0 0 10px #fde047;
+  animation: wsStepSpark 0.34s ease-out forwards;
+}
+
+@keyframes wsDustPuff {
+  0% { opacity: 0.9; transform: translate(0, 0) scale(0.5); }
+  100% { opacity: 0; transform: translate(var(--dust-x, -8px), -8px) scale(1.65); }
+}
+
+@keyframes wsStepSpark {
+  0% { opacity: 1; transform: translate(0, 0) scale(1); }
+  100% { opacity: 0; transform: translate(-6px, -12px) scale(0.3); }
 }

@@ -6,6 +6,7 @@ const copy = {
         noActions: ['Your code ran without an arena action.', 'Call a hero movement or color spell to affect the scene.'],
         timeout: ['The spell ran out of time during execution.', 'Reset the trial, then shorten the actions your code repeats.'],
         hazard: ['The hero stepped onto a marked shadow tile.', 'Change the movement path to go around the marked tile.'],
+        portal: ({ x, y }) => [`🌀 The hero stepped into a dimensional portal trap at (${x}, ${y}) and was warped back to spawn!`, 'Steer around the glowing swirling portals on the floor.'],
         obstacle: ({ x, y }) => [`A bookshelf blocked the path at (${x}, ${y}).`, 'Change the movement steps to go around it.'],
         directional: ['This area requires step-by-step movement.', 'Use hero.move_up/down/left/right instead of moving directly to a tile.'],
         flaskUnknown: ({ name }) => [`There is no flask named ${name}.`, 'Check the flask labels in the arena and the argument to put_in().'],
@@ -31,6 +32,10 @@ const copy = {
         foundIndex: ({ actual }) => [actual === undefined ? 'The spell did not identify an image position.' : `The spell chose position ${actual}.`, 'Check how your code finds the requested position.'],
         wrongColor: ['The cast color did not satisfy the objective.', 'Recheck each RGB channel calculation in your code.'],
         blank: ({ labels }) => [`These fields need another look: ${labels.join(', ')}.`, 'Check the expression and the nearby code for each marked field.'],
+        structure: ({ requirementEn }) => [
+            'Your code did not use the required Python concept for this stage.',
+            requirementEn || 'Follow the lesson structure (variables, loops, or conditions) specified in the objective.',
+        ],
     },
     th: {
         heading: 'คาถายังไม่ผ่าน ลองอีกครั้ง',
@@ -39,6 +44,7 @@ const copy = {
         noActions: ['โค้ดรันแล้ว แต่ไม่มีคำสั่งที่ส่งผลกับฉาก', 'ลองใช้คำสั่งเดินหรือร่ายสีของ hero'],
         timeout: ['เวลาร่ายคาถาหมดระหว่างรัน', 'รีเซ็ตด่าน แล้วลดจำนวนคำสั่งที่โค้ดทำซ้ำ'],
         hazard: ['ตัวละครเหยียบช่องเงาที่ทำเครื่องหมายไว้', 'ลองเปลี่ยนเส้นทางเดินเพื่อหลบช่องนั้น'],
+        portal: ({ x, y }) => [`🌀 ตัวละครเดินเหยียบประตูมิติที่ (${x}, ${y}) และถูกดูดกลับจุดเริ่มต้น!`, 'ปรับคำสั่งเดินเพื่ออ้อมหลบประตูมิติที่หมุนอยู่บนพื้น'],
         obstacle: ({ x, y }) => [`ชั้นหนังสือขวางทางที่ (${x}, ${y})`, 'ลองเปลี่ยนคำสั่งเดินให้เลี่ยงสิ่งกีดขวาง'],
         directional: ['พื้นที่นี้ต้องเดินทีละขั้น', 'ใช้ hero.move_up/down/left/right แทนการย้ายไปยังช่องโดยตรง'],
         flaskUnknown: ({ name }) => [`ไม่มีขวดชื่อ ${name}`, 'ดูชื่อขวดในฉากและค่าที่ส่งให้ put_in() อีกครั้ง'],
@@ -64,6 +70,10 @@ const copy = {
         foundIndex: ({ actual }) => [actual === undefined ? 'คาถายังไม่ระบุตำแหน่งในภาพ' : `คาถาเลือกตำแหน่ง ${actual}`, 'ลองตรวจวิธีหาตำแหน่งที่โจทย์ต้องการ'],
         wrongColor: ['สีที่ร่ายยังไม่ตรงกับโจทย์', 'ลองตรวจการคำนวณ RGB แต่ละช่อง'],
         blank: ({ labels }) => [`ลองดูช่องเหล่านี้อีกครั้ง: ${labels.join(', ')}`, 'ตรวจนิพจน์และโค้ดรอบช่องที่ไฮไลต์'],
+        structure: ({ requirementTh }) => [
+            'โค้ดของคุณยังไม่ได้ใช้โครงสร้างคำสั่งตามบทเรียนของด่านนี้',
+            requirementTh || 'กรุณาเขียนโค้ดโดยใช้ตัวแปร ลูป หรือเงื่อนไขตามที่โจทย์กำหนด ห้ามพิมพ์คำสั่งเดินลัดไปที่เป้าหมายอย่างเดียว',
+        ],
     },
 };
 
