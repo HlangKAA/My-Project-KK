@@ -25,7 +25,7 @@ export const STAGE_STORIES = {
     ]),
     '1-3': scene(E, [
         say(E, 'A scattered Rune Shard holds my true name among the ruins.', 'เศษรูนที่ตกอยู่กลางซากหินเก็บชื่อจริงของฉันไว้'),
-        say(E, 'Use hero.pick_up() on "ELDRIN" at (6, 1), store it in the [str] pedestal at (3, 3) with hero.put_in("str"), then wind to the altar (1, 1) and chant f"Welcome, {name}!".', 'ใช้ hero.pick_up() เก็บ "ELDRIN" ที่ (6, 1) วางลงแท่น [str] ที่ (3, 3) ด้วย hero.put_in("str") แล้วเดินอ้อมไปแท่น (1, 1) ร่าย f"Welcome, {name}!"', 'teaching'),
+        say(E, 'Use hero.pick_up() on "ELDRIN_SIGIL" at (6, 1), store it in the [str] pedestal at (3, 3) with hero.put_in("str"), then wind to the altar (1, 1) and chant f"Welcome, {name}!".', 'ใช้ hero.pick_up() เก็บ "ELDRIN_SIGIL" ที่ (6, 1) วางลงแท่น [str] ที่ (3, 3) ด้วย hero.put_in("str") แล้วเดินอ้อมไปแท่น (1, 1) ร่าย f"Welcome, {name}!"', 'teaching'),
     ]),
     '1-4': scene(E, [
         say(E, 'Krakk darkened the crossroads and knocked loose the Lantern Spark.', 'แคร็กก์ปิดเส้นทางแยกด้วยเงามืดและทำให้ประกายตะเกียงหลุดออกมา'),
@@ -33,11 +33,11 @@ export const STAGE_STORIES = {
     ]),
     '1-5': scene(E, [
         say(E, 'Echo Grove repeats every footstep while an Echo Stone rests across the grove.', 'Echo Grove สะท้อนเสียงฝีเท้าซ้ำไปมาและมีศิลาเสียงสะท้อนตกอยู่อีกฝั่ง'),
-        say(E, 'Sum steps into total with a for loop, pick up 15 at (6, 1), put it in [int] at (6, 4), and walk back left to the gate (1, 4).', 'ใช้ for loop รวมจำนวนก้าวใน total เก็บศิลา 15 ที่ (6, 1) ใส่โถ [int] ที่ (6, 4) แล้วเดินกลับซ้ายไปยังประตู (1, 4)', 'teaching'),
+        say(E, 'Sum steps into total with a for loop, pick up 5 at (6, 1), put it in [int] at (6, 4), and walk back left to the gate (1, 4).', 'ใช้ for loop รวมจำนวนก้าวใน total เก็บศิลา 5 ที่ (6, 1) ใส่โถ [int] ที่ (6, 4) แล้วเดินกลับซ้ายไปยังประตู (1, 4)', 'teaching'),
     ]),
     '1-6': scene(E, [
         say(E, 'Inside the ruined Spell Workshop, the Mana Core fell far from its conduit.', 'ในโรงฝึกคาถาที่พังทลาย แกนมานาตกอยู่ห่างจากแท่นส่งพลัง'),
-        say(E, 'Finish double_steps(steps), pick up 42 at (2, 4), place it in [int] at (1, 2), and navigate around the center pillar to the gate (6, 1).', 'เติมฟังก์ชัน double_steps(steps) เก็บแกน 42 ที่ (2, 4) ใส่ช่อง [int] ที่ (1, 2) แล้วเดินอ้อมเสากลางไปยังประตู (6, 1)', 'teaching'),
+        say(E, 'Finish double_steps(steps), pick up 4 at (2, 4), place it in [int] at (1, 2), and navigate around the center pillar to the gate (6, 1).', 'เติมฟังก์ชัน double_steps(steps) เก็บแกน 4 ที่ (2, 4) ใส่ช่อง [int] ที่ (1, 2) แล้วเดินอ้อมเสากลางไปยังประตู (6, 1)', 'teaching'),
     ]),
     '1-7': scene(E, [
         say(E, "Beyond this gate lies THE SCHOLAR'S ARCHIVE. Its keeper may know where Krakk carried the stolen color.", 'หลังประตูนี้คือ THE SCHOLAR\'S ARCHIVE ผู้ดูแลที่นั่นอาจรู้ว่าแคร็กก์พาสีที่ขโมยไปไว้ไหน'),

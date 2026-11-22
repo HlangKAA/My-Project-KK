@@ -169,7 +169,7 @@ export const CHAPTER_TWO_STAGES = {
         },
         objective: 'Restore two Memory Book plates while steering around the floor portals. Complete the <span class="highlight">average RGB shade</span> for Chapter Plate II.',
         initialCode: '# CHALLENGE 2-4: Calculate the integer average shade for the second memory book plate.\nfirst_r, first_g, first_b = 30, 90, 150\nmiddle_r, middle_g, middle_b = 180, 60, 30\nhero.move_up(3)\nfirst_shade = (first_r + first_g + first_b) // 3\nhero.cast_color(first_shade, first_shade, first_shade)\nhero.move_down(2)\nhero.move_right(4)\nmiddle_shade = 0\nhero.cast_color(middle_shade, middle_shade, middle_shade)\n',
-        visionChecks: ['assert "middle_shade" in dir() and middle_shade == 90, "Calculate middle_shade using (middle_r + middle_g + middle_b) // 3"'],
+        visionChecks: ['assert "middle_shade" in globals() and middle_shade == 90, "Calculate middle_shade using (middle_r + middle_g + middle_b) // 3"'],
         completeMessage: 'Both Memory Book plates return in crisp silver ink!',
         hints: [
             'Only middle_shade needs changing. Portals at (3, 4) and (5, 1) are already avoided by this route.',
@@ -196,7 +196,7 @@ export const CHAPTER_TWO_STAGES = {
         },
         objective: 'Unlock the sealed Grimoire Vault clasps while avoiding floor portals: finish the <span class="highlight">grayscale average</span> for the Silver Grimoire Seal.',
         initialCode: '# CHALLENGE 2-5: Apply brightness and grayscale averaging to unlock the Grimoire Vault.\nbright_r, bright_g, bright_b = 20, 30, 40\ngray_r, gray_g, gray_b = 60, 90, 120\nhero.move_up(3)\nhero.cast_color(bright_r + 40, bright_g + 40, bright_b + 40)\nhero.move_left(4)\nshade = 0\nhero.cast_color(shade, shade, shade)\n',
-        visionChecks: ['assert "shade" in dir() and shade == 90, "Calculate shade using (gray_r + gray_g + gray_b) // 3"'],
+        visionChecks: ['assert "shade" in globals() and shade == 90, "Calculate shade using (gray_r + gray_g + gray_b) // 3"'],
         completeMessage: 'Both Grimoire clasps unlock as the Archive shelves gleam!',
         hints: [
             'Only shade needs changing; watch out for floor portals on rows 2 and 4 if you change the route.',
@@ -221,7 +221,7 @@ export const CHAPTER_TWO_STAGES = {
         },
         objective: 'Step between the floor portals to restore the Gilded Compendium in golden yellow <span class="highlight">(255, 255, 0)</span> by correcting the blue channel.',
         initialCode: '# CHALLENGE 2-6: Configure RGB variables to mix pure yellow light for the Compendium.\nred, green, blue = 255, 255, 255\nhero.move_up(2)\nhero.cast_color(red, green, blue)\n',
-        visionChecks: ['assert "blue" in dir() and blue == 0 and red == 255 and green == 255, "Set blue to 0 while keeping red and green at 255"'],
+        visionChecks: ['assert "blue" in globals() and "red" in globals() and "green" in globals() and blue == 0 and red == 255 and green == 255, "Set blue to 0 while keeping red and green at 255"'],
         completeMessage: 'The Gilded Compendium cover shines in pure gold!',
         hints: [
             'Only the blue value needs changing. Portals flank columns 4 and 6!',
@@ -285,7 +285,7 @@ export const CHAPTER_TWO_STAGES = {
         ], 'Open the Living Atlas'),
         objective: 'Dodging portals: pick up <span class="highlight">"ATLAS_INDEX"</span> at (1, 1), shelve it onto the Lectern (4, 0), restore both Atlas pages (<span class="highlight">grayscale average</span>), and reach the Atlas Gate.',
         initialCode: '# BOSS TRIAL 2-8: Pick up ATLAS_INDEX, shelve it at (4, 0), restore both pages, and reach the gate.\nlight_r, light_g, light_b = 20, 30, 40\nsilver_r, silver_g, silver_b = 60, 90, 120\nhero.move_up(3)\nhero.pick_up()\nhero.cast_color(light_r + 50, light_g + 50, light_b + 50)\nhero.move_right(3)\nhero.put_in("str")\nshade = 0\nhero.cast_color(shade, shade, shade)\nhero.move_right(3)\nhero.move_down(3)\n',
-        visionChecks: ['assert "shade" in dir() and shade == 90, "Calculate shade using (silver_r + silver_g + silver_b) // 3"'],
+        visionChecks: ['assert "shade" in globals() and shade == 90, "Calculate shade using (silver_r + silver_g + silver_b) // 3"'],
         completeMessage: 'The Living Atlas is bound and its restored map reveals Krakk\'s portal traps in the Whispering Caverns!',
         hints: [
             'The route picks up "ATLAS_INDEX" at (1, 1) and shelves it at (4, 1) beside (4, 0). Only shade needs the grayscale formula!',

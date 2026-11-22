@@ -225,11 +225,9 @@ export default function WizardSprite({
         </div>
       )}
 
-      {/* Alternating Stride Boots & Footstep Dust during Walking */}
+      {/* Footstep Dust during Walking */}
       {state === 'walking' && (
         <div className="ws-walk-feet" aria-hidden="true">
-          <span className="ws-foot ws-foot-left" />
-          <span className="ws-foot ws-foot-right" />
           <span key={walkStep} className="ws-step-dust">
             <i className="ws-dust-puff puff-1" />
             <i className="ws-dust-puff puff-2" />
