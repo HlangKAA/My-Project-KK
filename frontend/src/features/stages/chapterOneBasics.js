@@ -58,7 +58,7 @@ export const CHAPTER_ONE_BASICS = {
         code: '# Pick up the sigil, place it in the [str] pedestal, then greet Eldrin with an f-string.\nname = "Eldrin"\nhero.move_up(3)\nhero.pick_up()\nhero.move_left(2)\nhero.move_down(2)\nhero.put_in("str")\nhero.move_down(1)\nhero.move_left(3)\nhero.move_up(3)\nprint(f"Welcome, {name}!")\n',
         starter: '# CHALLENGE 1-3: Pick up the str sigil at (6, 1), deposit it at (3, 3), and greet Eldrin at (1, 1).\nname = "Eldrin"\nhero.move_up(3)\nhero.pick_up()\nhero.move_left(2)\nhero.move_down(2)\n# Call hero.put_in("str") below, then wind to (1, 1) and chant with f"Welcome, {name}!":\n\n',
         reference: 'name = "Prisma"\nhero.pick_up()\nhero.put_in("str")\nprint(f"Hello, {name}!")',
-        check: ['assert "name" in dir() and name == "Eldrin", "Keep the name variable set to Eldrin"'],
+        check: ['assert "name" in globals() and name == "Eldrin", "Keep the name variable set to Eldrin"'],
         hint: 'Use hero.put_in("str") at (4, 3), then move_down(1), move_left(3), move_up(3) to (1, 1) and print(f"Welcome, {name}!").',
     }),
     '1-4': forestStage({
@@ -74,7 +74,7 @@ export const CHAPTER_ONE_BASICS = {
         code: '# Pick up the boolean spark, place it in the brazier, and use if/else to reach the gate.\nlantern_lit = True\nhero.move_up(3)\nhero.pick_up()\nhero.move_right(2)\nhero.move_down(1)\nhero.put_in("bool")\nhero.move_down(2)\nif lantern_lit:\n    steps = 3\nelse:\n    steps = 1\nhero.move_right(steps)\n',
         starter: '# CHALLENGE 1-4: Pick up True at (1, 1), deposit it at (2, 2), and set steps with if/else.\nlantern_lit = True\nhero.move_up(3)\nhero.pick_up()\nhero.move_right(2)\nhero.move_down(1)\nhero.put_in("bool")\nhero.move_down(2)\nif lantern_lit:\n    steps = 0\nelse:\n    steps = 1\nhero.move_right(steps)\n',
         reference: 'hero.pick_up()\nhero.put_in("bool")\nif lantern_lit:\n    steps = 3',
-        check: ['assert "steps" in dir() and steps == 3, "Set steps to 3 inside the if block to reach (6, 4)"'],
+        check: ['assert "steps" in globals() and steps == 3, "Set steps to 3 inside the if block to reach (6, 4)"'],
         hint: 'When standing at (3, 4), set steps = 3 when lantern_lit is True so hero.move_right(steps) reaches the gate at (6, 4).',
     }),
     '1-5': forestStage({
@@ -90,7 +90,7 @@ export const CHAPTER_ONE_BASICS = {
         code: '# Accumulate total in the loop, collect 5, place it in the [int] vessel, then return to the gate.\nsteps = [1, 1, 1, 1, 1]\ntotal = 0\nfor step in steps:\n    total += step\nhero.move_right(total)\nhero.pick_up()\nhero.move_down(2)\nhero.put_in("int")\nhero.move_left(total)\n',
         starter: '# CHALLENGE 1-5: Accumulate total, then navigate around the center wall to pick, put, and reach the gate.\nsteps = [1, 1, 1, 1, 1]\ntotal = 0\nfor step in steps:\n    pass\nhero.move_right(total)\nhero.pick_up()\nhero.move_down(2)\nhero.put_in("int")\nhero.move_left(total)\n',
         reference: 'for step in steps:\n    total += step\nhero.move_right(total)\nhero.pick_up()\nhero.put_in("int")',
-        check: ['assert "total" in dir() and total == 5, "Accumulate total inside the for loop"'],
+        check: ['assert "total" in globals() and total == 5, "Accumulate total inside the for loop"'],
         hint: 'Start total at 0 and write total += step inside the for loop; the U-turn path picks 5, deposits into "int", and returns left(total).',
     }),
     '1-6': forestStage({
@@ -123,7 +123,7 @@ export const CHAPTER_ONE_BASICS = {
         code: '# Collect the key and speak at the gate.\nname = "Eldrin"\nhero.move_right(2)\nhero.pick_up()\nhero.move_up(2)\nhero.put_in("str")\nhero.move_right(4)\nprint(f"Open, {name}!")\n',
         starter: '# BOSS TRIAL 1-7: Combine key collection, flask sorting, and f-string chanting.\nname = "Eldrin"\nhero.move_right(2)\nhero.pick_up()\nhero.move_up(2)\nhero.put_in("str")\nhero.move_right(4)\nprint(f"Open, ...!")\n',
         reference: 'hero.pick_up()\nhero.put_in("str")\nprint(f"Hello, {name}!")',
-        check: ['assert "name" in dir() and name == "Eldrin", "Keep the name variable set to Eldrin"'],
+        check: ['assert "name" in globals() and name == "Eldrin", "Keep the name variable set to Eldrin"'],
         hint: 'The route and flask are ready. Replace ... inside the f-string with {name}.',
     }),
 };

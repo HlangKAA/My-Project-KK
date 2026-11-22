@@ -172,3 +172,41 @@ test('obsolete legacy stages are removed across catalogs and Chapter 1-3 mechani
         }
     }
 });
+
+test('all playable stages use Skulpt-safe visionChecks and non-overlapping arena tiles', () => {
+    const playableKeys = Object.values(REGIONS).flatMap(region =>
+        region.stages.map(stage => `${region.id}-${stage.id}`)
+    );
+    for (const key of playableKeys) {
+        const stage = STAGE_DATA[key];
+        for (const check of stage.visionChecks || []) {
+            assert.equal(/\bdir\s*\(/.test(check), false, `Stage ${key} visionChecks must not call dir() (unsupported in Skulpt 1.2.0)`);
+            assert.equal(/\blocals\s*\(/.test(check), false, `Stage ${key} visionChecks must not call locals() (unsupported in Skulpt 1.2.0)`);
+        }
+
+        const arena = stage.arena;
+        const buckets = [
+            ['spawn', [arena.spawn]],
+            ['obstacle', arena.obstacles || []],
+            ['portal', arena.portals || []],
+            ['hazard', arena.hazards || []],
+            ['item', arena.items || []],
+            ['flask', arena.flasks || []],
+            ['colorTarget', arena.colorTargets || []],
+            ['altar', arena.altar ? [arena.altar] : []],
+            ['gate', arena.gate ? [arena.gate] : []],
+            ['boss', arena.boss ? [arena.boss] : []],
+        ];
+        const occupied = new Map();
+        for (const [kind, list] of buckets) {
+            for (const obj of list) {
+                assert.ok(obj.x >= 0 && obj.x < arena.cols && obj.y >= 0 && obj.y < arena.rows,
+                    `Stage ${key} ${kind} (${obj.x},${obj.y}) out of bounds`);
+                const tileKey = `${obj.x},${obj.y}`;
+                assert.equal(occupied.has(tileKey), false,
+                    `Stage ${key} has overlapping ${occupied.get(tileKey)} and ${kind} at (${tileKey})`);
+                occupied.set(tileKey, kind);
+            }
+        }
+    }
+});
