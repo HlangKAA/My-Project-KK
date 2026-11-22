@@ -1,17 +1,17 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from 'react-router-dom';
-import { GameProvider, useGame } from './context/GameContext';
+import { GameProvider, useGame } from '@/shared/context/GameContext';
+import { LanguageProvider } from '@/shared/i18n/LanguageContext';
 
 // Pages
-import Home from './pages/Home';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import ForgotPassword from './pages/ForgotPassword';
-import ResetPassword from './pages/ResetPassword';
-import CharacterDemo from './pages/CharacterDemo';
-import SpriteEditor from './pages/SpriteEditor';
-import Dashboard from './pages/Dashboard';
-import RegionMap from './pages/RegionMap';
-import StagePage from './pages/StagePage';
+import Home from '@/features/auth/Home';
+import Login from '@/features/auth/Login';
+import Register from '@/features/auth/Register';
+import ForgotPassword from '@/features/auth/ForgotPassword';
+import ResetPassword from '@/features/auth/ResetPassword';
+import Dashboard from '@/features/world/Dashboard';
+import RegionMap from '@/features/world/RegionMap';
+import StagePage from '@/features/gameplay/StagePage';
+import ProfilePage from '@/features/character/ProfilePage';
 
 // Redirect old /world/:zoneId to code-driven /region/:regionId
 const WorldRedirect = () => {
@@ -34,17 +34,15 @@ const ProtectedRoute = ({ children }) => {
 function App() {
   return (
     <Router>
-      <GameProvider>
+      <LanguageProvider><GameProvider>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
-          <Route path="/demo-characters" element={<CharacterDemo />} />
-          <Route path="/sprite-editor" element={<SpriteEditor />} />
           
-          <Route 
+          <Route
             path="/dashboard" 
             element={
               <ProtectedRoute>
@@ -53,6 +51,15 @@ function App() {
             } 
           />
           
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+
           <Route 
             path="/region/:regionId" 
             element={
@@ -87,7 +94,7 @@ function App() {
             element={<Navigate to="/dashboard" replace />} 
           />
         </Routes>
-      </GameProvider>
+      </GameProvider></LanguageProvider>
     </Router>
   );
 }

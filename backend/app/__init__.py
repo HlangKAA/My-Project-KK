@@ -1,16 +1,18 @@
 from flask import Flask
 from flask_mail import Mail
 import os
+from pathlib import Path
 from flask_cors import CORS
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(Path(__file__).resolve().parents[1] / '.env')
 
 app = Flask(__name__)
 # Allow requests from the React Frontend
 CORS(app, resources={r"/*": {"origins": ["http://localhost:5173", "http://localhost:5174"]}}, supports_credentials=True)
 
 app.secret_key = os.getenv('SECRET_KEY')
+app.config['FRONTEND_URL'] = os.getenv('FRONTEND_URL', 'http://localhost:5173').rstrip('/')
 
 # Email configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -24,6 +26,7 @@ mail = Mail(app)
 
 # Register Blueprints
 from app.auth.routes import auth_bp
+from app.auth import account_routes as _account_routes  # Register profile and account endpoints.
 from app.main.routes import main_bp
 from app.game.routes import game_bp
 

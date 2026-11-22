@@ -1,0 +1,18 @@
+.story-scene-backdrop { position: fixed; inset: 0; z-index: 2000; display: grid; place-items: center; padding: 22px; background: rgba(7, 7, 10, .88); backdrop-filter: blur(8px); }
+.story-scene { width: min(650px, 100%); max-height: 90vh; overflow: auto; padding: clamp(24px, 5vw, 48px); border: 1px solid #967954; border-radius: 16px; text-align: center; color: #eee4ce; background: radial-gradient(circle at 50% 15%, #3c342f, #151619 72%); box-shadow: 0 0 80px rgba(141, 104, 54, .22), inset 0 0 35px rgba(196, 163, 91, .07); }
+.story-scene-epilogue { background: radial-gradient(circle at 50% 15%, #3d493c, #171a1b 72%); }
+.story-scene-eyebrow { color: #d9ae71; text-transform: uppercase; letter-spacing: .22em; font-size: .76rem; }
+.story-scene-sigil { display: grid; place-items: center; width: 82px; height: 82px; margin: 24px auto 14px; border: 1px solid #ac9067; border-radius: 50%; color: #f6d396; font-size: 2.1rem; animation: story-sigil-glow 2.8s ease-in-out infinite alternate; }
+.story-scene h1 { margin: 0 0 24px; font-family: Georgia, serif; font-size: clamp(1.9rem, 5vw, 3rem); }
+.story-scene-lines p { margin: 0 0 18px; line-height: 1.7; font-size: 1.05rem; }
+.story-scene-continue { display: block; width: 100%; margin-top: 28px; padding: 13px 18px; border: 1px solid #d2ad72; border-radius: 8px; background: #634a32; color: #fff2d9; font: inherit; font-weight: 700; cursor: pointer; }
+.story-scene-skip { margin-top: 12px; border: 0; background: transparent; color: #c4b6a2; font: inherit; text-decoration: underline; cursor: pointer; }
+.story-scene-error { color: #ffc0ae; margin: 16px 0 0; }
+.story-scene button:disabled { opacity: .6; cursor: wait; }
+@keyframes story-sigil-glow { from { box-shadow: 0 0 9px #b7965277; } to { box-shadow: 0 0 30px #e5c171aa; } }
+@media (prefers-reduced-motion: reduce) { .story-scene-sigil { animation: none; } }
+.story-scene-world { position: relative; height: 125px; margin: 0 0 22px; overflow: hidden; border: 1px solid #9c825b; border-radius: 9px; }
+.story-scene-world img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1); }
+.story-scene-world .story-scene-world-color { filter: none; opacity: 0; animation: story-world-color 3s ease-in forwards; }
+@keyframes story-world-color { to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .story-scene-world .story-scene-world-color { opacity: 1; animation: none; } }

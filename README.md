@@ -37,46 +37,41 @@ Write real Python code to restore color to a grayscale world!
 
 ## 🏗️ Architecture
 
-```
+```text
 My-Project-KK/
-├── backend/                           # Flask API Server
+├── backend/                       Flask API and database persistence
 │   ├── app/
-│   │   ├── __init__.py                # Flask app factory
-│   │   ├── db.py                      # Database connection (Supabase)
-│   │   ├── auth/
-│   │   │   └── routes.py             # Authentication endpoints
-│   │   ├── game/
-│   │   │   ├── routes.py             # Game API endpoints
-│   │   │   └── levels.py             # Level definitions
-│   │   ├── main/
-│   │   │   └── routes.py             # Main routes
-│   │   ├── templates/                 # Jinja2 templates (auth pages)
-│   │   └── static/                    # Static assets
-│   ├── requirements.txt
-│   └── run.py                         # Entry point
-├── frontend/                          # React + Vite SPA
+│   │   ├── auth/                  Login, email, profile and account routes
+│   │   ├── game/                  Progress, submissions and leaderboard
+│   │   ├── main/                  API root and Swagger routes
+│   │   └── templates/             Active verification and Swagger pages
+│   ├── seed_game_catalog.sql      Generated stage data, not schema setup
+│   └── run.py
+├── frontend/
 │   ├── src/
-│   │   ├── pages/
-│   │   │   ├── GamePage.jsx           # Main game interface
-│   │   │   ├── StagePage.jsx          # Individual stage view
-│   │   │   ├── RegionMap.jsx          # World map navigation
-│   │   │   ├── Dashboard.jsx          # User dashboard
-│   │   │   ├── Login.jsx              # Login page
-│   │   │   └── Register.jsx           # Registration page
-│   │   ├── components/
-│   │   │   ├── CodeEditor.jsx         # Python code editor
-│   │   │   ├── GameVisualizer.jsx     # Visual output display
-│   │   │   ├── Grimoire.jsx           # In-game spell book
-│   │   │   └── LevelComplete.jsx      # Level completion screen
-│   │   ├── hooks/
-│   │   │   └── usePythonInterpreter.js  # Skulpt Python execution
-│   │   ├── context/
-│   │   │   └── GameContext.jsx        # Game state management
-│   │   └── data/
-│   │       └── stageData.js           # Stage/level configurations
-│   └── package.json
-└── start.bat                          # One-click startup script
+│   │   ├── App.jsx                Client routes and compatibility redirects
+│   │   ├── features/
+│   │   │   ├── auth/              Account screens
+│   │   │   ├── world/             Dashboard, map and onboarding story
+│   │   │   ├── gameplay/          Stage screen, story, puzzles and arena
+│   │   │   ├── stages/            Playable catalog and lesson content
+│   │   │   └── character/         Profile, XP display and sprites
+│   │   ├── shared/                API client, session and translations
+│   │   └── assets/                Bundled artwork
+│   └── public/                    Character sprite sheets and static assets
+├── scripts/export-game-catalog.mjs Frontend-to-backend catalog exporter
+├── start.bat                       Starts configured local servers
+└── README.md
 ```
+
+The playable stage list is `REGIONS` in `frontend/src/features/stages/stageData.js`.
+After changing stages, run `node scripts/export-game-catalog.mjs` from the
+repository root. Saved stage keys, submissions and progress must be preserved.
+The exporter does not update the live database.
+
+See [frontend/README.md](frontend/README.md) and [backend/README.md](backend/README.md)
+for feature and route maps. Old URLs remain as redirects; the old Flask pages
+and level definitions are no longer part of the game.
 
 ## 🛠️ Tech Stack
 
@@ -95,9 +90,9 @@ My-Project-KK/
 | Tool | Version | Download |
 |------|---------|----------|
 | **Python** | 3.10+ | [python.org](https://www.python.org/downloads/) *(tick "Add to PATH")* |
-| **Node.js** | 18+ LTS | [nodejs.org](https://nodejs.org/) |
+| **Node.js** | 22.12+ or 20.19+ | [nodejs.org](https://nodejs.org/) |
 
-> **Note:** No local database installation required — the project uses **Supabase** (Cloud PostgreSQL).
+> **Note:** The project uses **Supabase** (Cloud PostgreSQL). A new database needs the current schema before loading `backend/seed_game_catalog.sql`; that seed file does not create tables.
 
 ## 🚀 Getting Started
 
